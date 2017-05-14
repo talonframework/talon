@@ -16,7 +16,7 @@ defmodule ExAdmin.Mixfile do
   def application do
     # Specify extra applications you'll use from Erlang/Elixir
     [extra_applications: [:logger],
-     mod: {ExAdmin.Application, []}]
+     mod: {ExAdmin.Application, [:inflex]}]
   end
 
   # Dependencies can be Hex packages:
@@ -29,6 +29,8 @@ defmodule ExAdmin.Mixfile do
   #
   # Type "mix help deps" for more examples and options
   defp deps do
-    []
+    [
+      {:inflex, "~> 1.7"},
+    ]
   end
 end
