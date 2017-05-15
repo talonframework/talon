@@ -4,8 +4,16 @@ defmodule ExAdmin.Resource do
     unless schema do
       raise ":schema is required"
     end
+
+    schema_adapter = opts[:adapter] || Application.get_env(:ex_admin, :schema_adapter)
+    unless schema_adapter do
+      raise "schema_adapter required"
+    end
+
     quote do
       @__module__ unquote(schema)
+      @__adapter__ unquote(schema_adapter)
+
       def index_columns do
         @__module__.__schema__(:fields) -- ~w(id inserted_at updated_at)a
       end
@@ -24,7 +32,9 @@ defmodule ExAdmin.Resource do
       
       def schema, do: @__module__
 
-      defoverridable [index_columns: 0, card_title: 0, tool_bar: 0, route_name: 0]
+      def adapter, do: @__adapter__ 
+
+      defoverridable [index_columns: 0, card_title: 0, tool_bar: 0, route_name: 0, adapter: 0]
     end
   end
 end
