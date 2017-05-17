@@ -18,12 +18,20 @@ defmodule ExAdmin.Resource do
         @__module__.__schema__(:fields) -- ~w(id inserted_at updated_at)a
       end
 
-      def card_title do
-        "#{@__module__}s"
+      def form_columns do
+        @__module__.__schema__(:fields) -- ~w(id inserted_at updated_at)a
+      end
+
+      def index_card_title do
+        "#{Module.split(@__module__) |> List.last}s"
+      end
+
+      def form_card_title(name) do
+        "#{Module.split(@__module__) |> List.last} #{name}"
       end
 
       def tool_bar do
-        "Listing of #{card_title()}"
+        "Listing of #{index_card_title()}"
       end
 
       def route_name do
@@ -34,7 +42,7 @@ defmodule ExAdmin.Resource do
 
       def adapter, do: @__adapter__ 
 
-      defoverridable [index_columns: 0, card_title: 0, tool_bar: 0, route_name: 0, adapter: 0]
+      defoverridable [index_columns: 0, index_card_title: 0, form_card_title: 1, tool_bar: 0, route_name: 0, adapter: 0, form_columns: 0]
     end
   end
 end

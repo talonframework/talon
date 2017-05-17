@@ -33,6 +33,12 @@ defmodule ExAdmin do
         {String.to_atom(resource_name), schema(resource_name)}
       end
 
+      def controller_action(resource_name) do
+        {resource_name, resource_module} = resource_schema(resource_name)
+        schema = resource_module.schema()
+        {schema, resource_name, Application.get_env(:ex_admin, :theme)}
+      end
+
     end
   end
 end
