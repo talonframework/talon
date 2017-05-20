@@ -3,7 +3,6 @@ defmodule ExAdmin.Utils do
   A collection of utility functions.
   """
   require Logger
-  import Ecto.DateTime.Utils, only: [zero_pad: 2]
   alias ExAdmin.Messages
 
   @module Application.get_env(:ex_admin, :module)
@@ -27,6 +26,13 @@ defmodule ExAdmin.Utils do
     def endpoint, do: Module.concat([Application.get_env(:ex_admin, :module), "Endpoint"])
     @doc false
     def router, do: Module.concat([Application.get_env(:ex_admin, :module), "Router", "Helpers"])
+  end
+
+  @doc "Pads with zero"
+  def zero_pad(val, count) do
+    num = Integer.to_string(val)
+    pad_length = max(count - byte_size(num), 0)
+    :binary.copy("0", pad_length) <> num
   end
 
   @doc false
@@ -282,10 +288,10 @@ defmodule ExAdmin.Utils do
   def confirm_message, do: Messages.backend().are_you_sure_you_want_to_delete_this?()
 
   @doc false
-  def to_datetime(%Ecto.DateTime{} = dt) do
-    {:ok, {date, {h,m,s,_ms}}} = Ecto.DateTime.dump dt
-    {date, {h,m,s}}
-  end
+  # def to_datetime(%Ecto.DateTime{} = dt) do
+  #   {:ok, {date, {h,m,s,_ms}}} = Ecto.DateTime.dump dt
+  #   {date, {h,m,s}}
+  # end
   def to_datetime(%DateTime{} = dt) do
     DateTime.to_naive(dt)
     |> NaiveDateTime.to_erl

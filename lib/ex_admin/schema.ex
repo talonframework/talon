@@ -1,6 +1,6 @@
 defmodule ExAdmin.Schema do
 
-  def primary_key(%Ecto.Query{from: {_, mod}} = query) do
+  def primary_key(%{from: {_, mod}} = query) do
     adapter(mod).primary_key(query)
   end
 
@@ -16,7 +16,7 @@ defmodule ExAdmin.Schema do
     adapter(resource.__struct__).get_id(resource)
   end
 
-  def type(%Ecto.Query{from: {_, mod}} = query, key) do
+  def type(%{from: {_, mod}} = query, key) do
     adapter(mod).type(query, key)
   end
   def type(module, key) when is_atom(module) do
