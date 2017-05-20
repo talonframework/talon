@@ -94,11 +94,20 @@ defmodule ExAdmin.Utils do
       "My Model"
 
   """
-  def titleize(atom) when is_atom(atom), do: titleize(Atom.to_string(atom))
+  def titleize(atom) when is_atom(atom) do
+    atom
+    |> Module.split
+    |> List.last
+    |> to_string
+    |> titleize
+  end
   def titleize(string) when is_binary(string) do
     string
     |> Inflex.underscore
     |> humanize
+  end
+  def titleize(%{__struct__: struct_name}) do
+    titleize struct_name
   end
 
   @doc """
@@ -368,4 +377,3 @@ defmodule ExAdmin.Utils do
     false
   end
 end
-  

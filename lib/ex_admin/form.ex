@@ -24,10 +24,8 @@ defmodule ExAdmin.Form do
   defp build_input({a, f}, field, %Ecto.Association.BelongsTo{} = assoc, opts) do
     {collection, opts} = Keyword.pop(opts, :collection)
     assoc_list = Keyword.get(a[:associations] || [], field, [])
-    collection = collection || assoc_list
-    # require IEx
-    # IEx.pry
-    select(f, field, collection)
+    collection = for item <- collection || assoc_list, do: {item.name, item.id}
+    select(f, field, collection, opts)
   end
 
   defp build_input({_a, f}, field, type, opts) do

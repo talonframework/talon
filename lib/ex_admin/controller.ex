@@ -16,6 +16,8 @@ defmodule ExAdmin.Controller do
       admin = opts[:admin] || raise("admin option required")
       plug :set_repo, repo: repo, admin: admin
 
+      # TODO: Add docs for each of these and indicate they are overridable
+
       def set_repo(conn, opts) do
         assign conn, :ex_admin, Enum.into(opts, %{})
       end
@@ -24,22 +26,35 @@ defmodule ExAdmin.Controller do
         render(conn, "index.html")
       end
       def new(conn, _params) do
-        changeset = conn.assigns.schema.changeset(conn.assigns.resource)
+        ex_admin = conn.assigns.ex_admin
+        changeset = ex_admin.admin_resource.schema.changeset(conn.assigns.resource)
         render(conn, "new.html", changeset: changeset)
       end
       def edit(conn, params) do
-        # resource_name = conn.
-        # changeset = conn.assigns.schema.changeset(conn.assigns.resource, params[])
+        changeset = conn.assigns.ex_admin.schema.changeset(conn.assigns.resource)
+        render conn, "edit.html", changeset: changeset
       end
       def create(conn, params) do
-
+        IO.inspect params, label: "params: "
+        # TODO: What API do I use to get the scoped params?. Add the params to the changeset below
+        changeset = conn.assigns.ex_admin.schema.changeset(conn.assigns.resource)
+        # TODO: Need to create the record here
+        render conn, "edit.html", changeset: changeset
       end
       def update(conn, params) do
+        # TODO: Finish this
       end
       def delete(conn, params) do
+        # TODO: Finish this
 
       end
-      defoverridable [index: 2, new: 2, edit: 2, create: 2, update: 2, delete: 2, set_repo: 2]
+      def show(conn, params) do
+        # TODO: Finish this
+        # Need to implement a show template also. Not done yet.
+        # Also, do we want an option for not using show?. Just editable page.
+
+      end
+      defoverridable [index: 2, show: 2, new: 2, edit: 2, create: 2, update: 2, delete: 2, set_repo: 2]
     end
   end
 
@@ -47,7 +62,7 @@ defmodule ExAdmin.Controller do
     admin_resource_schema String.to_atom(resource)
   end
   def admin_resource_schema(resource) do
-    module = 
+    module =
       :ex_admin
       |> Application.get_env(:resources, [])
       |> Keyword.get(resource, [])

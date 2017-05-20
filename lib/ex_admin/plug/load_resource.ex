@@ -14,7 +14,9 @@ defmodule ExAdmin.Plug.LoadResource do
     repo = opts[:repo] || ex_admin[:repo]
     admin = opts[:admin] || ex_admin[:admin] || raise("admin option required")
     schema = admin.schema(conn.params["resource"])
-    handle_action(conn.private.phoenix_action, conn, repo, schema)
+    conn
+    |> Phoenix.Controller.action_name
+    |> handle_action(conn, repo, schema)
   end
 
   defp handle_action(:index, conn, repo, schema) do
@@ -24,10 +26,12 @@ defmodule ExAdmin.Plug.LoadResource do
     |> assign(:resources, resources)
   end
   defp handle_action(action, conn, repo, schema) when action in [:show, :edit, :delete] do
-    resources = repo.get schema, conn.params["id"]
-    assign(conn, :resource, schema)
+    # IO.inspect conn.params, label: "handle_action params"
+    resource = repo.get schema, conn.params["id"]
+    assign(conn, :resource, resource)
   end
-  defp handle_action(_, conn, _repo, schema) do
+  defp handle_action(action, conn, _repo, schema) do
+    # IO.puts "action: #{inspect action}, params: #{inspect conn.params}"
     assign(conn, :resource, schema.__struct__)
   end
 
