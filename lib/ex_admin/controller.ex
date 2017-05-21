@@ -48,11 +48,11 @@ defmodule ExAdmin.Controller do
         # TODO: Finish this
 
       end
-      def show(conn, params) do
+      def show(conn, _params) do
         # TODO: Finish this
         # Need to implement a show template also. Not done yet.
         # Also, do we want an option for not using show?. Just editable page.
-
+        render conn, "show.html"
       end
       defoverridable [index: 2, show: 2, new: 2, edit: 2, create: 2, update: 2, delete: 2, set_repo: 2]
     end

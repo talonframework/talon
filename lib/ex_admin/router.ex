@@ -53,7 +53,7 @@ defmodule ExAdmin.Router do
       patch "/:resource/:id", AdminResourceController, :update
       put "/:resource/:id", AdminResourceController, :update
       put "/:resource/:id/toggle_attr", AdminResourceController, :toggle_attr
-      delete "/:resource/:id", AdminResourceController, :destroy
+      delete "/:resource/:id", AdminResourceController, :delete
       post "/:resource/batch_action", AdminResourceController, :batch_action
       put   "/:resource/:id/member/:action", AdminResourceController, :member
       patch "/:resource/:id/member/:action", AdminResourceController, :member

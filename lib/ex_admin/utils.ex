@@ -204,7 +204,7 @@ defmodule ExAdmin.Utils do
       "/admin/products?scope=active"
   """
   def admin_resource_path(resource_or_model, method \\ nil, args \\ [])
-  def admin_resource_path(%Plug.Conn{} = conn, method, args) when method in [:show, :edit, :update, :destroy] do
+  def admin_resource_path(%Plug.Conn{} = conn, method, args) when method in [:show, :edit, :update, :delete] do
     admin_resource_path(conn.assigns.resource, method, args)
   end
   def admin_resource_path(%Plug.Conn{} = conn, method, args) do
