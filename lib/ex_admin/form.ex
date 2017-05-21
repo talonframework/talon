@@ -15,12 +15,15 @@ defmodule ExAdmin.Form do
   defp build_input({_a, f}, field, :string, opts) do
     text_input(f, field, opts)
   end
+
   defp build_input({_a, f}, field, type, opts) when type in ~w(integer id)a do
     text_input(f, field, [{:type, :number} | opts])
   end
+
   defp build_input({_a, f}, field, :boolean, opts) do
-    text_input(f, field, opts)
+    checkbox(f, field)
   end
+
   defp build_input({a, f}, field, %Ecto.Association.BelongsTo{} = assoc, opts) do
     {collection, opts} = Keyword.pop(opts, :collection)
     assoc_list = Keyword.get(a[:associations] || [], field, [])
