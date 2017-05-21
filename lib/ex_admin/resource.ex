@@ -26,6 +26,14 @@ defmodule ExAdmin.Resource do
         @__module__.__schema__(:fields) -- ~w(id inserted_at updated_at)a
       end
 
+      def get_index_field(resource, name) do
+        ExAdmin.View.get_resource_field(resource, name)
+      end
+
+      def get_show_field(resource, name) do
+        ExAdmin.View.get_resource_field(resource, name)
+      end
+
       def form_columns do
         @__module__.__schema__(:fields) -- ~w(id inserted_at updated_at)a
       end

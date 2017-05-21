@@ -69,10 +69,10 @@ See [this issue](https://github.com/smpallen99/ex_admin/issues/367) for more det
 - [ ] Create a generator for generating the default template .eex files
 - [ ] Implement the create/update/delete actions in the controller
 - [ ] Move the admin template to ExAdmin
-- [ ] Fix the brunch problem pulling the the skins
+- [X] Fix the brunch problem pulling the the skins
 - [ ] Add database backended support for the index page datatables
-- [ ] Add a show template
-- [ ] Add links to the index page actions
+- [X] Add a show template
+- [X] Add links to the index page actions
 - [ ] Index page filters (new design required). With live searching on the index page datatables, not sure if the existing ExAdmin design even makes sense anymore.
 - [ ] User new/edit state select should only show options based on the selected country.
 - [ ] Implenent boolean on/off toggle

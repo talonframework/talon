@@ -20,19 +20,24 @@ defmodule ExAdmin.Plug.LoadResource do
   end
 
   defp handle_action(:index, conn, repo, schema) do
-    resources = repo.all schema
+    admin_resource = ExAdmin.View.admin_resource(conn)
+    resources = admin_resource.preload(repo.all(schema), :index)
+
     conn
     |> assign(:resource, schema)
     |> assign(:resources, resources)
   end
   defp handle_action(action, conn, repo, schema) when action in [:show, :edit, :delete] do
+    admin_resource = ExAdmin.View.admin_resource(conn)
     # IO.inspect conn.params, label: "handle_action params"
-    resource = repo.get schema, conn.params["id"]
+    resource = admin_resource.preload(repo.get(schema, conn.params["id"]), action)
     assign(conn, :resource, resource)
   end
   defp handle_action(action, conn, _repo, schema) do
+    admin_resource = ExAdmin.View.admin_resource(conn)
     # IO.puts "action: #{inspect action}, params: #{inspect conn.params}"
-    assign(conn, :resource, schema.__struct__)
+    resource = admin_resource.preload(schema.__struct__, action)
+    assign(conn, :resource, resource)
   end
 
 end

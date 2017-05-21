@@ -23,20 +23,46 @@ defmodule ExAdmin.Schema do
     adapter(module).type(module, key)
   end
 
-  def type(resource, key) do 
+  def type(resource, key) do
     adapter(resource.__struct__).type(resource, key)
   end
 
   def get_intersection_keys(resource, assoc_name) do
-    adapter(resource.__struct__).get_intersection_keys(resource, assoc_name) 
+    adapter(resource.__struct__).get_intersection_keys(resource, assoc_name)
   end
 
   defp adapter(module) do
-    base = 
+    base =
       :ex_admin
       |> Application.get_env(:module)
-      
+
     Module.concat([base, Admin]).admin_resource(module)
     |> apply(:adapter, [])
+  end
+
+  ###############
+  # TODO: Move to the adapter
+  # Temporary solution. Need to move this to the adapter
+
+  def associations(struct) when is_map(struct) do
+    associations struct.__struct__
+  end
+  def associations(module) do
+    :associations
+    |> module.__schema__
+    |> Enum.map(fn field ->
+      case module.__schema__(:association, field) do
+        %Ecto.Association.BelongsTo{owner_key: owner_key} = assoc ->
+          {owner_key, assoc}
+        %Ecto.Association.Has{field: field} = assoc ->
+          {field, assoc}
+      end
+    end)
+  end
+
+  def association?(schema, name) do
+    :associations
+    |> schema.__schema__
+    |> Enum.any?(& State.__schema__(:association, &1).owner_key == :country_id)
   end
 end
