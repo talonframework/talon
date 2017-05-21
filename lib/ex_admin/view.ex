@@ -60,6 +60,26 @@ defmodule ExAdmin.View do
     conn.assigns.ex_admin.admin_resource
   end
 
+  @doc """
+  Extract the params_key from the conn
+  """
+  @spec params_key(Plug.Conn.t) :: String.t
+  def params_key(conn) do
+    admin_resource(conn).params_key()
+  end
+
+  @doc """
+  Extract the repo form the conn
+  """
+  @spec repo(Plug.Conn.t) :: Struct.t
+  def repo(conn) do
+    conn.assigns.ex_admin.repo
+  end
+
+  @doc """
+  Check if the value of an association is loaded
+  """
+  @spec association_loaded?(any) :: boolean
   def association_loaded?(%Ecto.Association.NotLoaded{}), do: false
   def association_loaded?(%{}), do: true
   def association_loaded?(_), do: false

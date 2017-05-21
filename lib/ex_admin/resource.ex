@@ -56,7 +56,7 @@ defmodule ExAdmin.Resource do
       end
 
       def params_key do
-        Module.split(@__module__) |> to_string |> Inflex.underscore
+        Module.split(@__module__) |> List.last |> to_string |> Inflex.underscore
       end
 
       def schema, do: @__module__
