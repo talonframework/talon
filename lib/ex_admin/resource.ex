@@ -22,45 +22,102 @@ defmodule ExAdmin.Resource do
       @__module__ unquote(schema)
       @__adapter__ unquote(schema_adapter)
 
-      def index_columns do
+      @doc """
+      Return the schema columns for rending on all pages.
+
+      By default, the id, inserted_at, and updated_at fields are removed
+      for all page types.
+
+      Page types include:
+
+      - :index
+      - :show
+      - :form
+
+      ## Examples
+
+      You can override this function is your resource file. If overriding a specific
+      action, make sure you add a default clause that calls `super(action)`.
+
+          defmodule MyApp.ExAdmin.User do
+            use ExAdmin.Register, schema: MyApp.User
+
+            # add :id, :updated_at, :inserted_at to the index page
+            def display_schema_name(:index) do
+              [:id | super(:index)] ++ [:updated_at, :inserted_at]
+            end
+
+            # use the defaults for the remaining pages.
+            def display_schema_name(action) do
+              super(action)
+            end
+          end
+
+      """
+      @spec display_schema_columns(atom) :: List.t
+      def display_schema_columns(_action) do
         @__module__.__schema__(:fields) -- ~w(id inserted_at updated_at)a
       end
 
-      def get_index_field(resource, name) do
+      @doc """
+      Translates column atoms into human title format.
+
+      ## Examples
+
+          iex> ExAdmin.Resource.render_column_name(:index, :first_name)
+          "First Name"
+          iex> ExAdmin.Resource.render_column_name(:index, :state_id)
+          "State"
+      """
+      @spec render_column_name(atom, atom) :: String.t
+      def render_column_name(_action, field) do
+        field = to_string(field)
+        if String.ends_with?(field, "_id") do
+          String.replace(field, "_id", "")
+        else
+          field
+        end
+        |> ExAdmin.Utils.titleize
+      end
+
+      @doc """
+
+      """
+      @spec get_schema_field(:index | :show | :form, Struct.t, String.t) :: atom
+      def get_schema_field(_action, resource, name) do
         ExAdmin.View.get_resource_field(resource, name)
       end
 
-      def get_show_field(resource, name) do
-        ExAdmin.View.get_resource_field(resource, name)
-      end
-
-      def form_columns do
-        @__module__.__schema__(:fields) -- ~w(id inserted_at updated_at)a
-      end
-
+      @spec index_card_title() :: String.t
       def index_card_title do
         # TODO: find a resuable approach here
         Inflex.Pluralize.pluralize "#{Module.split(@__module__) |> List.last}"
       end
 
+      @spec form_card_title(String.t) :: String.t
       def form_card_title(name) do
         "#{Module.split(@__module__) |> List.last} #{name}"
       end
 
+      @spec tool_bar() :: String.t
       def tool_bar do
         "Listing of #{index_card_title()}"
       end
 
+      @spec route_name() :: String.t
       def route_name do
         Module.split(@__module__) |> to_string |> Inflex.underscore |> Inflex.Pluralize.pluralize
       end
 
+      @spec params_key() :: String.t
       def params_key do
         Module.split(@__module__) |> List.last |> to_string |> Inflex.underscore
       end
 
+      @spec schema() :: Module.t
       def schema, do: @__module__
 
+      @spec adapter() :: Module.t
       def adapter, do: @__adapter__
 
       # TODO: I think the view helpers belong in a diffent module. Putting them here for now.
@@ -72,6 +129,7 @@ defmodule ExAdmin.Resource do
 
       Note: This function is overridable
       """
+      @spec nav_action_links(atom, Struct.t | Module.t) :: List.t
       def nav_action_links(action, resource) when action in [:index, :edit] do
         [ExAdmin.Resource.nav_action_link(:new, resource)]
       end
@@ -91,6 +149,7 @@ defmodule ExAdmin.Resource do
 
       Note: This function is overridable
       """
+      @spec resource_paths(Map.t) :: [Tuple.t]
       def resource_paths(%{admin: admin} = _ex_admin) do
         admin.resources()
         |> Enum.map(fn admin_resource ->
@@ -100,9 +159,9 @@ defmodule ExAdmin.Resource do
       end
 
       defoverridable [
-        resource_paths: 1, nav_action_links: 2, params_key: 0, index_columns: 0,
+        resource_paths: 1, nav_action_links: 2, params_key: 0, display_schema_columns: 1,
         index_card_title: 0, form_card_title: 1, tool_bar: 0, route_name: 0,
-        adapter: 0, form_columns: 0
+        adapter: 0, render_column_name: 2, get_schema_field: 3
       ]
     end
 
@@ -127,9 +186,8 @@ defmodule ExAdmin.Resource do
 
   def resource_module(admin, %{__struct__: module}), do: resource_module(admin, module)
 
-  def resource_module(admin, module) do
-    admin
-    |> ExAdmin.app_module()
+  def resource_module(admin, _module) do
+    ExAdmin.app_module(admin)
   end
 
   @doc """

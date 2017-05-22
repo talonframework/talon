@@ -5,8 +5,6 @@ defmodule ExAdmin.Plug.LoadAssociations do
   an example of the implemnation required.
   """
 
-  import Plug.Conn
-
   @behaviour Plug
 
   def init(opts) do

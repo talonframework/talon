@@ -63,6 +63,6 @@ defmodule ExAdmin.Schema do
   def association?(schema, name) do
     :associations
     |> schema.__schema__
-    |> Enum.any?(& State.__schema__(:association, &1).owner_key == :country_id)
+    |> Enum.any?(& schema.__schema__(:association, &1).owner_key == name)
   end
 end

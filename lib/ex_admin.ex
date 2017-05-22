@@ -1,6 +1,6 @@
 defmodule ExAdmin do
   @moduledoc """
-  
+
 
   First, some termonolgy:
 
@@ -8,7 +8,7 @@ defmodule ExAdmin do
   * admin_resource - the admin module for a given schema. .i.e. TestExAdmin.ExAdmin.Simple
 
   ## resource_map
-  
+
       iex> TestExAdmin.Admin.resource_map()["simples"]
       TestExAdmin.ExAdmin.Simple
 
@@ -29,7 +29,7 @@ defmodule ExAdmin do
 
       iex> TestExAdmin.Admin.admin_resource(TestExAdmin.Simple)
       TestExAdmin.ExAdmin.Simple
-      
+
       iex> TestExAdmin.Admin.admin_resource(%TestExAdmin.Simple{})
       TestExAdmin.ExAdmin.Simple
 
@@ -52,14 +52,14 @@ defmodule ExAdmin do
     quote location: :keep do
       @__resources__  Application.get_env(:ex_admin, :resources, [])
 
-      @__resource_map__  for mod <- @__resources__, into: %{}, 
+      @__resource_map__  for mod <- @__resources__, into: %{},
         do: {Module.split(mod) |> List.last() |> to_string |> Inflex.underscore |> Inflex.Pluralize.pluralize, mod}
-      
+
       @__view_path_names__ for {plural, _} <- @__resource_map__, into: %{}, do: {plural, Inflex.singularize(plural)}
 
       @__resource_to_admin__ for resource <- @__resources__, do: {resource.schema(), resource}
 
-      def base do 
+      def base do
         Application.get_env(:ex_admin, :base)
       end
 
@@ -69,13 +69,13 @@ defmodule ExAdmin do
 
       def resource_names, do: @__resource_map__ |> Map.keys
 
-      def schema(resource_name) do 
+      def schema(resource_name) do
         admin_resource(resource_name).schema()
       end
 
       def schema_names do
         resource_names()
-        |> Enum.map(fn name -> 
+        |> Enum.map(fn name ->
           name |> schema |> Module.split |> List.last
         end)
       end
@@ -105,17 +105,17 @@ defmodule ExAdmin do
       end
     end
   end
- 
+
   @doc """
   Return the app's base module.
 
   ## Examples
 
-      iex> ExAdmin(MyAdmin.Admin)
-      MyAdmin
+      iex> ExAdmin.app_module(TestExAdmin.Admin)
+      TestExAdmin
   """
-  # @spec app_module(atom) :: atom
-  # def app_module(admin) do
-  #   Application.get_env(admin.module)
-  # end
+  @spec app_module(atom) :: atom
+  def app_module(admin) do
+    admin.base()
+  end
 end

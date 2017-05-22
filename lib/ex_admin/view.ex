@@ -32,7 +32,7 @@ defmodule ExAdmin.View do
     {ExAdmin.Utils.titleize(to_string name), Map.get(resource, name)}
   end
 
-  defp get_resource_field(%{field: field, related: related}, _, resource, _, name) do
+  defp get_resource_field(%{field: field, related: related}, _, resource, _, _name) do
     value =
       if association_loaded? Map.get(resource, field) do
         assoc = Map.get(resource, field)

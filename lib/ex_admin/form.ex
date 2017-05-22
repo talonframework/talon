@@ -20,11 +20,11 @@ defmodule ExAdmin.Form do
     text_input(f, field, [{:type, :number} | opts])
   end
 
-  defp build_input({_a, f}, field, :boolean, opts) do
+  defp build_input({_a, f}, field, :boolean, _opts) do
     checkbox(f, field)
   end
 
-  defp build_input({a, f}, field, %Ecto.Association.BelongsTo{} = assoc, opts) do
+  defp build_input({a, f}, field, %Ecto.Association.BelongsTo{} = _assoc, opts) do
     {collection, opts} = Keyword.pop(opts, :collection)
     assoc_list = Keyword.get(a[:associations] || [], field, [])
     collection = for item <- collection || assoc_list, do: {item.name, item.id}
@@ -48,11 +48,11 @@ defmodule ExAdmin.Form do
   #   |> apply(:adapter, [])
   # end
 
-  defp get_all(f, queryable) do
-    # f.source.repo.all queryable
-    IO.inspect Map.from_struct(f.source), label: "f.source..."
-    # IO.inspect(f.impl, label: "f.impl ...")
-    []
-  end
+  # defp get_all(f, queryable) do
+  #   # f.source.repo.all queryable
+  #   IO.inspect Map.from_struct(f.source), label: "f.source..."
+  #   # IO.inspect(f.impl, label: "f.impl ...")
+  #   []
+  # end
 
 end
