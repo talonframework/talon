@@ -54,6 +54,35 @@ ExAdmin was developed for my first Phoenix Application. The approach I took, alt
 
 See [this issue](https://github.com/smpallen99/ex_admin/issues/367) for more details.
 
+## Customize the View Template for a Resource
+
+All the view templates can be customized for any resource by creating a resource level .eex generator template using the `admin.gen.template` mix task.
+
+### Examples
+
+```bash
+# Create a index.html.eex generator for the User resource default theme
+mix admin.gen.template index User
+
+# Create a form.html.eex generator for the Contact resource my_custom_theme theme
+mix admin.gen.template form Contact --theme=my_custom_theme
+
+# Create all the xxx.html.eex generators for the User resource for all configured themes
+mix admin.gen.template User --all --all-themes
+
+# Create show.html.eex generator for all resources
+mix admin.gen.template show --all-resources
+
+# Create all generators for all resources and all themes
+mix admin.gen.template --everything
+```
+
+Run `mix help gen.admin.template` for more options.
+
+Once the override template generator is created, simply edit the .eex template and customize it as designed.
+
+When you compile the project, the new slim template generated. The ex_admin comiler first checks to see if a template is defined in the `templates/admin/theme/resource/generators` path. It will be compiled instead of the global template if it exists.
+
 ## TODO
 - [X] Prototype a theme based template generator for master site
 - [X] Index page using datatables
@@ -63,11 +92,11 @@ See [this issue](https://github.com/smpallen99/ex_admin/issues/367) for more det
 - [X] Sidenav bar
 - [X] Gettext archecture similar to Coherence
 - [ ] Move the project over to phx-1.3 architecture
-- [ ] Prototype resource based template overlays
-- [ ] Move the theme based layout templates to a generator
-- [ ] Change the auto generate slime templates to a generator and move the .eex templates to /priv
+- [X] Prototype resource based template overlays
+- [X] Move the theme based layout templates to a generator
+- [ ] --Change the auto generate slime templates to a generator and move the .eex templates to /priv--
 - [ ] Create a generator for generating the default template .eex files
-- [ ] Implement the create/update/delete actions in the controller
+- [X] Implement the create/update/delete actions in the controller
 - [ ] Move the admin template to ExAdmin
 - [X] Fix the brunch problem pulling the the skins
 - [ ] Add database backended support for the index page datatables
@@ -75,7 +104,7 @@ See [this issue](https://github.com/smpallen99/ex_admin/issues/367) for more det
 - [X] Add links to the index page actions
 - [ ] Index page filters (new design required). With live searching on the index page datatables, not sure if the existing ExAdmin design even makes sense anymore.
 - [ ] User new/edit state select should only show options based on the selected country.
-- [ ] Implenent boolean on/off toggle
+- [X] Implenent boolean checkbox
 - [ ] Implement date/time selection
 - [ ] Implement remaining data types
 - [ ] Add many-to-many support (Group and Tag schema already done)
