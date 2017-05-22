@@ -52,7 +52,9 @@ defmodule Mix.Tasks.Compile.ExAdmin do
   end
 
   def compile_custom_template(action, resource_name, resource_module, theme) do
-    template = "web/templates/admin/#{theme}/#{resource_name}/generators/#{action}.html.eex"
+    path = "web/templates/admin/#{theme}/#{resource_name}/generators"
+    File.mkdir_p path
+    template = Path.join path, "#{action}.html.eex"
     if File.exists? template do
       if Application.get_env :ex_admin, :verbose_compile do
         IO.puts "compiling override template for #{resource_name} #{action}"

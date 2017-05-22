@@ -52,6 +52,32 @@ defmodule Mix.ExAdmin do
   def log(config, _message, _opts) do
     config
   end
+
+  @doc """
+  Find the package path.
+
+  Resoves the package path.
+  """
+  # This is a bit of a hack, but it works. There is a better
+  @spec get_package_path() :: String.t
+  def get_package_path do
+    __ENV__.file
+    |> Path.dirname
+    |> String.split("/lib/mix")
+    |> hd
+  end
+
+  @doc """
+  Get the base module name
+  """
+  @spec get_module() :: String.t
+  def get_module do
+    Mix.Project.get
+    |> Module.split
+    |> Enum.reverse
+    |> Enum.at(1)
+  end
+
 end
 
 
