@@ -1,10 +1,19 @@
 defmodule Mix.Tasks.Compile.ExAdmin do
+  @moduledoc """
+  ExAdmin compiler to create slime templates for the provided generator templates.
+
+  This compiler evaluates the .eex files in the `generators` folders and creates
+  the slim templates for each of the configured resource modules.
+
+  This is an interum design with the following behaviour:
+
+  - Compiles the .eex templates on every compile, not just when when the .eex template is dirty
+  - Does not work with live reload. You need to manually compile the project and live reload will pickup the changes.
+  """
   use Mix.Task
   @recursive true
 
   def run(_args) do
-    # {:ok, _} = Application.ensure_all_started(:new_admin)
-
     case touch() do
       [] -> :noop
       _ -> :ok
@@ -29,7 +38,9 @@ defmodule Mix.Tasks.Compile.ExAdmin do
 
       for action <- [:index, :edit, :form, :new, :show] do
         unless compile_custom_template(action, resource_name, resource_module, theme) do
-          IO.puts "......... compiling #{resource_name} #{action}"
+          if Application.get_env :ex_admin, :verbose_compile do
+            IO.puts "compiling global template for #{resource_name} #{action}"
+          end
           templ = EEx.eval_file("web/templates/admin/#{theme}/generators/#{action}.html.eex", assigns: [resource_module: resource_module])
           File.mkdir_p("web/templates/admin/#{theme}/#{resource_name}")
           File.write("web/templates/admin/#{theme}/#{resource_name}/#{action}.html.slim", templ)
@@ -43,12 +54,12 @@ defmodule Mix.Tasks.Compile.ExAdmin do
   def compile_custom_template(action, resource_name, resource_module, theme) do
     template = "web/templates/admin/#{theme}/#{resource_name}/generators/#{action}.html.eex"
     if File.exists? template do
-      IO.puts "+++++++ compiling #{resource_name} #{action}"
+      if Application.get_env :ex_admin, :verbose_compile do
+        IO.puts "compiling override template for #{resource_name} #{action}"
+      end
       templ = EEx.eval_file(template, assigns: [resource_module: resource_module])
-      # IO.puts templ
       File.mkdir_p("web/templates/admin/#{theme}/#{resource_name}")
       path = "web/templates/admin/#{theme}/#{resource_name}/#{action}.html.slim"
-      IO.inspect path, label: "templ path"
       File.write!(path, templ)
       true
     else

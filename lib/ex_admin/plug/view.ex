@@ -11,8 +11,9 @@ defmodule ExAdmin.Plug.View do
       case opts[:view] do
         nil ->
           ex_admin = conn.assigns[:ex_admin]
+          theme = Inflex.camelize ex_admin.theme
           schema = ex_admin.schema |> Module.split |> List.last
-          Module.concat ExAdmin, schema <> "View"
+          Module.concat theme, schema <> "View"
         view ->
           view
       end
