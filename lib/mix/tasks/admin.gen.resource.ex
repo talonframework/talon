@@ -158,39 +158,6 @@ defmodule Mix.Tasks.Admin.Gen.Resource do
     end
   end
 
-  @doc """
-  Copies files from source dir to target dir
-  according to the given map.
-  Files are evaluated against EEx according to
-  the given binding.
-  """
-  def copy_from(apps, source_dir, target_dir, binding, mapping, config) when is_list(mapping) do
-    roots = Enum.map(apps, &to_app_source(&1, source_dir))
-
-    create_opts = if config[:confirm], do: [], else: [force: true]
-
-    for {format, source_file_path, target_file_path} <- mapping do
-      source =
-        Enum.find_value(roots, fn root ->
-          source = Path.join(root, source_file_path)
-          if File.exists?(source), do: source
-        end) || raise("could not find #{source_file_path} in any of the sources")
-
-      target = Path.join(target_dir, target_file_path)
-      contents =
-        case format do
-          :text -> File.read!(source)
-          :eex  -> EEx.eval_file(source, binding)
-        end
-      Mix.Generator.create_file(target, contents, create_opts)
-    end
-  end
-
-  defp to_app_source(path, source_dir) when is_binary(path),
-    do: Path.join(path, source_dir)
-  defp to_app_source(app, source_dir) when is_atom(app),
-    do: Application.app_dir(app, source_dir)
-
   defp paths do
     [".", :ex_admin]
   end

@@ -1,0 +1,12 @@
+elixir:
+  {action, name, path} = @action_path
+  class = case action do
+    :new -> "fa fa-plus-square"
+    :edit -> "fa fa-edit"
+    :delete -> "fa fa-minus-square"
+    _ -> ""
+  end
+li
+  = link to: path do
+    i class="#{class}"
+    span = name
