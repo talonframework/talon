@@ -22,9 +22,10 @@ defmodule ExAdmin.Mixfile do
   defp deps do
     [
       {:inflex, "~> 1.7"},
-      {:phoenix, "~> 1.3.0-rc"},     
+      {:phoenix, "~> 1.3.0-rc"},
       {:phoenix_html, "~> 2.6"},
-      {:phoenix_ecto, "~> 3.2"},     
+      {:phoenix_ecto, "~> 3.2"},
+      {:scrivener_ecto, "~> 1.1"},
       {:postgrex, ">= 0.0.0", only: :test},
       {:phoenix_slime, github: "slime-lang/phoenix_slime"},
       # {:ecto_ex_admin, github: "ex-admin/ecto_ex_admin", only: :test},

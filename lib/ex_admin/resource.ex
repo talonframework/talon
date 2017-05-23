@@ -21,12 +21,16 @@ defmodule ExAdmin.Resource do
     end
 
     repo = opts[:repo]
+    paginate = opts[:paginate] || Application.get_env(:ex_admin, :paginage)
 
     quote do
       @__module__ unquote(schema)
       @__adapter__ unquote(schema_adapter)
       @__context__ unquote(context) || (Module.split(__MODULE__) |> hd |> Module.concat(nil))
       @__repo__ unquote(repo) || @__context__.repo() ||  Module.concat(@__context__, Repo)
+      @__paginate__ unquote(paginate) || true
+
+      require Ecto.Query
 
       @doc """
       Return the schema columns for rending on all pages.
@@ -126,6 +130,9 @@ defmodule ExAdmin.Resource do
       @spec adapter() :: Module.t
       def adapter, do: @__adapter__
 
+      @spec paginate() :: boolean
+      def paginate, do: @__paginate__
+
       # TODO: I think the view helpers belong in a diffent module. Putting them here for now.
 
       @doc """
@@ -169,10 +176,29 @@ defmodule ExAdmin.Resource do
 
       Note: This function is overridable
       """
-      @spec preload(Struct.t, atom) :: Struct.t
-      def preload(resource, _action) do
+      @spec preload(Ecto.Query.t | Struct.t, Map.t, atom) :: Ecto.Query.t
+      def preload(query, _params, action) when action in [:index, :show, :edit, :delete] do
+        associations = schema().__schema__(:associations)
+        Ecto.Query.preload(query, ^associations)
+      end
+      def preload(resource, _params, _action) do
         associations =  schema().__schema__(:associations)
         repo().preload(resource, associations)
+      end
+
+      @doc """
+      Hook for interceptig the query
+      """
+      @spec query(Ecto.Query.t, Map.t, atom) :: Ecto.Query.t
+      def query(query, %{"id" => id}, action), do: Ecto.Query.where(query, id: ^id)
+      def query(query, _parmas, action), do: query
+
+      @doc """
+      Paginate the query
+      """
+      @spec paginate(Ecto.Query.t, Map.t, atom) :: Ecto.Query.t
+      def paginate(query, params, :index) do
+        if @__paginate__, do: {:page, repo().paginate(query, params)}, else: {:resources, repo.all(query)}
       end
 
       @doc """
@@ -190,7 +216,8 @@ defmodule ExAdmin.Resource do
       defoverridable [
         resource_paths: 1, nav_action_links: 2, params_key: 0, display_schema_columns: 1,
         index_card_title: 0, form_card_title: 1, tool_bar: 0, route_name: 0, repo: 0,
-        adapter: 0, render_column_name: 2, get_schema_field: 3, preload: 2, context: 0
+        adapter: 0, render_column_name: 2, get_schema_field: 3, preload: 3, context: 0,
+        paginate: 3, query: 3
       ]
     end
 

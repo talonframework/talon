@@ -8,7 +8,6 @@ defmodule ExAdmin.Plug.LoadResource do
     Enum.into opts, %{}
   end
 
-
   def call(conn, opts) do
     ex_admin = conn.assigns[:ex_admin]
     repo = opts[:repo] || ex_admin[:repo]
@@ -21,22 +20,34 @@ defmodule ExAdmin.Plug.LoadResource do
 
   defp handle_action(:index, conn, repo, schema) do
     admin_resource = ExAdmin.View.admin_resource(conn)
-    resources = admin_resource.preload(repo.all(schema), :index)
-
-    conn
+    schema
+    |> admin_resource.query(conn.params, :index)
+    |> admin_resource.preload(conn.params, :index)
+    |> admin_resource.paginate(conn.params, :index)
+    |> case do
+      {:page, page} ->
+        conn
+        |> assign(:resources, page.entries)
+        |> assign(:page, struct(page, entries: []))
+      {_, resources} ->
+        assign(conn, :resources, resources)
+    end
     |> assign(:resource, schema)
-    |> assign(:resources, resources)
   end
+
   defp handle_action(action, conn, repo, schema) when action in [:show, :edit, :delete] do
     admin_resource = ExAdmin.View.admin_resource(conn)
-    # IO.inspect conn.params, label: "handle_action params"
-    resource = admin_resource.preload(repo.get(schema, conn.params["id"]), action)
+    resource =
+      schema
+      |> admin_resource.query(conn.params, action)
+      |> admin_resource.preload(conn.params, action)
+      |> repo.one
     assign(conn, :resource, resource)
   end
+
   defp handle_action(action, conn, _repo, schema) do
     admin_resource = ExAdmin.View.admin_resource(conn)
-    # IO.puts "action: #{inspect action}, params: #{inspect conn.params}"
-    resource = admin_resource.preload(schema.__struct__, action)
+    resource = admin_resource.preload(schema.__struct__, conn.params, action)
     assign(conn, :resource, resource)
   end
 

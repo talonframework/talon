@@ -25,9 +25,16 @@ html lang="en"
           .navbar-custom-menu
             ul.nav.navbar-nav
               li.dropdown.messages-menu
-      = render "sidebar.html", conn: @conn, admin_resource: @conn.assigns.ex_admin[:admin_resource]
+      = render "sidebar.html", conn: @conn, admin_resource: ExAdmin.View.admin_resource(@conn)
       .content-wrapper style="min-height: 916px;"
-        section.content-header
+        / TODO: Move this to a partial
+        section.content-header#title_bar style="padding-left: 30px;"
+          h1#page_title= ExAdmin.View.admin_resource(@conn).index_card_title()
+          ol.breadcrumb
+            li
+              a href="/admin"
+                i.fa.fa-dashboard
+                = "admin"
         section.content = render @view_module, @view_template, assigns
 
       footer.main-footer
