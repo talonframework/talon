@@ -15,19 +15,19 @@
                 th.disable-sorting.text-right data-orderable="false" Actions
             tbody
               = for resource <- @resources do
-              tr
+                tr
                 <%%= for name <- @resource_module.display_schema_columns(:index) do %>
                   - {_name, value} = ExAdmin.View.admin_resource(@conn).get_schema_field(:index, resource, <%%= ":#{name}" %>)
                   td= value
                 <%% end %>
 
-                td.text-right.index-actions
-                  button.btn.btn-xs.btn-primary.action-show type="button" data-url="#{ExAdmin.Utils.admin_resource_path(resource, :show)}"
-                    i.fa.fa-info-circle
-                  button.btn.btn-xs.btn-warning.action-edit type="button" data-url="#{ExAdmin.Utils.admin_resource_path(resource, :edit)}"
-                    i.fa.fa-pencil-square-o
-                  button.btn.btn-xs.btn-danger.action-delete type="button"
-                    i.fa.fa-times
+                  td.text-right.index-actions
+                    button.btn.btn-xs.btn-primary.action-show type="button" data-url="#{ExAdmin.Utils.admin_resource_path(resource, :show)}"
+                      i.fa.fa-info-circle
+                    button.btn.btn-xs.btn-warning.action-edit type="button" data-url="#{ExAdmin.Utils.admin_resource_path(resource, :edit)}"
+                      i.fa.fa-pencil-square-o
+                    button.btn.btn-xs.btn-danger.action-delete type="button"
+                      i.fa.fa-times
           tfoot
             tr
               <%%= for name <- @resource_module.display_schema_columns(:index) do %>

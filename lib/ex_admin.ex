@@ -49,6 +49,8 @@ defmodule ExAdmin do
       raise "Must provide :otp_app option"
     end
 
+    repo = opts[:repo]
+
     quote location: :keep do
       @__resources__  Application.get_env(:ex_admin, :resources, [])
 
@@ -57,11 +59,17 @@ defmodule ExAdmin do
 
       @__view_path_names__ for {plural, _} <- @__resource_map__, into: %{}, do: {plural, Inflex.singularize(plural)}
 
-      @__resource_to_admin__ for resource <- @__resources__, do: {resource.schema(), resource}
+      # @__resource_to_admin__ for resource <- @__resources__, do: {resource.schema(), resource}
 
-      def base do
-        Application.get_env(:ex_admin, :base)
-      end
+      @__base__ Module.split(__MODULE__) |> hd |> Module.concat(nil)
+
+      @__repo__ unquote(repo) || Module.concat(@__base__, Repo)
+
+      @spec base() :: atom
+      def base, do: @__base__
+
+      @spec repo() :: atom
+      def repo, do: @__repo__
 
       def resource_map, do: @__resource_map__
 
@@ -84,10 +92,10 @@ defmodule ExAdmin do
         @__resource_map__[resource_name]
       end
       def admin_resource(struct) when is_atom(struct) do
-        @__resource_to_admin__[struct]
+        with {_, resource} <- Enum.find(@__resources__, &(struct == &1.schema())), do: resource
       end
       def admin_resource(resource) when is_map(resource) do
-        @__resource_to_admin__[resource.__struct__]
+        admin_resource(resource.__struct__)
       end
 
       def resource_schema(resource_name) when is_binary(resource_name) do
@@ -103,6 +111,11 @@ defmodule ExAdmin do
       def template_path_name(resource_name) do
         @__view_path_names__[resource_name]
       end
+
+      defoverridable [
+          base: 0, repo: 0, resource_map: 0, schema: 1, schema_names: 0, admin_resource: 1,
+          resource_schema: 1, controller_action: 1, template_path_name: 1
+        ]
     end
   end
 

@@ -2,10 +2,6 @@ defmodule ExAdmin.Controller do
 
   defmacro __using__(:resource) do
     quote do
-      def preload(resource, _action) do
-        resource
-      end
-      defoverridable [preload: 2]
     end
   end
 

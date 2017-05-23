@@ -61,51 +61,112 @@ defmodule Mix.Tasks.Admin.New do
   defp do_run(config) do
     log config, inspect(config), label: "config"
     config
-    # |> create_resource_file
-    # |> create_view
-    # |> print_instructions
+    |> verify_project!
+    |> gen_config
+    |> gen_admin_context
+    |> gen_controller
+    |> gen_web
+    |> gen_messages
+    |> gen_theme
+    |> print_instructions
   end
 
-  # def create_resource_file(config) do
-  #   binding = Kernel.binding() ++ [base: config[:base], boilerplate: config.boilerplate, resource: config.resource]
-  #   name = String.downcase config.resource
-  #   unless config.dry_run do
-  #     copy_from paths(),
-  #       "priv/templates/admin.gen.resource", "", binding, [
-  #         {:eex, "resource.ex", Path.join(lib_path(), "admin/#{name}.ex")}
-  #       ], config
-  #   end
-  #   config
-  # end
+  def verify_project!(config) do
+    unless File.exists?("config/config.exs"), do: Mix.raise("Can't find config/config.exs")
+    config
+  end
 
-  # def create_view(config) do
-  #   name = String.downcase config.resource
-  #   unless config.dry_run do
-  #     Enum.each config.themes, fn theme ->
-  #       binding = Kernel.binding() ++ [base: config[:base], resource: config.resource, theme_module: Inflex.camelize(theme), theme_name: theme]
-  #       copy_from paths(),
-  #         "priv/templates/admin.gen.resource", "", binding, [
-  #           {:eex, "view.ex", Path.join([web_path(), "views", "admin",theme, "#{name}_view.ex"])}
-  #         ], config
-  #     end
-  #   end
-  #   config
-  # end
+  def gen_config(config) do
+    fname = "ex_admin.exs"
+    binding = Kernel.binding() ++ [base: config.base, theme: config.theme]
+    unless config.dry_run do
+      copy_from paths(),
+        "priv/templates/admin.new/config", "config", binding, [
+          {:eex, fname, fname},
+        ], config
+    end
+
+    path = "config/config.exs"
+
+    contents = File.read!(path)
+    unless String.contains? contents, fname do
+      File.write path, contents <> "\n" <> ~s(import_config "#{fname}"\n)
+    end
+    config
+  end
+
+  def gen_admin_context(config) do
+    fname = "admin.ex"
+    binding = Kernel.binding() ++ [base: config.base, app: config.app, boilerplate: config.boilerplate]
+    target_path = "lib/#{config.app}/admin"
+    unless config.dry_run do
+      File.mkdir_p! target_path
+      copy_from paths(),
+        "priv/templates/admin.new/lib", target_path, binding, [
+          {:eex, "admin_context.ex", fname},
+        ], config
+    end
+   config
+  end
+
+  def gen_controller(config) do
+    fname = "admin_resource_controller.ex"
+    binding = Kernel.binding() ++ [base: config.base, boilerplate: config[:boilerplate]]
+    target_path = Path.join([web_path(), "controller", "admin"])
+    unless config.dry_run do
+      File.mkdir_p! target_path
+      copy_from paths(),
+        "priv/templates/admin.new/web/controllers", target_path, binding, [
+          {:eex, fname, fname},
+        ], config
+    end
+   config
+  end
+
+  def gen_web(config) do
+    fname = "admin_web.ex"
+    binding = Kernel.binding() ++ [base: config.base]
+    target_path = web_path()
+    unless config.dry_run do
+      File.mkdir_p! target_path
+      copy_from paths(),
+        "priv/templates/admin.new/web", target_path, binding, [
+          {:eex, fname, fname},
+        ], config
+    end
+   config
+  end
+
+  def gen_messages(config) do
+    fname = "messages.ex"
+    binding = Kernel.binding() ++ [base: config.base]
+    target_path = web_path()
+    unless config.dry_run do
+      File.mkdir_p! target_path
+      copy_from paths(),
+        "priv/templates/admin.new/web", target_path, binding, [
+          {:eex, fname, fname},
+        ], config
+    end
+   config
+  end
+
+  def gen_theme(config) do
+    opts = if config[:verbose], do: ["--verbose"], else: []
+    opts = if config[:dry_run], do: ["--dry-run" | opts], else: opts
+
+    Mix.Tasks.Admin.Gen.Theme.run([@default_theme, @default_theme] ++ opts)
+    config
+  end
 
   def print_instructions(config) do
     Mix.shell.info """
 
-      Remember to update your config file with the resource module
-        config :ex_admin, :modules, [
-          ...
-          #{config.base}.ExAdmin.#{config.resource}
-        ]
       """
     config
   end
 
-
-  defp do_config({bin_opts, _opts, parsed} = args) do
+  defp do_config({bin_opts, opts, parsed} = args) do
     binding =
       Mix.Project.config
       |> Keyword.fetch!(:app)
@@ -114,9 +175,11 @@ defmodule Mix.Tasks.Admin.New do
 
     %{
       themes: get_themes(args),
+      theme: opts[:theme] || @default_theme,
       verbose: bin_opts[:verbose],
       dry_run: bin_opts[:dry_run],
       package_path: get_package_path(),
+      app: Mix.Project.config |> Keyword.fetch!(:app),
       binding: binding,
       boilerplate: bin_opts[:boilerplate] || Application.get_env(:ex_admin, :boilerplate, true),
       base: bin_opts[:module] || binding[:base],
@@ -157,39 +220,6 @@ defmodule Mix.Tasks.Admin.New do
         raise "Could not find web path '#{path1}'. Please use --web-path option to specify"
     end
   end
-
-  @doc """
-  Copies files from source dir to target dir
-  according to the given map.
-  Files are evaluated against EEx according to
-  the given binding.
-  """
-  def copy_from(apps, source_dir, target_dir, binding, mapping, config) when is_list(mapping) do
-    roots = Enum.map(apps, &to_app_source(&1, source_dir))
-
-    create_opts = if config[:confirm], do: [], else: [force: true]
-
-    for {format, source_file_path, target_file_path} <- mapping do
-      source =
-        Enum.find_value(roots, fn root ->
-          source = Path.join(root, source_file_path)
-          if File.exists?(source), do: source
-        end) || raise("could not find #{source_file_path} in any of the sources")
-
-      target = Path.join(target_dir, target_file_path)
-      contents =
-        case format do
-          :text -> File.read!(source)
-          :eex  -> EEx.eval_file(source, binding)
-        end
-      Mix.Generator.create_file(target, contents, create_opts)
-    end
-  end
-
-  defp to_app_source(path, source_dir) when is_binary(path),
-    do: Path.join(path, source_dir)
-  defp to_app_source(app, source_dir) when is_atom(app),
-    do: Application.app_dir(app, source_dir)
 
   defp paths do
     [".", :ex_admin]

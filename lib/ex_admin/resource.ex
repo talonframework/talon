@@ -13,14 +13,20 @@ defmodule ExAdmin.Resource do
       raise ":schema is required"
     end
 
+    context = opts[:context]
+
     schema_adapter = opts[:adapter] || Application.get_env(:ex_admin, :schema_adapter)
     unless schema_adapter do
       raise "schema_adapter required"
     end
 
+    repo = opts[:repo]
+
     quote do
       @__module__ unquote(schema)
       @__adapter__ unquote(schema_adapter)
+      @__context__ unquote(context) || (Module.split(__MODULE__) |> hd |> Module.concat(nil))
+      @__repo__ unquote(repo) || @__context__.repo() ||  Module.concat(@__context__, Repo)
 
       @doc """
       Return the schema columns for rending on all pages.
@@ -158,10 +164,33 @@ defmodule ExAdmin.Resource do
         end)
       end
 
+      @doc """
+      Preload your associations.
+
+      Note: This function is overridable
+      """
+      @spec preload(Struct.t, atom) :: Struct.t
+      def preload(resource, _action) do
+        associations =  schema().__schema__(:associations)
+        repo().preload(resource, associations)
+      end
+
+      @doc """
+      Returrn the Admin context.
+      """
+      @spec context() :: atom
+      def context, do: @__context__
+
+      @doc """
+      Return the Repo
+      """
+      @spec repo() :: atom
+      def repo, do: @__repo__
+
       defoverridable [
         resource_paths: 1, nav_action_links: 2, params_key: 0, display_schema_columns: 1,
-        index_card_title: 0, form_card_title: 1, tool_bar: 0, route_name: 0,
-        adapter: 0, render_column_name: 2, get_schema_field: 3
+        index_card_title: 0, form_card_title: 1, tool_bar: 0, route_name: 0, repo: 0,
+        adapter: 0, render_column_name: 2, get_schema_field: 3, preload: 2, context: 0
       ]
     end
 

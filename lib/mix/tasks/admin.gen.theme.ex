@@ -144,6 +144,7 @@ defmodule Mix.Tasks.Admin.Gen.Theme do
       |> Keyword.fetch!(:app)
       |> Atom.to_string
       |> Mix.Phoenix.inflect
+      # |> IO.inspect(label: "binding")
 
     %{
       theme: theme,

@@ -7,7 +7,8 @@ defmodule ExAdmin.Plug.Layout do
   end
 
   def call(conn, opts) do
-    mod = Module.concat ExAdmin, LayoutView
+    theme = opts[:theme] || conn.assigns.ex_admin.theme
+    mod = Module.concat Inflex.camelize(theme), LayoutView
     layout = opts[:layout] || {mod, "app.html"}
     Phoenix.Controller.put_layout conn, layout
   end

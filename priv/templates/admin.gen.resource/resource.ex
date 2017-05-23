@@ -4,8 +4,7 @@ defmodule <%= base %>.ExAdmin.<%= resource %> do
 
   TBD
   """
-  use ExAdmin.Resource, schema: <%= base <> "." <> resource %>
-  use ExAdmin.Controller, :resource
+  use ExAdmin.Resource, schema: <%= "#{base}.#{resource}" %>, context: <%= "#{base}.Admin" %>
   <%= if boilerplate do %>
   # The above is all that is required to use ExAdmin with defaults
   # If you would like to customize some of the features, wee the
