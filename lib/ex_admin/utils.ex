@@ -372,6 +372,39 @@ defmodule ExAdmin.Utils do
   #  ExAdmin.Authorization.authorize_action(conn.assigns[:defn], conn, action)
   #end
 
+  @doc """
+  General string to integer convertor.
+
+  Takes either a string, a char list, or an integer
+
+  ## Examples
+
+      iex> ExAdmin.to_integer(123)
+      123
+
+      iex> ExAdmin.to_integer("123")
+      123
+
+      iex> ExAdmin.to_integer([?1, ?2, ?3])
+      123
+
+      iex> ExAdmin.to_integer("123A")
+      123
+  """
+  @spec to_integer(integer | String.t) :: integer
+  def to_integer(int) when is_integer(int), do: int
+
+  def to_integer(list) when is_list(list) do
+    list |> to_string |> to_integer
+  end
+
+  def to_integer(string) do
+    case Integer.parse string do
+      {int, _} -> int
+      _ -> 0
+    end
+  end
+
   @doc false
   def use_authentication do
     false

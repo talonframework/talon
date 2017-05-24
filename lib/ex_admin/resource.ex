@@ -30,6 +30,10 @@ defmodule ExAdmin.Resource do
       @__repo__ unquote(repo) || @__context__.repo() ||  Module.concat(@__context__, Repo)
       @__paginate__ unquote(paginate) || true
 
+      IO.inspect @__module__, label: "compiling module"
+      @__params_key__  Module.split(@__module__) |> List.last |> to_string |> Inflex.underscore
+      @__route_name__ @__params_key__ |> Inflex.Pluralize.pluralize
+
       require Ecto.Query
 
       @doc """
@@ -115,14 +119,10 @@ defmodule ExAdmin.Resource do
       end
 
       @spec route_name() :: String.t
-      def route_name do
-        Module.split(@__module__) |> to_string |> Inflex.underscore |> Inflex.Pluralize.pluralize
-      end
+      def route_name, do: @__route_name__
 
       @spec params_key() :: String.t
-      def params_key do
-        Module.split(@__module__) |> List.last |> to_string |> Inflex.underscore
-      end
+      def params_key, do: @__params_key__
 
       @spec schema() :: Module.t
       def schema, do: @__module__
@@ -177,7 +177,7 @@ defmodule ExAdmin.Resource do
       Note: This function is overridable
       """
       @spec preload(Ecto.Query.t | Struct.t, Map.t, atom) :: Ecto.Query.t
-      def preload(query, _params, action) when action in [:index, :show, :edit, :delete] do
+      def preload(query, _params, action) when action in [:index, :show, :edit, :delete, :search] do
         associations = schema().__schema__(:associations)
         Ecto.Query.preload(query, ^associations)
       end
@@ -187,17 +187,21 @@ defmodule ExAdmin.Resource do
       end
 
       @doc """
-      Hook for interceptig the query
+      Hook for intercepting the query
       """
       @spec query(Ecto.Query.t, Map.t, atom) :: Ecto.Query.t
       def query(query, %{"id" => id}, action), do: Ecto.Query.where(query, id: ^id)
+      def query(query, %{"order" => order}, :index) when not is_nil(order) do
+        order = ExAdmin.Datatable.sort_column_order(order)
+        Ecto.Query.order_by(query, ^order)
+      end
       def query(query, _parmas, action), do: query
 
       @doc """
       Paginate the query
       """
       @spec paginate(Ecto.Query.t, Map.t, atom) :: Ecto.Query.t
-      def paginate(query, params, :index) do
+      def paginate(query, params, action) when action in [:index, :search] do
         if @__paginate__, do: {:page, repo().paginate(query, params)}, else: {:resources, repo.all(query)}
       end
 
@@ -213,11 +217,24 @@ defmodule ExAdmin.Resource do
       @spec repo() :: atom
       def repo, do: @__repo__
 
+      def search(conn) do
+        ExAdmin.Search.search(schema(), conn.params["search_terms"])
+      end
+
+      def search(schema, params) do
+        ExAdmin.Search.search(schema, params["search_terms"])
+      end
+
+      def search(schema, params, :search) do
+        search(schema, params)
+      end
+      def search(schema, _params, _), do: schema
+
       defoverridable [
         resource_paths: 1, nav_action_links: 2, params_key: 0, display_schema_columns: 1,
         index_card_title: 0, form_card_title: 1, tool_bar: 0, route_name: 0, repo: 0,
         adapter: 0, render_column_name: 2, get_schema_field: 3, preload: 3, context: 0,
-        paginate: 3, query: 3
+        paginate: 3, query: 3, search: 1, search: 2, search: 3
       ]
     end
 

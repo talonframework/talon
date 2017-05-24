@@ -112,7 +112,7 @@ defmodule Mix.Tasks.Admin.New do
   def gen_controller(config) do
     fname = "admin_resource_controller.ex"
     binding = Kernel.binding() ++ [base: config.base, boilerplate: config[:boilerplate]]
-    target_path = Path.join([web_path(), "controller", "admin"])
+    target_path = Path.join([web_path(), "controllers", "admin"])
     unless config.dry_run do
       File.mkdir_p! target_path
       copy_from paths(),

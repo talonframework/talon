@@ -71,7 +71,11 @@ defmodule ExAdmin.Controller do
         redirect conn, "index.html"
       end
 
-      defoverridable [index: 2, show: 2, new: 2, edit: 2, create: 2, update: 2, delete: 2, set_repo: 2]
+      def search(conn, _params) do
+        conn
+      end
+
+      defoverridable [index: 2, show: 2, new: 2, edit: 2, create: 2, update: 2, delete: 2, set_repo: 2, search: 2]
     end
   end
 

@@ -45,6 +45,7 @@ defmodule ExAdmin.Router do
         get "/switch_user/:id", AdminController, :switch_user
       end
       get "/:resource/", AdminResourceController, :index
+      # get "/:resource/search/:search_terms", AdminResourceController, :search
       get "/:resource/new", AdminResourceController, :new
       get "/:resource/csv", AdminResourceController, :csv
       get "/:resource/:id", AdminResourceController, :show
