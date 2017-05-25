@@ -3,20 +3,20 @@
     .col-md-12
       .box
         .box-header
-          .box-title <%%= @resource_module.index_card_title() %>
+          .box-title <%%= @admin_resource.index_card_title() %>
         .box-body
           table#datatables.table.table-hover.table-striped
             thead
               tr
-                <%%= for name <- @resource_module.display_schema_columns(:index) do %>
+                <%%= for name <- @admin_resource.display_schema_columns(:index) do %>
                   / - name = ExAdmin.View.admin_resource(@conn).get_schema_field(:index, @resource, <%%= ":#{name}" %>)
-                  th <%%= @resource_module.render_column_name(:index, name) %>
+                  th <%%= @admin_resource.render_column_name(:index, name) %>
                 <%% end %>
                 th.disable-sorting.text-right data-orderable="false" Actions
             tbody
               = for resource <- @resources do
                 tr
-                <%%= for name <- @resource_module.display_schema_columns(:index) do %>
+                <%%= for name <- @admin_resource.display_schema_columns(:index) do %>
                   - {_name, value} = ExAdmin.View.admin_resource(@conn).get_schema_field(:index, resource, <%%= ":#{name}" %>)
                   td= value
                 <%% end %>
@@ -30,8 +30,8 @@
                       i.fa.fa-times
           tfoot
             tr
-              <%%= for name <- @resource_module.display_schema_columns(:index) do %>
-                th <%%= @resource_module.render_column_name(:index, name) %>
+              <%%= for name <- @admin_resource.display_schema_columns(:index) do %>
+                th <%%= @admin_resource.render_column_name(:index, name) %>
               <%% end %>
               th.text-right data-orderable="false" Actions
 javascript:

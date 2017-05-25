@@ -12,17 +12,17 @@ defmodule ExAdmin do
       iex> TestExAdmin.Admin.resource_map()["simples"]
       TestExAdmin.ExAdmin.Simple
 
-      iex> TestExAdmin.Admin.resources() |> hd
-      TestExAdmin.ExAdmin.Simple
+      iex> TestExAdmin.Admin.resources() |> Enum.any?(& &1 == TestExAdmin.ExAdmin.Simple)
+      true
 
-      iex> TestExAdmin.Admin.resource_names() |> hd
-      "simples"
+      iex> TestExAdmin.Admin.resource_names()|> Enum.any?(& &1 == "simples")
+      true
 
       iex> TestExAdmin.Admin.schema("simples")
       TestExAdmin.Simple
 
-      iex> TestExAdmin.Admin.schema_names() |> hd
-      "Simple"
+      iex> TestExAdmin.Admin.schema_names() |> Enum.any?(& &1 == "Simple")
+      true
 
       iex> TestExAdmin.Admin.admin_resource("simples")
       TestExAdmin.ExAdmin.Simple
@@ -34,7 +34,7 @@ defmodule ExAdmin do
       TestExAdmin.ExAdmin.Simple
 
       iex> TestExAdmin.Admin.controller_action("simples")
-      {TestExAdmin.Simple, :simples, nil}
+      {TestExAdmin.Simple, :simples, "admin_lte"}
 
       iex> TestExAdmin.Admin.base()
       TestExAdmin
@@ -103,8 +103,8 @@ defmodule ExAdmin do
       end
 
       def controller_action(resource_name) do
-        {resource_name, resource_module} = resource_schema(resource_name)
-        schema = resource_module.schema()
+        {resource_name, admin_resource} = resource_schema(resource_name)
+        schema = admin_resource.schema()
         {schema, resource_name, Application.get_env(:ex_admin, :theme)}
       end
 

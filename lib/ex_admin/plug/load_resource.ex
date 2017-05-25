@@ -18,7 +18,7 @@ defmodule ExAdmin.Plug.LoadResource do
     |> handle_action(conn, repo, schema)
   end
 
-  defp handle_action(action, conn, repo, schema) when action in [:index, :search] do
+  defp handle_action(action, conn, _repo, schema) when action in [:index, :search] do
     admin_resource = ExAdmin.View.admin_resource(conn)
     schema
     |> admin_resource.search(conn.params, action)

@@ -37,15 +37,15 @@ defmodule Mix.Tasks.Compile.ExAdmin do
       mod = Module.concat base, Admin
       Code.ensure_compiled mod
       # TODO: need to replace Admin namespace here
-      for {resource_name, resource_module} <- mod.resource_map() do
+      for {resource_name, admin_resource} <- mod.resource_map() do
         resource_name = mod.template_path_name resource_name
 
         for action <- [:index, :edit, :form, :new, :show] do
-          unless compile_custom_template(action, resource_name, resource_module, theme) do
+          unless compile_custom_template(action, resource_name, admin_resource, theme) do
             if Application.get_env :ex_admin, :verbose_compile do
               IO.puts "compiling global template for #{resource_name} #{action}"
             end
-            templ = EEx.eval_file("web/templates/admin/#{theme}/generators/#{action}.html.eex", assigns: [resource_module: resource_module])
+            templ = EEx.eval_file("web/templates/admin/#{theme}/generators/#{action}.html.eex", assigns: [admin_resource: admin_resource])
             File.mkdir_p("web/templates/admin/#{theme}/#{resource_name}")
             File.write("web/templates/admin/#{theme}/#{resource_name}/#{action}.html.slim", templ)
           end
@@ -58,14 +58,14 @@ defmodule Mix.Tasks.Compile.ExAdmin do
     end
   end
 
-  def compile_custom_template(action, resource_name, resource_module, theme) do
+  def compile_custom_template(action, resource_name, admin_resource, theme) do
     path = "web/templates/admin/#{theme}/#{resource_name}/generators"
     template = Path.join path, "#{action}.html.eex"
     if File.exists? template do
       if Application.get_env :ex_admin, :verbose_compile do
         IO.puts "compiling override template for #{resource_name} #{action}"
       end
-      templ = EEx.eval_file(template, assigns: [resource_module: resource_module])
+      templ = EEx.eval_file(template, assigns: [admin_resource: admin_resource])
       File.mkdir_p("web/templates/admin/#{theme}/#{resource_name}")
       path = "web/templates/admin/#{theme}/#{resource_name}/#{action}.html.slim"
       File.write!(path, templ)

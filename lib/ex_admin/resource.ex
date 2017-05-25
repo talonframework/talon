@@ -192,7 +192,7 @@ defmodule ExAdmin.Resource do
       @spec query(Ecto.Query.t, Map.t, atom) :: Ecto.Query.t
       def query(query, %{"id" => id}, action), do: Ecto.Query.where(query, id: ^id)
       def query(query, %{"order" => order}, :index) when not is_nil(order) do
-        order = ExAdmin.Datatable.sort_column_order(order)
+        order = ExAdmin.Components.Datatable.sort_column_order(order)
         Ecto.Query.order_by(query, ^order)
       end
       def query(query, _parmas, action), do: query
@@ -202,7 +202,7 @@ defmodule ExAdmin.Resource do
       """
       @spec paginate(Ecto.Query.t, Map.t, atom) :: Ecto.Query.t
       def paginate(query, params, action) when action in [:index, :search] do
-        if @__paginate__, do: {:page, repo().paginate(query, params)}, else: {:resources, repo.all(query)}
+        if @__paginate__, do: {:page, repo().paginate(query, params)}, else: {:resources, repo().all(query)}
       end
 
       @doc """
@@ -217,14 +217,17 @@ defmodule ExAdmin.Resource do
       @spec repo() :: atom
       def repo, do: @__repo__
 
+      @spec search(Plug.Conn.t) :: Ecto.Query.t
       def search(conn) do
         ExAdmin.Search.search(schema(), conn.params["search_terms"])
       end
 
+      @spec search(Struct.t, Map.t) :: Ecto.Query.t
       def search(schema, params) do
         ExAdmin.Search.search(schema, params["search_terms"])
       end
 
+      @spec search(Struct.t, Map.t, atom) :: Ecto.Query.t
       def search(schema, params, :search) do
         search(schema, params)
       end
@@ -241,29 +244,6 @@ defmodule ExAdmin.Resource do
   end
 
   @doc """
-  Return the resource module.
-
-  Looks up the resource module from either a given scema module or a schema
-  struct.
-
-  ## Examples
-
-      iex> ExAdmin.Resource.resource_module(MyApp.User)
-      MyApp.ExAdmin.User
-
-      iex> ExAdmin.Resource.resource_module(%MyApp.User{})
-      MyApp.ExAdmin.User
-
-  """
-  @spec resource_module(atom, module_or_struct) :: atom
-
-  def resource_module(admin, %{__struct__: module}), do: resource_module(admin, module)
-
-  def resource_module(admin, _module) do
-    ExAdmin.app_module(admin)
-  end
-
-  @doc """
   Return the action link tuple for an action link
 
   Returns the action link for `:new`, `:edit`, and `:delete` actions.
@@ -277,10 +257,10 @@ defmodule ExAdmin.Resource do
       {:new, "New Simple", "/admin/simples/new"}
 
       iex> ExAdmin.Resource.nav_action_link(:edit, %TestExAdmin.Simple{id: 1})
-      {:new, "Edit Simple", "/admin/simples/1/edit"}
+      {:edit, "Edit Simple", "/admin/simples/1/edit"}
 
       iex> ExAdmin.Resource.nav_action_link(:delete, %TestExAdmin.Simple{id: 1})
-      {:new, "Edit Simple", "/admin/simples/1"}
+      {:delete, "Delete Simple", "/admin/simples/1"}
   """
   @spec nav_action_link(atom, atom | struct) :: {atom, String.t, String.t}
   def nav_action_link(action, resource_or_module) do

@@ -3,12 +3,12 @@
     .col-md-12
       .box
         .box-header.with-border
-          .box-title <%%= @resource_module.index_card_title() %>
+          .box-title <%%= @admin_resource.index_card_title() %>
         .box-body.table-responsive.no-padding
           .panel_contents
             table.table.table-hover
               tbody
-                <%%= for name <- @resource_module.display_schema_columns(:show) do %>
+                <%%= for name <- @admin_resource.display_schema_columns(:show) do %>
                   - {name, value} = ExAdmin.View.admin_resource(@conn).get_schema_field(:show, @resource, <%%= ":#{name}" %>)
                   tr
                     th= name

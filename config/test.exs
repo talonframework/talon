@@ -19,21 +19,27 @@ config :ex_admin, TestExAdmin.Repo,
 config :ex_admin, TestExAdmin.Admin,
   resources: [
     TestExAdmin.ExAdmin.Simple,
+    TestExAdmin.ExAdmin.Product,
     # TestExAdmin.ExAdmin.Dashboard,
     # TestExAdmin.ExAdmin.Noid,
     # TestExAdmin.ExAdmin.User,
-    # TestExAdmin.ExAdmin.Product,
     # TestExAdmin.ExAdmin.Simple,
     # TestExAdmin.ExAdmin.ModelDisplayName,
     # TestExAdmin.ExAdmin.DefnDisplayName,
     # TestExAdmin.ExAdmin.RestrictedEdit,
-  ] 
+  ],
+  schema_adapter: ExAdmin.Schema.Adapters.Ecto,
+  module: TestExAdmin,
+  theme: "admin_lte"
+
 
 config :ex_admin,
   schema_adapter: ExAdmin.Schema.Adapters.Ecto,
-  base: TestExAdmin,
+  module: TestExAdmin,
+  theme: "admin_lte",
   resources: [
     TestExAdmin.ExAdmin.Simple,
+    TestExAdmin.ExAdmin.Product,
   ]
 
 config :logger, level: :error

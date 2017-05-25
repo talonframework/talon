@@ -54,8 +54,8 @@ defmodule <%= base %>.Admin do
   # end
 
   # def controller_action(resource_name) do
-  #   {resource_name, resource_module} = resource_schema(resource_name)
-  #   schema = resource_module.schema()
+  #   {resource_name, admin_resource} = resource_schema(resource_name)
+  #   schema = admin_resource.schema()
   #   {schema, resource_name, Application.get_env(:ex_admin, :theme)}
   # end
 

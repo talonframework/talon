@@ -166,7 +166,7 @@ defmodule Mix.Tasks.Admin.New do
     config
   end
 
-  defp do_config({bin_opts, opts, parsed} = args) do
+  defp do_config({bin_opts, opts, _parsed} = args) do
     binding =
       Mix.Project.config
       |> Keyword.fetch!(:app)
@@ -206,9 +206,9 @@ defmodule Mix.Tasks.Admin.New do
     {bin_opts, opts -- bin_opts, parsed}
   end
 
-  defp lib_path do
-    Path.join("lib", to_string(Mix.Phoenix.otp_app()))
-  end
+  # defp lib_path do
+  #   Path.join("lib", to_string(Mix.Phoenix.otp_app()))
+  # end
 
   defp web_path do
     path1 = Path.join ["lib", to_string(Mix.Phoenix.otp_app()), "web"]

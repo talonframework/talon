@@ -28,7 +28,9 @@ defmodule ExAdmin.Mixfile do
       {:scrivener_ecto, "~> 1.1"},
       {:postgrex, ">= 0.0.0", only: :test},
       {:phoenix_slime, github: "slime-lang/phoenix_slime"},
-      # {:ecto_ex_admin, github: "ex-admin/ecto_ex_admin", only: :test},
+      {:ecto_ex_admin, github: "ex-admin/ecto_ex_admin", only: :test},
+      # {:ecto_ex_admin, path: "../ecto_ex_admin", only: :test},
     ]
   end
 end
+

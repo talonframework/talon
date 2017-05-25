@@ -77,6 +77,21 @@ defmodule ExAdmin.View do
   end
 
   @doc """
+  Get the current theme module.
+
+  ## Examples
+
+      iex> ExAdmin.View.theme_module(%{assigns: %{ex_admin: %{theme: "admin_lte"}}})
+      AdminLte
+  """
+  @spec theme_module(Plug.Conn.t) :: atom
+  def theme_module(conn) do
+    conn.assigns.ex_admin.theme
+    |> Inflex.camelize
+    |> Module.concat(nil)
+  end
+
+  @doc """
   Check if the value of an association is loaded
   """
   @spec association_loaded?(any) :: boolean
