@@ -1,4 +1,4 @@
-# Contributing to ExAdmin
+# Contributing to Talon
 
 Please take a moment to review this document in order to make the contribution
 process easy and effective for everyone involved!
@@ -14,13 +14,13 @@ Use the issues tracker for:
 Please **do not** use the issue tracker for personal support requests nor feature requests. Support requests should be sent to:
 
 Development issues can also be discussed on:
-* [#exadmin channel on chat.spallen.com](https://chat.spallen.com) (prefered).
-* Elixir Slack Team #exadmin channel
-* [the exadmin-talk mailing list](http://groups.google.com/group/exadmin-talk).
+* [#talon channel on chat.spallen.com](https://chat.spallen.com) (prefered).
+* Elixir Slack Team #talon channel
+* [the talon-talk mailing list](http://groups.google.com/group/talon-talk).
 
 We do our best to keep the issue tracker tidy and organized, making it useful
 for everyone. For example, we classify open issues per perceived difficulty,
-making it easier for developers to [contribute to ExAdmin](#pull-requests).
+making it easier for developers to [contribute to Talon](#pull-requests).
 
 ## Bug reports
 
@@ -39,7 +39,7 @@ Guidelines for bug reports:
    case.
 
 Please try to be as detailed as possible in your report. Include information about
-your Operating System, as well as your Erlang, Elixir, Phoenix, and ExAdmin versions. Please provide steps to
+your Operating System, as well as your Erlang, Elixir, Phoenix, and Talon versions. Please provide steps to
 reproduce the issue as well as the outcome you were expecting! All these details
 will help developers to fix any potential bugs.
 
@@ -63,7 +63,7 @@ Example:
 
 ## Feature requests
 
-Feature requests are welcome and should be discussed on the [#exadmin channel on chat.spallen.com](https://chat.spallen.com). But take a moment to find
+Feature requests are welcome and should be discussed on the [#talon channel on chat.spallen.com](https://chat.spallen.com). But take a moment to find
 out whether your idea fits with the scope and aims of the project. It's up to *you*
 to make a strong case to convince the community of the merits of this feature.
 Please provide as much detail and context as possible.
@@ -131,24 +131,24 @@ in order to craft an excellent pull request:
 
    ```bash
    # Clone your fork of the repo into the current directory
-   git clone https://github.com/<your-username>/ex_admin
+   git clone https://github.com/<your-username>/talon
    # Navigate to the newly cloned directory
-   cd ex_admin
+   cd talon
    # Assign the original repo to a remote called "upstream"
-   git remote add upstream https://github.com/ex-admin/ex_admin
+   git remote add upstream https://github.com/talonframework/talon
    ```
 
-2. Pick a project to interactively see your ExAdmin changes:
+2. Pick a project to interactively see your Talon changes:
 
   * Create your own project or use one of the two working working demos:
     * Coming soon
 
-  * Change the :ex_admin dependency in your project to a path directive like
+  * Change the :talon dependency in your project to a path directive like
 
     ```elixir
       def deps do
         [
-          {:ex_admin, path: "../ex_admin"}
+          {:talon, path: "../talon"}
         ]
       end
     ```
@@ -156,8 +156,8 @@ in order to craft an excellent pull request:
   * Get the new deps and remove the old build dir
 
     ```bash
-    mix deps.get ex_admin
-    rm -rf build/dev/lib/ex_admin
+    mix deps.get talon
+    rm -rf build/dev/lib/talon
     ```
 
   * Now your project should be setup to your up your local changes every time you compile your project.

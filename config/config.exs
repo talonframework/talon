@@ -10,11 +10,11 @@ use Mix.Config
 
 # You can configure for your application as:
 #
-#     config :ex_admin, key: :value
+#     config :talon, key: :value
 #
 # And access this configuration in your application as:
 #
-#     Application.get_env(:ex_admin, :key)
+#     Application.get_env(:talon, :key)
 #
 # Or configure a 3rd-party app:
 #
@@ -27,7 +27,4 @@ use Mix.Config
 # Configuration from the imported file will override the ones defined
 # here (which is why it is important to import them last).
 #
-try, do: import_config("#{Mix.env}.exs")
-# rescue
-#   _ -> :ok
-# end
+import_config("#{Mix.env}.exs")

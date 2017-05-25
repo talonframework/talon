@@ -1,6 +1,6 @@
-defmodule TestExAdmin.Router do
+defmodule TestTalon.Router do
   use Phoenix.Router
-  use ExAdmin.Router
+  use Talon.Router
 
 
   pipeline :browser do
@@ -11,8 +11,8 @@ defmodule TestExAdmin.Router do
     plug :put_secure_browser_headers
   end
 
-  scope "/admin", ExAdmin do
+  scope "/talon", Talon do
     pipe_through :browser
-    admin_routes()
+    talon_routes()
   end
 end

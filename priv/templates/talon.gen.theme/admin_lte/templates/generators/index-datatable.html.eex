@@ -1,0 +1,61 @@
+.container-fluid
+  .row
+    .col-md-12
+      .box
+        .box-header
+          .box-title <%%= @talon_resource.index_card_title() %>
+        .box-body
+          table#datatables.table.table-hover.table-striped
+            thead
+              tr
+                <%%= for name <- @talon_resource.display_schema_columns(:index) do %>
+                  / - name = Talon.View.talon_resource(@conn).get_schema_field(:index, @resource, <%%= ":#{name}" %>)
+                  th <%%= @talon_resource.render_column_name(:index, name) %>
+                <%% end %>
+                th.disable-sorting.text-right data-orderable="false" Actions
+            tbody
+              = for resource <- @resources do
+                tr
+                <%%= for name <- @talon_resource.display_schema_columns(:index) do %>
+                  - {_name, value} = Talon.View.talon_resource(@conn).get_schema_field(:index, resource, <%%= ":#{name}" %>)
+                  td= value
+                <%% end %>
+
+                  td.text-right.index-actions
+                    button.btn.btn-xs.btn-primary.action-show type="button" data-url="#{Talon.Utils.talon_resource_path(resource, :show)}"
+                      i.fa.fa-info-circle
+                    button.btn.btn-xs.btn-warning.action-edit type="button" data-url="#{Talon.Utils.talon_resource_path(resource, :edit)}"
+                      i.fa.fa-pencil-square-o
+                    button.btn.btn-xs.btn-danger.action-delete type="button"
+                      i.fa.fa-times
+          tfoot
+            tr
+              <%%= for name <- @talon_resource.display_schema_columns(:index) do %>
+                th <%%= @talon_resource.render_column_name(:index, name) %>
+              <%% end %>
+              th.text-right data-orderable="false" Actions
+javascript:
+  window.onload = function(e) {
+    console.log('on load!!')
+    $('body').on('click', '.index-actions button.action-show', function(e) {
+      window.location = $(this).data('url');
+    })
+    $('body').on('click', '.index-actions button.action-edit', function(e) {
+      window.location = $(this).data('url');
+    })
+
+    $('#datatables').DataTable({
+          "pagingType": "full_numbers",
+          "lengthMenu": [
+              [10, 25, 50, -1],
+              [10, 25, 50, "All"]
+          ],
+          responsive: true,
+          language: {
+              search: "_INPUT_",
+              searchPlaceholder: "Search records",
+          }
+      });
+
+    var table = $('#datatables').DataTable();
+  }

@@ -1,0 +1,16 @@
+.container-fluid
+  .row
+    .col-md-12
+      .box
+        .box-header.with-border
+          .box-title <%%= @talon_resource.index_card_title() %>
+        .box-body.table-responsive.no-padding
+          .panel_contents
+            table.table.table-hover
+              tbody
+                <%%= for name <- @talon_resource.display_schema_columns(:show) do %>
+                  - {name, value} = Talon.View.talon_resource(@conn).get_schema_field(:show, @resource, <%%= ":#{name}" %>)
+                  tr
+                    th= name
+                    td= value
+                <%% end %>

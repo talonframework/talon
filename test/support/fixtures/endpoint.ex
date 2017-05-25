@@ -1,12 +1,12 @@
-defmodule TestExAdmin.Endpoint do
-  use Phoenix.Endpoint, otp_app: :ex_admin
+defmodule TestTalon.Endpoint do
+  use Phoenix.Endpoint, otp_app: :talon
 
   # Serve at "/" the static files from "priv/static" directory.
   #
   # You should set gzip to true if you are running phoenix.digest
   # when deploying your static files in production.
   plug Plug.Static,
-    at: "/", from: :ex_admin, gzip: false,
+    at: "/", from: :talon, gzip: false,
     only: ~w(css fonts images js favicon.ico robots.txt)
 
   # Code reloading can be explicitly enabled under the
@@ -33,5 +33,5 @@ defmodule TestExAdmin.Endpoint do
     key: "_binaryid_key",
     signing_salt: "JFbk5iZ6"
 
-  plug TestExAdmin.Router
+  plug TestTalon.Router
 end

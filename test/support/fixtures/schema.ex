@@ -1,4 +1,4 @@
-defmodule TestExAdmin.User do
+defmodule TestTalon.User do
   import Ecto.Changeset
   use Ecto.Schema
   import Ecto.Query
@@ -7,9 +7,9 @@ defmodule TestExAdmin.User do
     field :name, :string
     field :email, :string
     field :active, :boolean, default: true
-    has_many :products, TestExAdmin.Product, on_replace: :delete
-    has_many :noids, TestExAdmin.Noid
-    many_to_many :roles, TestExAdmin.Role, join_through: TestExAdmin.UserRole, on_replace: :delete
+    has_many :products, TestTalon.Product, on_replace: :delete
+    has_many :noids, TestTalon.Noid
+    many_to_many :roles, TestTalon.Role, join_through: TestTalon.UserRole, on_replace: :delete
   end
 
   @fields ~w(name active email)a
@@ -28,7 +28,7 @@ defmodule TestExAdmin.User do
   def add_roles(changeset, params) do
     if Enum.count(Map.get(params, :roles, [])) > 0 do
       ids = params[:roles]
-      roles = TestExAdmin.Repo.all(from r in TestExAdmin.Role, where: r.id in ^ids)
+      roles = TestTalon.Repo.all(from r in TestTalon.Role, where: r.id in ^ids)
       put_assoc(changeset, :roles, roles)
     else
       changeset
@@ -36,15 +36,15 @@ defmodule TestExAdmin.User do
   end
 end
 
-defmodule TestExAdmin.Role do
+defmodule TestTalon.Role do
   use Ecto.Schema
   import Ecto.Changeset
-  alias TestExAdmin.Repo
+  alias TestTalon.Repo
 
   schema "roles" do
     field :name, :string
-    has_many :uses_roles, TestExAdmin.UserRole
-    many_to_many :users, TestExAdmin.User, join_through: TestExAdmin.UserRole
+    has_many :uses_roles, TestTalon.UserRole
+    many_to_many :users, TestTalon.User, join_through: TestTalon.UserRole
   end
 
   @fields ~w(name)a
@@ -60,13 +60,13 @@ defmodule TestExAdmin.Role do
   end
 end
 
-defmodule TestExAdmin.UserRole do
+defmodule TestTalon.UserRole do
   use Ecto.Schema
   import Ecto.Changeset
 
   schema "users_roles" do
-    belongs_to :user, TestExAdmin.User
-    belongs_to :role, TestExAdmin.Role
+    belongs_to :user, TestTalon.User
+    belongs_to :role, TestTalon.Role
 
     timestamps()
   end
@@ -80,7 +80,7 @@ defmodule TestExAdmin.UserRole do
   end
 end
 
-defmodule TestExAdmin.Product do
+defmodule TestTalon.Product do
   use Ecto.Schema
   import Ecto.Changeset
 
@@ -88,7 +88,7 @@ defmodule TestExAdmin.Product do
     field :_destroy, :boolean, virtual: true
     field :title, :string
     field :price, :decimal
-    belongs_to :user, TestExAdmin.User
+    belongs_to :user, TestTalon.User
   end
 
   @fields ~w(title price user_id)a
@@ -112,7 +112,7 @@ defmodule TestExAdmin.Product do
   end
 end
 
-defmodule TestExAdmin.Noid do
+defmodule TestTalon.Noid do
   import Ecto.Changeset
   use Ecto.Schema
   @primary_key {:name, :string, []}
@@ -120,7 +120,7 @@ defmodule TestExAdmin.Noid do
   schema "noids" do
     field :description, :string
     field :company, :string
-    belongs_to :user, TestExAdmin.User, foreign_key: :user_id, references: :id
+    belongs_to :user, TestTalon.User, foreign_key: :user_id, references: :id
   end
 
   @fields ~w(name description company user_id)a
@@ -133,7 +133,7 @@ defmodule TestExAdmin.Noid do
   end
 end
 
-defmodule TestExAdmin.Noprimary do
+defmodule TestTalon.Noprimary do
   import Ecto.Changeset
   use Ecto.Schema
   @primary_key false
@@ -154,7 +154,7 @@ defmodule TestExAdmin.Noprimary do
   end
 end
 
-defmodule TestExAdmin.Simple do
+defmodule TestTalon.Simple do
   import Ecto.Changeset
   use Ecto.Schema
 
@@ -203,7 +203,7 @@ defmodule TestExAdmin.Simple do
   end
 end
 
-defmodule TestExAdmin.Restricted do
+defmodule TestTalon.Restricted do
   import Ecto.Changeset
   use Ecto.Schema
 
@@ -223,17 +223,17 @@ defmodule TestExAdmin.Restricted do
   end
 end
 
-defmodule TestExAdmin.PhoneNumber do
+defmodule TestTalon.PhoneNumber do
   import Ecto.Changeset
   use Ecto.Schema
   import Ecto.Query
   alias __MODULE__
-  alias TestExAdmin.Repo
+  alias TestTalon.Repo
 
   schema "phone_numbers" do
     field :number, :string
     field :label, :string
-    has_many :contacts_phone_numbers, TestExAdmin.ContactPhoneNumber
+    has_many :contacts_phone_numbers, TestTalon.ContactPhoneNumber
     has_many :contacts, through: [:contacts_phone_numbers, :contact]
     timestamps()
   end
@@ -255,14 +255,14 @@ defmodule TestExAdmin.PhoneNumber do
   end
 end
 
-defmodule TestExAdmin.Contact do
+defmodule TestTalon.Contact do
   import Ecto.Changeset
   use Ecto.Schema
 
   schema "contacts" do
     field :first_name, :string
     field :last_name, :string
-    has_many :contacts_phone_numbers, TestExAdmin.ContactPhoneNumber
+    has_many :contacts_phone_numbers, TestTalon.ContactPhoneNumber
     has_many :phone_numbers, through: [:contacts_phone_numbers, :phone_number]
     timestamps()
   end
@@ -276,13 +276,13 @@ defmodule TestExAdmin.Contact do
   end
 end
 
-defmodule TestExAdmin.ContactPhoneNumber do
+defmodule TestTalon.ContactPhoneNumber do
   import Ecto.Changeset
   use Ecto.Schema
 
   schema "contacts_phone_numbers" do
-    belongs_to :contact, TestExAdmin.Contact
-    belongs_to :phone_number, TestExAdmin.PhoneNumber
+    belongs_to :contact, TestTalon.Contact
+    belongs_to :phone_number, TestTalon.PhoneNumber
   end
 
   @fields ~w(contact_id phone_number_id)a
@@ -294,7 +294,7 @@ defmodule TestExAdmin.ContactPhoneNumber do
   end
 end
 
-defmodule TestExAdmin.UUIDSchema do
+defmodule TestTalon.UUIDSchema do
   import Ecto.Changeset
   use Ecto.Schema
 
@@ -315,7 +315,7 @@ defmodule TestExAdmin.UUIDSchema do
 
 end
 
-defmodule TestExAdmin.ModelDisplayName do
+defmodule TestTalon.ModelDisplayName do
   use Ecto.Schema
 
   schema "model_display_name" do
@@ -333,7 +333,7 @@ defmodule TestExAdmin.ModelDisplayName do
   end
 end
 
-defmodule TestExAdmin.DefnDisplayName do
+defmodule TestTalon.DefnDisplayName do
   use Ecto.Schema
 
   schema "defn_display_name" do
@@ -343,7 +343,7 @@ defmodule TestExAdmin.DefnDisplayName do
   end
 end
 
-defmodule TestExAdmin.Maps do
+defmodule TestTalon.Maps do
   use Ecto.Schema
 
   schema "maps" do

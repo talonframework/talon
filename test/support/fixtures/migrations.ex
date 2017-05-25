@@ -1,4 +1,4 @@
-defmodule TestExAdmin.Migrations do
+defmodule TestTalon.Migrations do
   use Ecto.Migration
 
   def change do
