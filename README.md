@@ -1,3 +1,4 @@
+[![Stories in Ready](https://badge.waffle.io/ex-admin/ex_admin.png?label=ready&title=Ready)](https://waffle.io/ex-admin/ex_admin?utm_source=badge)
 # ExAdmin
 
 This is a new ExAdmin project, located under the new Github Group [ex-admin](https://github.com/ex-admin). This is a complete redesign of ExAdmin. See the justification and goals below.
