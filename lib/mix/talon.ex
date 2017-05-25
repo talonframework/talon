@@ -113,6 +113,11 @@ defmodule Mix.Talon do
     end
   end
 
+  def source_path(apps, source_dir) do
+    roots = Enum.map(apps, &to_app_source(&1, source_dir))
+    # source =
+  end
+
   defp to_app_source(path, source_dir) when is_binary(path),
     do: Path.join(path, source_dir)
   defp to_app_source(app, source_dir) when is_atom(app),
