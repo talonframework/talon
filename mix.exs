@@ -1,8 +1,8 @@
-defmodule ExAdmin.Mixfile do
+defmodule Talon.Mixfile do
   use Mix.Project
 
   def project do
-    [app: :ex_admin,
+    [app: :talon,
      version: "0.1.0",
      elixir: "~> 1.4",
      elixirc_paths: elixirc_paths(Mix.env),
@@ -13,7 +13,7 @@ defmodule ExAdmin.Mixfile do
 
   def application do
     [extra_applications: [:logger],
-     mod: {ExAdmin.Application, [:inflex]}]
+     mod: {Talon.Application, [:inflex]}]
   end
 
   defp elixirc_paths(:test), do: ["lib", "test/support"]
@@ -28,8 +28,8 @@ defmodule ExAdmin.Mixfile do
       {:scrivener_ecto, "~> 1.1"},
       {:postgrex, ">= 0.0.0", only: :test},
       {:phoenix_slime, github: "slime-lang/phoenix_slime"},
-      {:ecto_ex_admin, github: "talonframework/ecto_ex_admin", only: :test},
-      # {:ecto_ex_admin, path: "../ecto_ex_admin", only: :test},
+      {:ecto_talon, github: "talonframework/ecto_talon", only: :test},
+      # {:ecto_talon, path: "../ecto_talon", only: :test},
     ]
   end
 end

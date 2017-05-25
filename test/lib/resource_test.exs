@@ -1,5 +1,5 @@
-defmodule TestExAdmin.Resource do
+defmodule TestTalon.Resource do
   use ExUnit.Case
-  doctest ExAdmin.Resource
+  doctest Talon.Resource
 
 end

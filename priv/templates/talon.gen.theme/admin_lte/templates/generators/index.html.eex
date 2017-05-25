@@ -1,0 +1,34 @@
+.container-fluid
+  .row
+    .col-md-12#datatable-view
+      = TalonLte.DatatableView.render_table(@conn, @resources)
+javascript:
+
+  function search_path(value) {
+    var route = $('#datatable-body').data('route')
+    return '/talon/' + route + '/search/' + value + '?format.js';
+  }
+
+  window.onload = function(e) {
+    console.log('on load!!')
+    $('body').on('click', '.index-actions button.action-show', function(e) {
+      window.location = $(this).data('url');
+    })
+    $('body').on('click', '.index-actions button.action-edit', function(e) {
+      window.location = $(this).data('url');
+    })
+    $('body').on('keypress', '#search', function(e) {
+      var value = $(this).val() + e.key
+      $.get(search_path(value), function(html) {
+        $('#datatable-body').html(html)
+      })
+    })
+    $('body').on('keyup', '#search', function(e) {
+      var value = $(this).val()
+      if(e.keyCode == 8) {
+        $.get(search_path(value), function(html) {
+          $('#datatable-body').html(html)
+        })
+      }
+    })
+  }

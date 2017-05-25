@@ -1,4 +1,4 @@
-defmodule TestExAdmin.ConnCase do
+defmodule TestTalon.ConnCase do
   @moduledoc """
   This module defines the test case to be used by
   tests that require setting up a connection.
@@ -20,23 +20,23 @@ defmodule TestExAdmin.ConnCase do
       # Import conveniences for testing with connections
       use Phoenix.ConnTest
 
-      alias ExAdminTest.Repo
+      alias TalonTest.Repo
       import Ecto
       import Ecto.Changeset
       import Ecto.Query
 
-      import TestExAdmin.Router.Helpers
+      import TestTalon.Router.Helpers
 
       # The default endpoint for testing
-      @endpoint TestExAdmin.Endpoint
+      @endpoint TestTalon.Endpoint
     end
   end
 
   setup tags do
-    :ok = Ecto.Adapters.SQL.Sandbox.checkout(TestExAdmin.Repo)
+    :ok = Ecto.Adapters.SQL.Sandbox.checkout(TestTalon.Repo)
 
     unless tags[:async] do
-      Ecto.Adapters.SQL.Sandbox.mode(TestExAdmin.Repo, {:shared, self()})
+      Ecto.Adapters.SQL.Sandbox.mode(TestTalon.Repo, {:shared, self()})
     end
 
     {:ok, conn: Phoenix.ConnTest.build_conn()}

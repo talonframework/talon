@@ -1,4 +1,4 @@
-defmodule TestExAdmin.Web do
+defmodule TestTalon.Web do
 
   def view do
     quote do
@@ -16,11 +16,11 @@ defmodule TestExAdmin.Web do
     quote do
       use Phoenix.Controller
 
-      alias ExAdminTest.Repo
+      alias TalonTest.Repo
       import Ecto
       import Ecto.Query
 
-      import TestExAdmin.Router.Helpers
+      import TestTalon.Router.Helpers
     end
   end
 

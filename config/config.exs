@@ -10,11 +10,11 @@ use Mix.Config
 
 # You can configure for your application as:
 #
-#     config :ex_admin, key: :value
+#     config :talon, key: :value
 #
 # And access this configuration in your application as:
 #
-#     Application.get_env(:ex_admin, :key)
+#     Application.get_env(:talon, :key)
 #
 # Or configure a 3rd-party app:
 #

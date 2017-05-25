@@ -1,5 +1,5 @@
-defmodule TestExAdmin do
+defmodule TestTalon do
   use ExUnit.Case
-  doctest ExAdmin
+  doctest Talon
 
 end
