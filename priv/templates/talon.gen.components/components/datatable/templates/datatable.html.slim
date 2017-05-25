@@ -1,0 +1,34 @@
+- talon_resource = Talon.View.talon_resource(@conn)
+      .box
+        .box-header
+          .row
+            .col-sm-9
+            .col-sm-3
+              button#go-search.btn.btn-xs.btn-primary type="button" style="float: right; margin-left: 5px;" Go
+              input#search type="search" placeholder="Search" style="float: right;"
+        .box-body.table-responsived.no-padding
+          .paginated_collection
+            table#datatables.table.table-hover.table-striped.index_table
+              thead
+                tr
+                  th.slectable
+                    .resource_selection_toggle_cell
+                      input.toggle_all#collection_selection_toggle_all type="checkbox" name="collection_selection_toggle_all"
+                  = for name <- talon_resource.display_schema_columns(:index) do
+                    th class="sortable #{sort_column_class(@conn, name)}"
+                      a href="#{column_sort_link(@conn, name)}" = talon_resource.render_column_name(:index, name)
+                  th.disable-sorting.text-right data-orderable="false" Actions
+              tbody#datatable-body data-route="#{talon_resource.route_name()}"
+                = render "table_body.html", resources: @resources, conn: @conn
+              tfoot
+                tr
+                  th.selectable
+                    .resource_selection_toggle_cell
+                      input.toggle_all#collection_selection_toggle_all type="checkbox" name="collection_selection_toggle_all"
+                  = for name <- talon_resource.display_schema_columns(:index) do
+                    th = talon_resource.render_column_name(:index, name)
+
+                  th.text-right data-orderable="false" Actions
+
+        .box-footer.clear-fix
+          = <%= theme_module %>.PaginateView.paginate(@conn)

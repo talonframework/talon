@@ -1,11 +1,12 @@
 .container-fluid
   .row
     .col-md-12#datatable-view
-      = TalonLte.DatatableView.render_table(@conn, @resources)
+      = <%= target_module %>.DatatableView.render_table(@conn, @resources)
 javascript:
 
   function search_path(value) {
     var route = $('#datatable-body').data('route')
+    // TODO: this needs to be based on the route scope. Should build this with router builders
     return '/talon/' + route + '/search/' + value + '?format.js';
   }
 

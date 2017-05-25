@@ -33,12 +33,14 @@ defmodule Mix.Tasks.Talon.Gen.Theme do
     theme: :string
   ] ++ Enum.map(@boolean_options, &({&1, :boolean}))
 
+  @default_theme "admin_lte"
 
   @doc """
   The entry point of the mix task.
   """
   @spec run(List.t) :: any
   def run(args) do
+    Mix.shell.info "Running talon.gen.theme"
     {opts, parsed, _unknown} = OptionParser.parse(args, switches: @switches)
 
     # TODO: Add args verification
@@ -57,10 +59,20 @@ defmodule Mix.Tasks.Talon.Gen.Theme do
     |> gen_generators
     |> gen_assets
     |> gen_brunch
+    |> gen_components
     |> print_instructions
   end
 
-  def gen_layout_view(config) do
+
+  defp gen_components(config) do
+    opts = if config[:verbose], do: ["--verbose"], else: []
+    opts = if config[:dry_run], do: ["--dry-run" | opts], else: opts
+
+    Mix.Tasks.Talon.Gen.Components.run([@default_theme] ++ opts)
+    config
+  end
+
+  defp gen_layout_view(config) do
     binding = Kernel.binding() ++ [base: config.base, target_name: config.target_name, target_module: config.target_module]
     theme = config.theme
     view_path = Path.join([web_path(), "views", "talon", config.target_name])
@@ -92,7 +104,8 @@ defmodule Mix.Tasks.Talon.Gen.Theme do
   end
 
   defp gen_generators(config) do
-    binding = Kernel.binding() ++ [base: config.base, target_name: config.target_name, target_module: config.target_module]
+    binding = Kernel.binding() ++ [base: config.base, target_name: config.target_name,
+      target_module: config.target_module]
     theme = config.theme
     template_path = Path.join([web_path(), "templates", "talon", config.theme, "generators"])
     unless config.dry_run do
@@ -192,7 +205,6 @@ defmodule Mix.Tasks.Talon.Gen.Theme do
         raise "Could not find web path '#{path1}'. Please use --web-path option to specify"
     end
   end
-
 
   defp paths do
     [".", :talon]

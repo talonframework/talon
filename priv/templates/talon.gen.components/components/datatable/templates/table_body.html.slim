@@ -1,0 +1,17 @@
+- talon_resource = Talon.View.talon_resource(@conn)
+= for resource <- @resources do
+  tr
+    td.selctable
+      .resource_selection_cell
+        input.collection_selection type="checkbox" name="collection_selection[]"
+    = for name <- talon_resource.display_schema_columns(:index) do
+      - {_name, value} = talon_resource.get_schema_field(:index, resource, name)
+      td= value
+
+    td.text-right.index-actions
+      button.btn.btn-xs.btn-primary.action-show type="button" data-url="#{Talon.Utils.talon_resource_path(resource, :show)}"
+        i.fa.fa-info-circle
+      button.btn.btn-xs.btn-warning.action-edit type="button" data-url="#{Talon.Utils.talon_resource_path(resource, :edit)}"
+        i.fa.fa-pencil-square-o
+      button.btn.btn-xs.btn-danger.action-delete type="button"
+        i.fa.fa-times

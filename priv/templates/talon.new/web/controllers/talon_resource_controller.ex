@@ -1,6 +1,6 @@
 defmodule <%= base %>.TalonResourceController do
   use <%= base %>.Web, :controller
-  use Talon.Controller, repo: <%= base %>.Repo, talon: <%= base %>.Talon
+  use Talon.Controller, repo: <%= base %>.Repo, context: <%= base %>.Talon
 
   plug Talon.Plug.TalonResource
   plug Talon.Plug.LoadResource
