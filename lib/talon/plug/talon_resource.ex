@@ -10,10 +10,12 @@ defmodule Talon.Plug.TalonResource do
 
 
   def call(conn, opts) do
+    # require IEx
+    # IEx.pry
     talon = conn.assigns[:talon] || %{}
-    talon = opts[:talon] || talon[:talon] || raise("talon option required")
-    schema = talon.schema(conn.params["resource"])
-    talon_resource = talon.talon_resource(conn.params["resource"])
+    context = opts[:talon] || talon[:talon] || raise("talon option required")
+    schema = context.schema(conn.params["resource"])
+    talon_resource = context.talon_resource(conn.params["resource"])
     assign conn, :talon, Enum.into([talon_resource: talon_resource, schema: schema], talon)
   end
 

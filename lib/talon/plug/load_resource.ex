@@ -11,8 +11,8 @@ defmodule Talon.Plug.LoadResource do
   def call(conn, opts) do
     talon = conn.assigns[:talon]
     repo = opts[:repo] || talon[:repo]
-    talon = opts[:talon] || talon[:talon] || raise("talon option required")
-    schema = talon.schema(conn.params["resource"])
+    context = opts[:talon] || talon[:talon] || raise("talon option required")
+    schema = context.schema(conn.params["resource"])
     conn
     |> Phoenix.Controller.action_name
     |> handle_action(conn, repo, schema)

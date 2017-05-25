@@ -4,7 +4,7 @@ defmodule Talon.Controller do
     quote do
       opts = unquote(opts)
       repo = opts[:repo]   || raise("repo option required")
-      talon = opts[:talon] || raise("talon option required")
+      talon = opts[:context] || raise("context option required")
       plug :set_repo, repo: repo, talon: talon
 
       # TODO: Add docs for each of these and indicate they are overridable

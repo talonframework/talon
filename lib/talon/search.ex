@@ -8,30 +8,32 @@ defmodule Talon.Search do
   @doc """
   Default freetext search handler
   """
-  @spec search(Module.t, String.t) :: Ecto.Query.t
-  def search(schema, nil), do: where(schema, true)
-  def search(schema, search_terms) do
+  @spec search(Module.t, Module.t, String.t) :: Ecto.Query.t
+  def search(_, schema, nil), do: where(schema, true)
+  def search(talon_resource, schema, search_terms) do
     cond do
-      function_exported?(schema, :search_fields, 0) ->
-        {:cont, apply(schema, :search_fields, [])}
-      function_exported?(schema, :search_query, 1) ->
-        {:halt, apply(schema, :search_query, [search_terms])}
-      schema.__schema__(:type, :name) ->
-        {:cont, :name}
+      function_exported?(talon_resource, :search_fields, 0) ->
+        {:cont, apply(talon_resource, :search_fields, [])}
+      function_exported?(talon_resource, :search_query, 1) ->
+        {:halt, apply(talon_resource, :search_query, [search_terms])}
       true ->
         # TODO: this will not work if no string type is found
-        {:cont, find_first_string_field(schema)}
+        {:cont, find_string_fields(talon_resource, schema)}
     end
     |> build_query(schema, search_terms)
   end
 
-  defp find_first_string_field(schema) do
-    :types
-    |> schema.__schema__
-    |> Enum.reduce_while(:id, fn
-      {field, :string}, _ -> {:halt, field}
-      _, acc -> {:cont, acc}
-    end)
+  defp find_string_fields(talon_resource, schema) do
+    string_fields =
+      :types
+      |> schema.__schema__
+      |> Enum.reduce([], fn
+        {field, :string}, acc -> [field | acc]
+        _, acc -> acc
+      end)
+
+    talon_resource.display_schema_columns(:index)
+    |> Enum.filter(& &1 in string_fields)
   end
 
   def build_query({:halt, query}, _, _), do: query
