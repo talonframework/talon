@@ -43,7 +43,7 @@ defmodule Mix.Tasks.Compile.ExAdmin do
         for action <- [:index, :edit, :form, :new, :show] do
           unless compile_custom_template(action, resource_name, admin_resource, theme) do
             if Application.get_env :ex_admin, :verbose_compile do
-              IO.puts "compiling global template for #{resource_name} #{action}"
+              IO.puts "compiling global emplate for #{resource_name} #{action}"/
             end
             templ = EEx.eval_file("web/templates/admin/#{theme}/generators/#{action}.html.eex", assigns: [admin_resource: admin_resource])
             File.mkdir_p("web/templates/admin/#{theme}/#{resource_name}")
