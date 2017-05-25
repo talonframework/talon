@@ -1,22 +1,23 @@
 [![Stories in Ready](https://badge.waffle.io/ex-admin/ex_admin.png?label=ready&title=Ready)](https://waffle.io/ex-admin/ex_admin?utm_source=badge)
 # Talon
 
-This is a new Talon project, located under the new Github Group [talonframework](https://github.com/talonframework). This is a complete redesign of Talon. See the justification and goals below.
+This is the new ExAdmin project, located under the new Github Group [talonframework](https://github.com/talonframework). This is a complete redesign of ExAdmin, renamed Talon. See the justification and goals below.
 
 > <b><span style="color: #FA366A;">IMPORTANT NOTE</span></b>
 >
 > This project is still is a work in progress and it not ready for public use yet. Please use this project if you would to contribute to the new archecture.
 >
-> We are considering renaming the Talon project. Personally I, and I suspect others, use Talon for more than backend Talonistrative projects. I use it as the front end on a number of internal IT systems. I find the the 'talon` name gives the perception that its only for talon interfaces. The new archecture is much more decomposible and customizable. So it lends itself more for a generic sie builder than the previous version.
+> We are considering renaming the Talon project. Personally I, and I suspect others, use Talon for more than backend administrative projects. I use it as the front end on a number of internal IT systems. I find the the 'talon` name gives the perception that its only for talon interfaces. The new archecture is much more decomposible and customizable. So it lends itself more for a generic sie builder than the previous version.
 >
 > The project is still in the exploritory stage. Much of the API has not been documented yet, nor any real test coverage added. When we finalized on the overall archtecture, we will go back and complete the docs and tests.
 >
 > Contributors are very welcome. We can use your help!
 
 ## Project Overview
+
 ### Justification
 
-Talon was developed for my first Phoenix Application. The approach I took, although functional, does not align very well with the Phoenix way. Furthermore, I feel that we can do better without the heavy use of DSLs. Finally, I've never been happy with the theme support implementation.
+ExAdmin was developed for my first Phoenix Application. The approach I took, although functional, does not align very well with the Phoenix way. Furthermore, I feel that we can do better without the heavy use of DSLs. Finally, I've never been happy with the theme support implementation.
 
 ### Design Goals
 
@@ -28,7 +29,7 @@ Talon was developed for my first Phoenix Application. The approach I took, altho
 - still works out of the box, without the need to configure anything
 - intelligent defaults
 - optimize the architecture to support large data (no association drop-downs with thousands of entries)
-- support multiple themes/layouts in a single application (front facing layout and a back office "talon" interface)
+- support multiple themes/layouts in a single application (front facing layout and a back office "admin" interface)
 
 ### Ideas being kicked around
 
@@ -51,9 +52,9 @@ Talon was developed for my first Phoenix Application. The approach I took, altho
 
 > <b><span style="color: #FA366A;">NOTE:</span></b>
 >
-> **This will be a break point release. No backwards compatibility!!**
+> **This is a break point release. No backwards compatibility with ExAdmin!!**
 
-See [this issue](https://github.com/smpallen99/talon/issues/367) for more details.
+See [this issue](https://github.com/talonframework/talon/issues/367) for more details.
 
 ## Customize the View Template for a Resource
 
@@ -82,7 +83,7 @@ Run `mix help gen.talon.template` for more options.
 
 Once the override template generator is created, simply edit the .eex template and customize it as designed.
 
-When you compile the project, the new slim template generated. The talon comiler first checks to see if a template is defined in the `templates/talon/theme/resource/generators` path. It will be compiled instead of the global template if it exists.
+When you compile the project, the new slim template generated. The talon comiler first checks to see if a template is defined in the `templates/admin_lte/theme/resource/generators` path. It will be compiled instead of the global template if it exists.
 
 ## TODO
 - [X] Prototype a theme based template generator for master site
@@ -96,9 +97,8 @@ When you compile the project, the new slim template generated. The talon comiler
 - [X] Prototype resource based template overlays
 - [X] Move the theme based layout templates to a generator
 - [ ] --Change the auto generate slime templates to a generator and move the .eex templates to /priv--
-- [ ] Create a generator for generating the default template .eex files
+- [X] Create a generator for generating the default template .eex files
 - [X] Implement the create/update/delete actions in the controller
-- [ ] Move the talon template to Talon
 - [X] Fix the brunch problem pulling the the skins
 - [ ] Add database backended support for the index page datatables
 - [X] Add a show template
@@ -119,13 +119,13 @@ The new Talon architecture is under very active development. So, expect signific
 Before starting to work on anything, please have a quick conversation with @smpallen99 on the relevant issue on [talonframework/talon](https://github.com/talonframework/talon/issues). If an issues does not exist, please create one. For realtime discussions, @smpallen99 can be reached on:
 
 * #talon channel in https://chat.spallen.com (preferred - my own Phoenix chat app)
-* #talon channel in Elixir's slack team
+* #exadmin channel in Elixir's slack team
 * skype `wedge99` (one-on-one voice/video)
 
 Please review [CONTRIUBITING](CONTRIBUTING.md) and [CODE OF CONDUCT](CODE_OF_CONDUCT.md) for additional information.
 ## License
 
-`talon` is Copyright (c) 2015-2017 E-MetroTel
+`talon` is Copyright (c) 2017 E-MetroTel
 
 The source code is released under the MIT License.
 
