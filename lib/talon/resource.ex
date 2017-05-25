@@ -29,8 +29,6 @@ defmodule Talon.Resource do
       @__context__ unquote(context) || (Module.split(__MODULE__) |> hd |> Module.concat(nil))
       @__repo__ unquote(repo) || @__context__.repo() ||  Module.concat(@__context__, Repo)
       @__paginate__ unquote(paginate) || true
-
-      IO.inspect @__module__, label: "compiling module"
       @__params_key__  Module.split(@__module__) |> List.last |> to_string |> Inflex.underscore
       @__route_name__ @__params_key__ |> Inflex.Pluralize.pluralize
 
@@ -219,25 +217,26 @@ defmodule Talon.Resource do
 
       @spec search(Plug.Conn.t) :: Ecto.Query.t
       def search(conn) do
-        Talon.Search.search(schema(), conn.params["search_terms"])
+        Talon.Search.search(__MODULE__, schema(), conn.params["search_terms"])
       end
 
       @spec search(Struct.t, Map.t) :: Ecto.Query.t
       def search(schema, params) do
-        Talon.Search.search(schema, params["search_terms"])
+        Talon.Search.search(__MODULE__, schema, params["search_terms"])
       end
 
       @spec search(Struct.t, Map.t, atom) :: Ecto.Query.t
       def search(schema, params, :search) do
         search(schema, params)
       end
+
       def search(schema, _params, _), do: schema
 
       defoverridable [
         resource_paths: 1, nav_action_links: 2, params_key: 0, display_schema_columns: 1,
         index_card_title: 0, form_card_title: 1, tool_bar: 0, route_name: 0, repo: 0,
         adapter: 0, render_column_name: 2, get_schema_field: 3, preload: 3, context: 0,
-        paginate: 3, query: 3, search: 1, search: 2, search: 3
+        paginate: 3, query: 3, search: 1, search: 3
       ]
     end
 
