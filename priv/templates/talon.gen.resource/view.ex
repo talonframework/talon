@@ -1,5 +1,4 @@
-defmodule <%= theme_module %>.<%= resource <> "View" %> do
-  # defmodule TalonLte.UserView do
-  use Phoenix.View, root: "web/templates/talon/<%= theme_name %>"
-  use Talon.Web, :view
+defmodule <%= theme_module %>.<%= web_namespace %><%= resource <> "View" %> do
+  use Talon.Web, :view<%= view_opts %>
+
 end

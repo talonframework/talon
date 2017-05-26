@@ -1,4 +1,4 @@
-defmodule <%= base %>.TalonResourceController do
+defmodule <%= base %>.<%= web_namespace %>TalonResourceController do
   use <%= base %>.Web, :controller
   use Talon.Controller, repo: <%= base %>.Repo, context: <%= base %>.Talon
 

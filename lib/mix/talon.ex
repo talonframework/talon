@@ -113,15 +113,113 @@ defmodule Mix.Talon do
     end
   end
 
-  def source_path(apps, source_dir) do
-    roots = Enum.map(apps, &to_app_source(&1, source_dir))
-    # source =
-  end
+  # def source_path(apps, source_dir) do
+  #   roots = Enum.map(apps, &to_app_source(&1, source_dir))
+  #   # source =
+  # end
 
   defp to_app_source(path, source_dir) when is_binary(path),
     do: Path.join(path, source_dir)
   defp to_app_source(app, source_dir) when is_atom(app),
     do: Application.app_dir(app, source_dir)
+
+  @spec detect_project_structure() :: :phx | :phoenix | :unknown
+  def detect_project_structure do
+    phx_dir = otp_app_path()
+    cond do
+      File.exists?("web") -> :phoenix
+      Path.join(["lib", phx_dir, "web"]) |> File.exists? -> :phx
+      true -> :unknown
+    end
+  end
+
+  @spec otp_app_path() :: String.t
+  def otp_app_path do
+    to_string(Mix.Phoenix.otp_app())
+  end
+
+  @spec prompt_project_structure(Keyword.t) :: :phx | :phoenix | :unknown
+  def prompt_project_structure(binding) do
+    Mix.shell.info [
+      "Cannot automatically detect the project structure!\n",
+      "1. Use phx 1.3 structure (lib/#{binding.base}/web)\n",
+      "2. Use phoenix structure (web)\n",
+      "3. Abort\n",
+    ]
+
+    case Mix.shell.prompt("Please make a selection") do
+      "1" <> _ ->
+        Mix.shell.info("Using phx structure")
+        :phx
+      "2" <> _ ->
+        Mix.shell.info("Using phoenix structure")
+        :phoenix
+      "3" <> _ ->
+        Mix.raise("User aborted installation!")
+      _ ->
+        Mix.shell.info "Sorry, that's not a valid selection"
+        prompt_project_structure(binding)
+    end
+  end
+
+  def assets_paths(config) do
+    proj_struct = config.project_structure
+    config
+    |> Map.put(:brunch_path, brunch_path(proj_struct))
+    |> Map.put(:images_path, images_path(proj_struct))
+    |> Map.put(:vendor_parent, vendor_parent(proj_struct))
+  end
+
+  defp brunch_path(:phx), do: "assets"
+  defp brunch_path(_), do: ""
+
+  defp images_path(:phx), do: Path.join(~w(assets static images))
+  defp images_path(_), do: Path.join(~w(web static assets images))
+
+  defp vendor_parent(:phx), do: Path.join(~w(assets))
+  defp vendor_parent(_), do: Path.join(~w(web static))
+
+  @doc """
+  Return the current web path based on project structure
+
+  Checks if the project uses phx 1.3 project structure or not. Then
+  verifies that the path exists.
+
+  ## Options
+
+  * verify (false) -- Verify if the path exists
+  """
+  @spec web_path(Keyword.t) :: String.t
+  def web_path(opts \\ []) do
+    path =
+      case detect_project_structure() do
+        :phx -> Path.join ["lib", otp_app_path(), "web"]
+        _    -> "web"
+      end
+
+    if opts[:verify] do
+      unless File.exists?(path), do: Mix.raise("Could not find web path")
+    end
+    path
+  end
+
+  @spec theme_module(String.t) :: Module.t
+  def theme_module(theme) do
+    theme |> theme_module_name |> Module.concat(nil)
+  end
+
+  @spec theme_module_name(String.t) :: String.t
+  def theme_module_name(theme) do
+    Inflex.camelize(theme)
+  end
+
+  @spec view_opts(String.t, atom) :: String.t
+  def view_opts(theme, proj_struct) do
+    name = theme_module_name(theme)
+    module =
+      if proj_struct == :phx, do: Module.concat(name, Web), else: name
+    ~s(, theme: "#{theme}", module: #{module})
+  end
 end
 
 

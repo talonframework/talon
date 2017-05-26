@@ -15,6 +15,9 @@ defmodule Talon.Plug.TalonResource do
     talon = conn.assigns[:talon] || %{}
     context = opts[:talon] || talon[:talon] || raise("talon option required")
     schema = context.schema(conn.params["resource"])
+    unless schema do
+      raise Phoenix.Router.NoRouteError, conn: conn, router: __MODULE__
+    end
     talon_resource = context.talon_resource(conn.params["resource"])
     assign conn, :talon, Enum.into([talon_resource: talon_resource, schema: schema], talon)
   end

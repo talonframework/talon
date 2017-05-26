@@ -1,6 +1,5 @@
-defmodule <%= theme_module %>.PaginateView do
-  use Phoenix.View, root: "web/templates/talon/<%= theme_name %>/components"
-  use Talon.Web, :view
+defmodule <%= theme_module %>.<%= web_namespace %>PaginateView do
+  use Talon.Web, :component_view, theme: <%= theme_name %>, module: <%= theme_module %>.<%= web_namespace %>
 
   import Talon.Components.Paginate
   import Talon.Utils, only: [to_integer: 1]

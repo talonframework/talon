@@ -13,7 +13,7 @@ defmodule Talon.Plug.View do
           talon = conn.assigns[:talon]
           theme = Inflex.camelize talon.theme
           schema = talon.schema |> Module.split |> List.last
-          Module.concat theme, schema <> "View"
+          Module.concat [theme, Talon.web_namespace(), schema <> "View"]
         view ->
           view
       end

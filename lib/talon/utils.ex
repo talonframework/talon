@@ -8,8 +8,9 @@ defmodule Talon.Utils do
   @module Application.get_env(:talon, :module)
 
   if @module do
-    @endpoint Module.concat([@module, "Endpoint"])
-    @router Module.concat([@module, "Router", "Helpers"])
+    @namespace Application.get_env(:talon, :web_namespace)
+    @endpoint Module.concat([@module, @namespace, "Endpoint"])
+    @router Module.concat([@module, @namespace, "Router", "Helpers"])
 
     @doc false
     def endpoint, do: @endpoint

@@ -29,9 +29,14 @@ defmodule Mix.Tasks.Compile.Talon do
     end
   end
 
-  def compile_templates(theme) do
+  defp templates_path(theme) do
+    Path.join([Mix.Talon.web_path(), "templates", "talon", theme])
+  end
+
+  defp compile_templates(theme) do
     try do
       base = Application.get_env :talon, :module
+      base_path = templates_path(theme)
       unless base, do: Mix.raise(":module configuration required")
 
       mod = Module.concat base, Talon
@@ -45,36 +50,40 @@ defmodule Mix.Tasks.Compile.Talon do
             if Application.get_env :talon, :verbose_compile do
               IO.puts "compiling global emplate for #{resource_name} #{action}"
             end
-            templ = EEx.eval_file("web/templates/talon/#{theme}/generators/#{action}.html.eex", assigns: [talon_resource: talon_resource])
-            File.mkdir_p("web/templates/talon/#{theme}/#{resource_name}")
-            File.write("web/templates/talon/#{theme}/#{resource_name}/#{action}.html.slim", templ)
+            base_path = Path.join([Talon.web_path(), "templates", "talon", theme])
+            templ = EEx.eval_file(Path.join([base_path, "generators", "#{action}.html.eex"]), assigns: [talon_resource: talon_resource])
+            File.mkdir_p(Path.join(base_path, resource_name))
+            Path.join([base_path, resource_name, "#{action}.html.slim"])
+            |> File.write(templ)
           end
         end
-        view_name = "#{resource_name}_view.ex"
-        File.touch! "web/views/talon/#{theme}/#{view_name}"
+        File.touch! Path.join(base_path, "#{resource_name}_view.ex")
       end
     rescue
       _ -> []
     end
   end
 
-  def compile_custom_template(action, resource_name, talon_resource, theme) do
-    path = "web/templates/talon/#{theme}/#{resource_name}/generators"
-    template = Path.join path, "#{action}.html.eex"
-    if File.exists? template do
-      if Application.get_env :talon, :verbose_compile do
-        IO.puts "compiling override template for #{resource_name} #{action}"
+  defp compile_custom_template(action, resource_name, talon_resource, theme) do
+    try do
+      base_path = templates_path(theme)
+      path = Path.join([base_path, resource_name, "generators"])
+      template = Path.join path, "#{action}.html.eex"
+      if File.exists? template do
+        if Application.get_env :talon, :verbose_compile do
+          IO.puts "compiling override template for #{resource_name} #{action}"
+        end
+        templ = EEx.eval_file(template, assigns: [talon_resource: talon_resource])
+        File.mkdir_p(Path.join(base_path, resource_name))
+        path = Path.join [base_path, resource_name, "#{action}.html.slim"]
+        File.write!(path, templ)
+        true
+      else
+        false
       end
-      templ = EEx.eval_file(template, assigns: [talon_resource: talon_resource])
-      File.mkdir_p("web/templates/talon/#{theme}/#{resource_name}")
-      path = "web/templates/talon/#{theme}/#{resource_name}/#{action}.html.slim"
-      File.write!(path, templ)
-      true
-    else
-      false
+    rescue
+      _ -> false
     end
   end
 
 end
-
-

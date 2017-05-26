@@ -6,10 +6,9 @@ html lang="en"
     meta content="width=device-width, initial-scale=1" name="viewport"
     meta content="" name="description"
     meta content="" name="author"
-    title Hello ApplicationName!
+    title Hello Talon App
     link rel="stylesheet" href="#{static_path(@conn, "/css/app.css")}"
-    / link rel="stylesheet" href="#{static_path(@conn, "/css/all_themes.css")}"
-    / link rel="stylesheet" href="#{static_path(@conn, "/css/TalonLTE.css")}"
+    link rel="stylesheet" href="#{static_path(@conn, "/css/talon/<%= target_name %>/talon.css")}"
     link href="http://maxcdn.bootstrapcdn.com/font-awesome/latest/css/font-awesome.min.css" rel="stylesheet"
     link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/ionicons/2.0.1/css/ionicons.min.css"
 
