@@ -1,5 +1,4 @@
-defmodule <%= target_module %>.LayoutView do
-  use Phoenix.View, root: "web/templates/talon/<%= target_name %>/"
-  use Talon.Web, :view
+defmodule <%= target_module %>.<%= web_namespace %>LayoutView do
+  use Talon.Web, :component_view, theme: "<%= theme_name %>", module: <%= theme_module %>.<%= web_namespace %>
 
 end

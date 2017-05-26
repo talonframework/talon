@@ -78,7 +78,11 @@ defmodule Talon do
       def resource_names, do: @__resource_map__ |> Map.keys
 
       def schema(resource_name) do
-        talon_resource(resource_name).schema()
+        try do
+          talon_resource(resource_name).schema()
+        rescue
+          _ -> nil
+        end
       end
 
       def schema_names do
@@ -130,5 +134,20 @@ defmodule Talon do
   @spec app_module(atom) :: atom
   def app_module(talon) do
     talon.base()
+  end
+
+  @spec web_namespace() :: Module.t | nil
+  def web_namespace do
+    Application.get_env(:talon, :web_namespace)
+  end
+
+  @spec web_path() :: String.t
+  def web_path do
+    case Application.get_env(:talon, :web_namespace) do
+      nil -> "web"
+      _ ->
+        mod = Application.get_env(:talon, :module)
+        Path.join(["lib", Inflex.underscore(mod), "web"])
+    end
   end
 end

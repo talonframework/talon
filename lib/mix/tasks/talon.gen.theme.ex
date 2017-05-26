@@ -34,6 +34,19 @@ defmodule Mix.Tasks.Talon.Gen.Theme do
   ] ++ Enum.map(@boolean_options, &({&1, :boolean}))
 
   @default_theme "admin_lte"
+  @source_path Path.join(~w(priv templates talon.gen.theme))
+
+  # TODO: Move this to a theme config file.
+  @admin_lte_files [
+    {"vendor/talon/admin-lte/plugins/jQuery", ["jquery-2.2.3.min.js"]},
+    {"vendor/talon/admin-lte/bootstrap/js", ["bootstrap.min.js"]},
+    {"vendor/talon/admin-lte/dist/js", ["app.min.js"]},
+    {"css/talon/admin-lte", ["talon.css"]},
+    {"vendor/talon/admin-lte/dist/css/skins", ["all-skins.css"]},
+    {"vendor/talon/admin-lte/bootstrap/css", ["bootstrap.min.css"]},
+    {"vendor/talon/admin-lte/dist/css", ["AdminLTE.min.css"]},
+  ]
+  @vendor_files %{"admin_lte" =>  @admin_lte_files}
 
   @doc """
   The entry point of the mix task.
@@ -54,15 +67,16 @@ defmodule Mix.Tasks.Talon.Gen.Theme do
   defp do_run(config) do
     log config, inspect(config), label: "config"
     config
+    |> assets_paths
     |> gen_layout_view
     |> gen_layout_templates
     |> gen_generators
-    |> gen_assets
+    |> gen_images
+    |> gen_vendor
     |> gen_brunch
     |> gen_components
     |> print_instructions
   end
-
 
   defp gen_components(config) do
     opts = if config[:verbose], do: ["--verbose"], else: []
@@ -73,9 +87,10 @@ defmodule Mix.Tasks.Talon.Gen.Theme do
   end
 
   defp gen_layout_view(config) do
-    binding = Kernel.binding() ++ [base: config.base, target_name: config.target_name, target_module: config.target_module]
+    binding = Kernel.binding() ++ [base: config.base, target_name: config.target_name,
+      target_module: config.target_module, web_namespace: config.web_namespace]
     theme = config.theme
-    view_path = Path.join([web_path(), "views", "talon", config.target_name])
+    view_path = Path.join([config.web_path, "views", "talon", config.target_name])
     unless config.dry_run do
       File.mkdir_p! view_path
       copy_from paths(),
@@ -87,9 +102,9 @@ defmodule Mix.Tasks.Talon.Gen.Theme do
   end
 
   defp gen_layout_templates(config) do
-    binding = Kernel.binding()
+    binding = Kernel.binding() ++ [web_namespace: config.web_namespace, target_name: config.target_name]
     theme = config.theme
-    template_path = Path.join([web_path(), "templates", "talon", config.theme, "layout"])
+    template_path = Path.join([config.web_path, "templates", "talon", config.theme, "layout"])
     unless config.dry_run do
       File.mkdir_p! template_path
       copy_from paths(),
@@ -107,7 +122,7 @@ defmodule Mix.Tasks.Talon.Gen.Theme do
     binding = Kernel.binding() ++ [base: config.base, target_name: config.target_name,
       target_module: config.target_module]
     theme = config.theme
-    template_path = Path.join([web_path(), "templates", "talon", config.theme, "generators"])
+    template_path = Path.join([config.web_path, "templates", "talon", config.theme, "generators"])
     unless config.dry_run do
       File.mkdir_p! template_path
       copy_from paths(),
@@ -122,9 +137,45 @@ defmodule Mix.Tasks.Talon.Gen.Theme do
     config
   end
 
-  defp gen_assets(config) do
+  defp gen_images(config) do
+    unless config.dry_run do
+      source_path = Path.join([@source_path, "assets", "images"])
+      target_path = Path.join([config.images_path, "talon", config.target_name])
 
+      files =
+        source_path
+        |> Path.join("*")
+        |> Path.wildcard
+        |> Enum.map(&Path.basename/1)
+
+      File.mkdir_p! target_path
+      copy_from paths(), source_path, target_path, [], files, config
+    end
     config
+  end
+
+  defp gen_vendor(config) do
+    unless config.dry_run do
+      source_path = Path.join([@source_path, config.target_name, "assets"]) |> IO.inspect(label: "source_path")
+      target_path = Path.join([config.vendor_parent])
+
+      File.mkdir_p! target_path
+      copy_from paths(), source_path, target_path, [],
+        theme_asset_files(config.target_name), config
+    end
+    config
+  end
+
+  defp theme_asset_files(theme) do
+    @vendor_files[theme]
+    |> Enum.map(fn {path, files} ->
+      Enum.map(files, fn file ->
+        fpath = Path.join(path, file)
+        {:eex, fpath, fpath}
+      end)
+    end)
+    |> List.flatten
+    # |> IO.inspect(label: "theme #{inspect theme} files")
   end
 
   defp gen_brunch(config) do
@@ -158,19 +209,25 @@ defmodule Mix.Tasks.Talon.Gen.Theme do
       |> Atom.to_string
       |> Mix.Phoenix.inflect
       # |> IO.inspect(label: "binding")
+    proj_struct = detect_project_structure()
 
     %{
       theme: theme,
       target_name: target_name,
-      target_module: Inflex.camelize(target_name),
+      target_module: theme_module_name(theme),
       verbose: bin_opts[:verbose],
       dry_run: bin_opts[:dry_run],
-      # package_path: get_package_path(),
+      project_structure: proj_struct,
+      web_namespace: web_namespace(proj_struct),
+      web_path: web_path(verify: true),
       binding: binding,
       boilerplate: bin_opts[:boilerplate] || Application.get_env(:talon, :boilerplate, true),
       base: bin_opts[:module] || binding[:base],
     }
   end
+
+  defp web_namespace(:phx), do: "Web."
+  defp web_namespace(_), do: ""
 
   defp get_available_themes do
     :talon
@@ -194,17 +251,6 @@ defmodule Mix.Tasks.Talon.Gen.Theme do
   # defp lib_path do
   #   Path.join("lib", to_string(Mix.Phoenix.otp_app()))
   # end
-
-  defp web_path do
-    path1 = Path.join ["lib", to_string(Mix.Phoenix.otp_app()), "web"]
-    path2 = "web"
-    cond do
-      File.exists? path1 -> path1
-      File.exists? path2 -> path2
-      true ->
-        raise "Could not find web path '#{path1}'. Please use --web-path option to specify"
-    end
-  end
 
   defp paths do
     [".", :talon]

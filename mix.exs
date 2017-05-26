@@ -28,7 +28,7 @@ defmodule Talon.Mixfile do
       {:scrivener_ecto, "~> 1.1"},
       {:postgrex, ">= 0.0.0", only: :test},
       {:phoenix_slime, github: "slime-lang/phoenix_slime"},
-      {:ecto_talon, github: "talonframework/ecto_talon", only: :test},
+      {:ecto_talon, github: "talonframework/ecto_talon"},
       # {:ecto_talon, path: "../ecto_talon", only: :test},
     ]
   end

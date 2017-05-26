@@ -61,8 +61,8 @@ defmodule Mix.Tasks.Talon.New do
   defp do_run(config) do
     log config, inspect(config), label: "config"
     config
-    |> verify_project!
     |> gen_config
+    |> verify_project!
     |> gen_talon_context
     |> gen_controller
     |> gen_web
@@ -78,7 +78,8 @@ defmodule Mix.Tasks.Talon.New do
 
   def gen_config(config) do
     fname = "talon.exs"
-    binding = Kernel.binding() ++ [base: config.base, theme: config.theme]
+    binding = Kernel.binding() ++ [base: config.base, theme: config.theme,
+      web_namespace: config.web_namespace]
     unless config.dry_run do
       copy_from paths(),
         "priv/templates/talon.new/config", "config", binding, [
@@ -111,8 +112,9 @@ defmodule Mix.Tasks.Talon.New do
 
   def gen_controller(config) do
     fname = "talon_resource_controller.ex"
-    binding = Kernel.binding() ++ [base: config.base, boilerplate: config[:boilerplate]]
-    target_path = Path.join([web_path(), "controllers", "talon"])
+    binding = Kernel.binding() ++ [base: config.base,
+      boilerplate: config[:boilerplate], web_namespace: config.web_namespace]
+    target_path = Path.join([config.web_path, "controllers", "talon"])
     unless config.dry_run do
       File.mkdir_p! target_path
       copy_from paths(),
@@ -125,8 +127,11 @@ defmodule Mix.Tasks.Talon.New do
 
   def gen_web(config) do
     fname = "talon_web.ex"
-    binding = Kernel.binding() ++ [base: config.base]
-    target_path = web_path()
+    theme = config.theme
+    binding = Kernel.binding() ++
+      [base: config.base, web_namespace: config.web_namespace, theme: theme,
+        theme_module: Inflex.camelize(theme), web_path: config.web_path]
+    target_path = config.web_path
     unless config.dry_run do
       File.mkdir_p! target_path
       copy_from paths(),
@@ -139,8 +144,9 @@ defmodule Mix.Tasks.Talon.New do
 
   def gen_messages(config) do
     fname = "messages.ex"
-    binding = Kernel.binding() ++ [base: config.base]
-    target_path = web_path()
+    binding = Kernel.binding() ++
+      [base: config.base, web_namespace: config.web_namespace]
+    target_path = config.web_path
     unless config.dry_run do
       File.mkdir_p! target_path
       copy_from paths(),
@@ -161,7 +167,7 @@ defmodule Mix.Tasks.Talon.New do
 
   def print_instructions(config) do
     Mix.shell.info """
-
+      TBD...
       """
     config
   end
@@ -173,6 +179,8 @@ defmodule Mix.Tasks.Talon.New do
       |> Atom.to_string
       |> Mix.Phoenix.inflect
 
+    proj_struct = detect_project_structure()
+
     %{
       themes: get_themes(args),
       theme: opts[:theme] || @default_theme,
@@ -180,11 +188,17 @@ defmodule Mix.Tasks.Talon.New do
       dry_run: bin_opts[:dry_run],
       package_path: get_package_path(),
       app: Mix.Project.config |> Keyword.fetch!(:app),
+      project_structure: proj_struct,
+      web_namespace: web_namespace(proj_struct),
+      web_path: web_path(verify: true),
       binding: binding,
       boilerplate: bin_opts[:boilerplate] || Application.get_env(:talon, :boilerplate, true),
       base: bin_opts[:module] || binding[:base],
     }
   end
+
+  defp web_namespace(:phx), do: "Web."
+  defp web_namespace(_), do: ""
 
   defp get_themes({opts, bin_opts, _parsed}) do
     cond do
@@ -209,17 +223,6 @@ defmodule Mix.Tasks.Talon.New do
   # defp lib_path do
   #   Path.join("lib", to_string(Mix.Phoenix.otp_app()))
   # end
-
-  defp web_path do
-    path1 = Path.join ["lib", to_string(Mix.Phoenix.otp_app()), "web"]
-    path2 = "web"
-    cond do
-      File.exists? path1 -> path1
-      File.exists? path2 -> path2
-      true ->
-        raise "Could not find web path '#{path1}'. Please use --web-path option to specify"
-    end
-  end
 
   defp paths do
     [".", :talon]

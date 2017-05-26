@@ -73,10 +73,13 @@ defmodule Mix.Tasks.Talon.Gen.Resource do
     name = String.downcase config.resource
     unless config.dry_run do
       Enum.each config.themes, fn theme ->
-        binding = Kernel.binding() ++ [base: config[:base], resource: config.resource, theme_module: Inflex.camelize(theme), theme_name: theme]
+        view_opts = view_opts(theme, config.project_structure)
+        binding = config.binding ++ [base: config[:base], resource: config.resource,
+          theme_module: theme_module_name(theme), theme_name: theme, view_opts: view_opts,
+          web_namespace: config.web_namespace]
         copy_from paths(),
           "priv/templates/talon.gen.resource", "", binding, [
-            {:eex, "view.ex", Path.join([web_path(), "views", "talon",theme, "#{name}_view.ex"])}
+            {:eex, "view.ex", Path.join([config.web_path, "views", "talon",theme, "#{name}_view.ex"])}
           ], config
       end
     end
@@ -103,7 +106,7 @@ defmodule Mix.Tasks.Talon.Gen.Resource do
       |> Atom.to_string
       |> Mix.Phoenix.inflect
 
-    resource =
+    scoped_resource =
       case parsed do
         [resource] ->
           resource
@@ -111,17 +114,35 @@ defmodule Mix.Tasks.Talon.Gen.Resource do
           Mix.raise "Invalid arguments #{inspect other}"
       end
 
+    proj_struct = detect_project_structure()
+
+    resource =
+      if proj_struct == :phx do
+        case Module.split(scoped_resource) do
+          [_scope, resource | tail] -> inspect Module.concat([resource | tail])
+          _ -> scoped_resource
+        end
+      else
+        scoped_resource
+      end
+
     %{
       themes: get_themes(args),
       verbose: bin_opts[:verbose],
       resource: resource,
+      scoped_resource: scoped_resource,
+      web_path: web_path(),
       dry_run: bin_opts[:dry_run],
-      package_path: get_package_path(),
       binding: binding,
+      web_namespace: web_namespace(proj_struct),
+      project_structure: proj_struct,
       boilerplate: bin_opts[:boilerplate] || Application.get_env(:talon, :boilerplate, true),
       base: bin_opts[:module] || binding[:base],
     }
   end
+
+  defp web_namespace(:phx), do: "Web."
+  defp web_namespace(_), do: ""
 
   defp get_themes({opts, bin_opts, _parsed}) do
     cond do
@@ -145,17 +166,6 @@ defmodule Mix.Tasks.Talon.Gen.Resource do
 
   defp lib_path do
     Path.join("lib", to_string(Mix.Phoenix.otp_app()))
-  end
-
-  defp web_path do
-    path1 = Path.join ["lib", to_string(Mix.Phoenix.otp_app()), "web"]
-    path2 = "web"
-    cond do
-      File.exists? path1 -> path1
-      File.exists? path2 -> path2
-      true ->
-        raise "Could not find web path '#{path1}'. Please use --web-path option to specify"
-    end
   end
 
   defp paths do

@@ -73,14 +73,14 @@ defmodule Mix.Tasks.Talon.Gen.Components do
 
   defp gen_component_views(config, {_component, component_path} = comp_info) do
     source_path = Path.join([component_path, "views"])
-    target_path = Path.join([web_path(), "views", "talon", config.theme_name, "components"])
+    target_path = Path.join([config.web_path, "views", "talon", config.theme_name, "components"])
 
     gen_files(config, comp_info, source_path, target_path)
   end
 
   defp gen_component_templates(config, {component, component_path} = comp_info) do
     source_path = Path.join([component_path, "templates"])
-    target_path = Path.join([web_path(), "templates", "talon", config.theme_name, "components", component])
+    target_path = Path.join([config.web_path, "templates", "talon", config.theme_name, "components", component])
 
     gen_files(config, comp_info, source_path, target_path)
   end
@@ -92,7 +92,8 @@ defmodule Mix.Tasks.Talon.Gen.Components do
       |> Path.wildcard
       |> Enum.map(&Path.basename/1)
 
-    binding = Kernel.binding() ++ [base: config.base, theme_name: config.theme_name, theme_module: config.theme_module]
+    binding = Kernel.binding() ++ [base: config.base, theme_name: config.theme_name,
+      theme_module: config.theme_module, web_namespace: config.web_namespace]
 
     infos =
       file_names
@@ -132,16 +133,23 @@ defmodule Mix.Tasks.Talon.Gen.Components do
       |> Atom.to_string
       |> Mix.Phoenix.inflect
 
+    proj_struct = detect_project_structure()
+
     %{
       theme_name: theme_name,
       theme_module: theme_module,
       verbose: bin_opts[:verbose],
       dry_run: bin_opts[:dry_run],
       binding: binding,
+      web_path: web_path(verify: true),
+      web_namespace: web_namespace(proj_struct),
       boilerplate: bin_opts[:boilerplate] || Application.get_env(:talon, :boilerplate, true),
       base: bin_opts[:module] || binding[:base],
     }
   end
+
+  defp web_namespace(:phx), do: "Web."
+  defp web_namespace(_), do: ""
 
   defp get_available_themes do
     :talon
@@ -156,17 +164,6 @@ defmodule Mix.Tasks.Talon.Gen.Components do
   defp parse_options(opts, parsed) do
     bin_opts = Enum.filter(opts, fn {k,_v} -> k in @boolean_options end)
     {bin_opts, opts -- bin_opts, parsed}
-  end
-
-  defp web_path do
-    path1 = Path.join ["lib", to_string(Mix.Phoenix.otp_app()), "web"]
-    path2 = "web"
-    cond do
-      File.exists? path1 -> path1
-      File.exists? path2 -> path2
-      true ->
-        raise "Could not find web path '#{path1}'. Please use --web-path option to specify"
-    end
   end
 
   defp copy_from(source_dir, target_dir, binding, mapping, config) when is_list(mapping) do

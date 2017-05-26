@@ -12,7 +12,7 @@ defmodule <%= base %>.Talon.Messages do
   """
   @behaviour Talon.Messages
 
-  import <%= base %>.Gettext
+  import <%= base %>.<%= web_namespace %>Gettext
 
   # Change this to override the "talon" gettext domain. If you would like
   # the talon message to be part of your projects domain change it to "default"
