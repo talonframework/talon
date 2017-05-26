@@ -58,7 +58,8 @@ defmodule Mix.Tasks.Talon.Gen.Resource do
   end
 
   def create_resource_file(config) do
-    binding = config.binding ++ [base: config[:base], boilerplate: config.boilerplate, resource: config.resource]
+    binding = config.binding ++ [base: config[:base], boilerplate: config.boilerplate,
+      resource: config.resource, scoped_resource: config.scoped_resource]
     name = String.downcase config.resource
     unless config.dry_run do
       copy_from paths(),

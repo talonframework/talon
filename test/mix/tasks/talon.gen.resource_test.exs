@@ -52,7 +52,8 @@ defmodule Mix.Tasks.Talon.Gen.ResourceTest do
       mk_web_path()
       GenResource.create_resource_file phx_config()
       assert_file "lib/blogger/talon/blog.ex", fn file ->
-        assert file =~ "defmodule Blogger.Talon.Blog do"
+        assert file =~ "defmodule Blogger.Talon.Blogs.Blog do"
+        assert file =~ "use Talon.Resource, schema: Blogger.Blogs.Blog, context: Blogger.Talon"
       end
     end
   end

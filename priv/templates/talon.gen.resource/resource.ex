@@ -1,10 +1,10 @@
-defmodule <%= base %>.Talon.<%= resource %> do
+defmodule <%= base %>.Talon.<%= scoped_resource %> do
   @moduledoc """
   Use this file to configure how Talon renders your resource.
 
   TBD
   """
-  use Talon.Resource, schema: <%= "#{base}.#{resource}" %>, context: <%= "#{base}.Talon" %>
+  use Talon.Resource, schema: <%= "#{base}.#{scoped_resource}" %>, context: <%= "#{base}.Talon" %>
   <%= if boilerplate do %>
   # The above is all that is required to use Talon with defaults
   # If you would like to customize some of the features, wee the
