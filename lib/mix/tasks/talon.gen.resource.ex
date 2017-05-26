@@ -58,12 +58,12 @@ defmodule Mix.Tasks.Talon.Gen.Resource do
   end
 
   def create_resource_file(config) do
-    binding = Kernel.binding() ++ [base: config[:base], boilerplate: config.boilerplate, resource: config.resource]
+    binding = config.binding ++ [base: config[:base], boilerplate: config.boilerplate, resource: config.resource]
     name = String.downcase config.resource
     unless config.dry_run do
       copy_from paths(),
         "priv/templates/talon.gen.resource", "", binding, [
-          {:eex, "resource.ex", Path.join(lib_path(), "talon/#{name}.ex")}
+          {:eex, "resource.ex", Path.join(config.lib_path, "talon/#{name}.ex")}
         ], config
     end
     config
@@ -117,13 +117,12 @@ defmodule Mix.Tasks.Talon.Gen.Resource do
     proj_struct = detect_project_structure()
 
     resource =
-      if proj_struct == :phx do
-        case Module.split(scoped_resource) do
-          [_scope, resource | tail] -> inspect Module.concat([resource | tail])
-          _ -> scoped_resource
-        end
+      with :phx <- proj_struct,
+           true <- String.contains?(scoped_resource, "."),
+           [_scope, resource | tail]  <- String.split(scoped_resource, ".") do
+        Enum.join([resource | tail], ".")
       else
-        scoped_resource
+        _ -> scoped_resource
       end
 
     %{
@@ -134,6 +133,7 @@ defmodule Mix.Tasks.Talon.Gen.Resource do
       web_path: web_path(),
       dry_run: bin_opts[:dry_run],
       binding: binding,
+      lib_path: lib_path(),
       web_namespace: web_namespace(proj_struct),
       project_structure: proj_struct,
       boilerplate: bin_opts[:boilerplate] || Application.get_env(:talon, :boilerplate, true),

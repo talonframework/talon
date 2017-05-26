@@ -1,0 +1,23 @@
+
+.index-actions button.action-edit,
+.index-actions button.action-delete {
+  margin-left: 2px;
+}
+
+.help-block {
+  color: #dd4b39 !important;
+  font-weight: 600;
+}
+/*#datatables td {
+  width: inherit;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}*/
+table.index_table th.sortable a {
+      background: url("/images/talon/orderable.png") no-repeat 0 4px;
+      padding-left: 13px; }
+table.index_table th.sorted-asc a {
+      background-position: 0 -27px; }
+table.index_table th.sorted-desc a {
+      background-position: 0 -56px; }

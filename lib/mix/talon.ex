@@ -217,7 +217,7 @@ defmodule Mix.Talon do
   def view_opts(theme, proj_struct) do
     name = theme_module_name(theme)
     module =
-      if proj_struct == :phx, do: Module.concat(name, Web), else: name
+      if proj_struct == :phx, do: Module.concat(name, Web) |> inspect, else: name
     ~s(, theme: "#{theme}", module: #{module})
   end
 end
