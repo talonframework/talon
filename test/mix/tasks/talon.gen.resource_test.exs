@@ -29,6 +29,7 @@ defmodule Mix.Tasks.Talon.Gen.ResourceTest do
     themes: ["admin_lte"],
     project_structure: :phx,
     verbose: false,
+    lib_path: "lib/blogger",
     web_namespace: "Web."
   }
 
@@ -42,6 +43,16 @@ defmodule Mix.Tasks.Talon.Gen.ResourceTest do
       GenResource.create_view phx_config()
       assert_file web_path("views/talon/admin_lte/blog_view.ex"), fn file ->
         assert file =~ "defmodule AdminLte.Web.BlogView do"
+      end
+    end
+  end
+
+  test "create_resource_file" do
+    in_tmp "create_resource_file", fn ->
+      mk_web_path()
+      GenResource.create_resource_file phx_config()
+      assert_file "lib/blogger/talon/blog.ex", fn file ->
+        assert file =~ "defmodule Blogger.Talon.Blog do"
       end
     end
   end

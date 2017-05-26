@@ -88,7 +88,8 @@ defmodule Mix.Tasks.Talon.Gen.Theme do
 
   defp gen_layout_view(config) do
     binding = Kernel.binding() ++ [base: config.base, target_name: config.target_name,
-      target_module: config.target_module, web_namespace: config.web_namespace]
+      target_module: config.target_module, web_namespace: config.web_namespace,
+      view_opts: config.view_opts]
     theme = config.theme
     view_path = Path.join([config.web_path, "views", "talon", config.target_name])
     unless config.dry_run do
@@ -210,6 +211,7 @@ defmodule Mix.Tasks.Talon.Gen.Theme do
       |> Mix.Phoenix.inflect
       # |> IO.inspect(label: "binding")
     proj_struct = detect_project_structure()
+    view_opts = view_opts(theme, proj_struct)
 
     %{
       theme: theme,
@@ -220,6 +222,7 @@ defmodule Mix.Tasks.Talon.Gen.Theme do
       project_structure: proj_struct,
       web_namespace: web_namespace(proj_struct),
       web_path: web_path(verify: true),
+      view_opts: view_opts,
       binding: binding,
       boilerplate: bin_opts[:boilerplate] || Application.get_env(:talon, :boilerplate, true),
       base: bin_opts[:module] || binding[:base],
