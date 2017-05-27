@@ -89,11 +89,10 @@ defmodule Mix.Tasks.Talon.Gen.Resource do
 
   def print_instructions(config) do
     Mix.shell.info """
-
       Remember to update your config file with the resource module
         config :talon, :modules, [
           ...
-          #{config.base}.Talon.#{config.resource}
+          #{config.base}.Talon.#{config.scoped_resource}
         ]
       """
     config
