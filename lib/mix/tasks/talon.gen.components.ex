@@ -93,7 +93,8 @@ defmodule Mix.Tasks.Talon.Gen.Components do
       |> Enum.map(&Path.basename/1)
 
     binding = Kernel.binding() ++ [base: config.base, theme_name: config.theme_name,
-      theme_module: config.theme_module, web_namespace: config.web_namespace]
+      theme_module: config.theme_module, web_namespace: config.web_namespace,
+      view_opts: config.view_opts]
 
     infos =
       file_names
@@ -134,6 +135,7 @@ defmodule Mix.Tasks.Talon.Gen.Components do
       |> Mix.Phoenix.inflect
 
     proj_struct = detect_project_structure()
+    view_opts = view_opts(theme_name, proj_struct)
 
     %{
       theme_name: theme_name,
@@ -141,6 +143,7 @@ defmodule Mix.Tasks.Talon.Gen.Components do
       verbose: bin_opts[:verbose],
       dry_run: bin_opts[:dry_run],
       binding: binding,
+      view_opts: view_opts,
       web_path: web_path(verify: true),
       web_namespace: web_namespace(proj_struct),
       boilerplate: bin_opts[:boilerplate] || Application.get_env(:talon, :boilerplate, true),

@@ -121,7 +121,7 @@ defmodule Mix.Tasks.Talon.Gen.Theme do
 
   defp gen_generators(config) do
     binding = Kernel.binding() ++ [base: config.base, target_name: config.target_name,
-      target_module: config.target_module]
+      target_module: config.target_module, web_namespace: config.web_namespace]
     theme = config.theme
     template_path = Path.join([config.web_path, "templates", "talon", config.theme, "generators"])
     unless config.dry_run do

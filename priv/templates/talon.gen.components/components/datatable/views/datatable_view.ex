@@ -1,5 +1,5 @@
 defmodule <%= theme_module %>.<%= web_namespace %>DatatableView do
-  use Talon.Web, :component_view, theme: <%= theme_name %>, module: <%= theme_module %>.<%= web_namespace %>
+  use Talon.Web, which: :component_view<%= view_opts %>
   use Talon.Components.Datatable, __MODULE__
 
 end

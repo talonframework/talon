@@ -61,7 +61,7 @@ defmodule Talon.Web do
   def component_view(opts) do
     quote do
       opts = unquote(opts)
-      use Phoenix.View, root: "<%= web_path %>/templates/talon/#{opts[:theme]}}/components", namespace: opts[:module]
+      use Phoenix.View, root: "<%= web_path %>/templates/talon/#{opts[:theme]}/components", namespace: opts[:module]
 
       # Import convenience functions from controllers
       import Phoenix.Controller, only: [get_csrf_token: 0, get_flash: 2, view_module: 1]
@@ -95,7 +95,10 @@ defmodule Talon.Web do
   @doc """
   When used, dispatch to the appropriate controller/view/etc.
   """
-  defmacro __using__(which, opts \\ []) when is_atom(which) do
-    apply(__MODULE__, which, opts)
+  defmacro __using__(which) when is_atom(which) do
+    apply(__MODULE__, which, [])
+  end
+  defmacro __using__(opts) when is_list(opts) do
+    apply(__MODULE__, opts[:which], [opts])
   end
 end
