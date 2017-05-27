@@ -5,28 +5,47 @@ defmodule Talon.Utils do
   require Logger
   alias Talon.Messages
 
-  @module Application.get_env(:talon, :module)
+  # @module Application.get_env(:talon, :module)
 
-  if @module do
-    @namespace Application.get_env(:talon, :web_namespace)
-    @endpoint Module.concat([@module, @namespace, "Endpoint"])
-    @router Module.concat([@module, @namespace, "Router", "Helpers"])
+  # if @module do
+  #   @namespace Application.get_env(:talon, :web_namespace)
+  #   @endpoint Module.concat([@module, @namespace, "Endpoint"])
+  #   @router Module.concat([@module, @namespace, "Router", "Helpers"])
 
-    @doc false
-    def endpoint, do: @endpoint
-    @doc false
-    def router, do: @router
-  else
-    # run time version of endpoint and router
-    Logger.warn """
-    Talon requires recompiling after adding :talon configuration in your config/config.exs file.
-    After running 'mix talon.install' and updating your config.exs file, please
-    run 'touch deps/talon/mix.exs && mix deps.compile talon'.
-    """
-    @doc false
-    def endpoint, do: Module.concat([Application.get_env(:talon, :module), "Endpoint"])
-    @doc false
-    def router, do: Module.concat([Application.get_env(:talon, :module), "Router", "Helpers"])
+  #   @doc false
+  #   def endpoint, do: @endpoint
+  #   @doc false
+  #   def router, do: @router
+  # else
+  #   # run time version of endpoint and router
+  #   Logger.warn """
+  #   Talon requires recompiling after adding :talon configuration in your config/config.exs file.
+  #   After running 'mix talon.install' and updating your config.exs file, please
+  #   run 'touch deps/talon/mix.exs && mix deps.compile talon'.
+  #   """
+  #   @doc false
+  #   def endpoint, do: Module.concat([Application.get_env(:talon, :module), "Endpoint"])
+  #   @doc false
+  #   def router, do: Module.concat([Application.get_env(:talon, :module), "Router", "Helpers"])
+  # end
+
+  # TODO: This needs to be done differently. In needs to be scoped to the
+  #       applicable talon context
+
+  def router do
+    module = Application.get_env(:talon, :module)
+    namespace =  Application.get_env(:talon, :web_namespace)
+    Module.concat([module, namespace, "Router"])
+  end
+
+  def router_helpers do
+    Module.concat router(), "Helpers"
+  end
+
+  def endpoint do
+    module = Application.get_env(:talon, :module)
+    namespace =  Application.get_env(:talon, :web_namespace)
+    Module.concat([module, namespace, "Endpoint"])
   end
 
   @doc "Pads with zero"
@@ -213,7 +232,7 @@ defmodule Talon.Utils do
   end
   def talon_resource_path(resource_model, method, args) when is_atom(resource_model) do
     resource_name = resource_model |> Talon.Helpers.model_name |> Inflex.pluralize
-    apply(router(), :talon_resource_path, [endpoint(), method || :index, resource_name | args])
+    apply(router_helpers(), :talon_resource_path, [endpoint(), method || :index, resource_name | args])
   end
   def talon_resource_path(resource, method, args) when is_map(resource) do
     resource_model = resource.__struct__
@@ -241,10 +260,10 @@ defmodule Talon.Utils do
       "/talon/select_theme/1"
   """
   def talon_path do
-    router().talon_path(endpoint(), :dashboard)
+    router_helpers().talon_path(endpoint(), :dashboard)
   end
   def talon_path(method, args \\ []) do
-    apply(router(), :talon_path, [endpoint(), method | args])
+    apply(router_helpers(), :talon_path, [endpoint(), method | args])
   end
 
   @doc """
@@ -261,7 +280,7 @@ defmodule Talon.Utils do
   def talon_association_path(resource, assoc_name, method \\ nil, args \\ []) do
     resource_model = resource.__struct__
     resource_id = Talon.Schema.get_id(resource)
-    apply(router(), :talon_association_path, [endpoint(), method || :index, resource_model.__schema__(:source), resource_id, assoc_name | args])
+    apply(router_helpers(), :talon_association_path, [endpoint(), method || :index, resource_model.__schema__(:source), resource_id, assoc_name | args])
   end
 
 

@@ -6,8 +6,7 @@ html lang="en"
     meta content="width=device-width, initial-scale=1" name="viewport"
     meta content="" name="description"
     meta content="" name="author"
-    title Hello Talon App
-    link rel="stylesheet" href="#{static_path(@conn, "/css/app.css")}"
+    title Talon
     link rel="stylesheet" href="#{static_path(@conn, "/css/talon/<%= target_name %>/talon.css")}"
     link href="http://maxcdn.bootstrapcdn.com/font-awesome/latest/css/font-awesome.min.css" rel="stylesheet"
     link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/ionicons/2.0.1/css/ionicons.min.css"
@@ -16,8 +15,8 @@ html lang="en"
     .wrapper
       header.main-header
         a href="#" class="logo"
-          span.logo-mini = raw "<b>A</b>LT"
-          span.logo-lg = raw "<b>Talon</b>LTE"
+          span.logo-mini = raw "<b>T</b>F"
+          span.logo-lg = raw "<b>T</b>alon"
         nav.navbar.navbar-static-top
           a.sidebar-toggle href="#" data-toggle="offcanvas" role="button"
             span.sr-only "Toggle navigation"
@@ -37,14 +36,7 @@ html lang="en"
         section.content = render @view_module, @view_template, assigns
 
       footer.main-footer
-      / aside.control-sidebar.control-sidebar-dark.control-sidebar-open
 
-    script src="#{static_path(@conn, "/js/jquery-2.2.3.min.js")}"
-    script src="#{static_path(@conn, "/js/bootstrap.min.js")}"
-    script src="#{static_path(@conn, "/js/jquery.dataTables.js")}"
-    script src="#{static_path(@conn, "/js/dataTables.bootstrap.js")}"
-    script src="#{static_path(@conn, "/js/app.min.js")}"
-    script src="#{static_path(@conn, "/js/app.js")}"
-
-
-    / script src="#{static_path(@conn, "/js/vendor.js")}"
+    script src="#{static_path(@conn, "/js/<%= target_name %>/jquery-2.2.3.min.js")}"
+    script src="#{static_path(@conn, "/js/<%= target_name %>/bootstrap.min.js")}"
+    script src="#{static_path(@conn, "/js/talon/<%= target_name %>/app.min.js")}"

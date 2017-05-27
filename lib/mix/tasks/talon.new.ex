@@ -90,10 +90,27 @@ defmodule Mix.Tasks.Talon.New do
     path = "config/config.exs"
 
     contents = File.read!(path)
-    unless String.contains? contents, fname do
-      File.write path, contents <> "\n" <> ~s(import_config "#{fname}"\n)
-    end
+
+    File.write path,
+      contents
+      |> append_talon_config(fname, contents =~ fname)
+      |> append_template_engine(contents =~ "PhoenixSlime.Engine")
+
     config
+  end
+
+  defp append_talon_config(contents, _, true), do: contents
+  defp append_talon_config(contents, fname, _) do
+    contents <> "\n" <> ~s(import_config "#{fname}") <> "\n"
+  end
+
+  defp append_template_engine(contents, true), do: contents
+  defp append_template_engine(contents, _) do
+    contents <> """
+      config :phoenix, :template_engines,
+        slim: PhoenixSlime.Engine,
+        slime: PhoenixSlime.Engine
+      """
   end
 
   def gen_talon_context(config) do
