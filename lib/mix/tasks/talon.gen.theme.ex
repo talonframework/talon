@@ -19,6 +19,7 @@ defmodule Mix.Tasks.Talon.Gen.Theme do
 
   * --dry-run -- print what will be done, but don't create any files
   * --verbose -- Print extra information
+  * --web-path=path -- set the web path
   """
   use Mix.Task
 
@@ -26,15 +27,16 @@ defmodule Mix.Tasks.Talon.Gen.Theme do
   # import Mix.Generator
 
   # list all supported boolean options
-  @boolean_options ~w(all_themes verbose boilerplate dry_run no_assets no_brunch)a
+  @boolean_options ~w(all_themes verbose boilerplate dry_run no_assets no_brunch phx phoenix)a
 
   # complete list of supported options
   @switches [
-    theme: :string
+    theme: :string, web_path: :string, assets_path: :string
   ] ++ Enum.map(@boolean_options, &({&1, :boolean}))
 
   @default_theme "admin_lte"
-  @source_path Path.join(~w(priv templates talon.gen.theme))
+  @source_path_relative Path.join(~w(priv templates talon.gen.theme))
+  @source_path Path.join(Application.app_dir(:talon), @source_path_relative)
 
   # TODO: Move this to a theme config file.
   @admin_lte_files [
@@ -47,6 +49,8 @@ defmodule Mix.Tasks.Talon.Gen.Theme do
     {"vendor/talon/admin-lte/dist/css", ["AdminLTE.min.css"]},
   ]
   @vendor_files %{"admin_lte" =>  @admin_lte_files}
+
+  @theme_mapping %{"admin_lte" => "admin-lte"}
 
   @doc """
   The entry point of the mix task.
@@ -81,6 +85,7 @@ defmodule Mix.Tasks.Talon.Gen.Theme do
   defp gen_components(config) do
     opts = if config[:verbose], do: ["--verbose"], else: []
     opts = if config[:dry_run], do: ["--dry-run" | opts], else: opts
+    opts = ["--web-path=#{config.web_path}", "--proj-struct=#{config.project_structure}" | opts]
 
     Mix.Tasks.Talon.Gen.Components.run([@default_theme] ++ opts)
     config
@@ -138,9 +143,12 @@ defmodule Mix.Tasks.Talon.Gen.Theme do
     config
   end
 
-  defp gen_images(config) do
+  def gen_images(config) do
     unless config.dry_run do
-      source_path = Path.join([@source_path, "assets", "images"])
+      theme_name = @theme_mapping[config.theme]
+      path = Path.join [config.theme, "assets", "static", "images", "talon", theme_name]
+      source_path = Path.join([@source_path, path])
+      source_path_relative = Path.join(@source_path_relative, path)
       target_path = Path.join([config.images_path, "talon", config.target_name])
 
       files =
@@ -148,20 +156,21 @@ defmodule Mix.Tasks.Talon.Gen.Theme do
         |> Path.join("*")
         |> Path.wildcard
         |> Enum.map(&Path.basename/1)
+        |> Enum.map(& {:text, &1, &1})
 
       File.mkdir_p! target_path
-      copy_from paths(), source_path, target_path, [], files, config
+      copy_from paths(), source_path_relative, target_path, [], files, config
     end
     config
   end
 
-  defp gen_vendor(config) do
+  def gen_vendor(config) do
     unless config.dry_run do
-      source_path = Path.join([@source_path, config.target_name, "assets"]) |> IO.inspect(label: "source_path")
+      source_path = Path.join([@source_path_relative, config.target_name, "assets"])
       target_path = Path.join([config.vendor_parent])
 
       File.mkdir_p! target_path
-      copy_from paths(), source_path, target_path, [],
+      copy_from paths(), source_path, target_path, [target_name: config.target_name],
         theme_asset_files(config.target_name), config
     end
     config
@@ -191,7 +200,7 @@ defmodule Mix.Tasks.Talon.Gen.Theme do
     config
   end
 
-  defp do_config({bin_opts, _opts, parsed} = _args) do
+  defp do_config({bin_opts, opts, parsed} = _args) do
     themes = get_available_themes()
 
     {theme, target_name} =
@@ -210,7 +219,13 @@ defmodule Mix.Tasks.Talon.Gen.Theme do
       |> Atom.to_string
       |> Mix.Phoenix.inflect
       # |> IO.inspect(label: "binding")
-    proj_struct = detect_project_structure()
+    proj_struct =
+      cond do
+        bin_opts[:phx] -> :phx
+        bin_opts[:phoenix] -> :phoenix
+        true -> detect_project_structure()
+      end
+
     view_opts = view_opts(theme, proj_struct)
 
     %{
@@ -221,7 +236,7 @@ defmodule Mix.Tasks.Talon.Gen.Theme do
       dry_run: bin_opts[:dry_run],
       project_structure: proj_struct,
       web_namespace: web_namespace(proj_struct),
-      web_path: web_path(verify: true),
+      web_path: opts[:web_path] || web_path(verify: true),
       view_opts: view_opts,
       binding: binding,
       boilerplate: bin_opts[:boilerplate] || Application.get_env(:talon, :boilerplate, true),

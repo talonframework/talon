@@ -22,6 +22,7 @@ defmodule Mix.Tasks.Talon.Gen.Components do
 
   # complete list of supported options
   @switches [
+    web_path: :string, proj_struct: :string
   ] ++ Enum.map(@boolean_options, &({&1, :boolean}))
 
   @component_path "priv/templates/talon.gen.components/components/*"
@@ -45,6 +46,7 @@ defmodule Mix.Tasks.Talon.Gen.Components do
 
   defp do_run(config) do
     log config, inspect(config), label: "config"
+
     config
     |> get_components
     |> gen_components
@@ -113,7 +115,7 @@ defmodule Mix.Tasks.Talon.Gen.Components do
     config
   end
 
-  defp do_config({bin_opts, _opts, parsed} = _args) do
+  defp do_config({bin_opts, opts, parsed} = _args) do
     themes = get_available_themes()
 
     theme_name =
@@ -134,7 +136,7 @@ defmodule Mix.Tasks.Talon.Gen.Components do
       |> Atom.to_string
       |> Mix.Phoenix.inflect
 
-    proj_struct = detect_project_structure()
+    proj_struct = to_atom(opts[:proj_struct] || detect_project_structure())
     view_opts = view_opts(theme_name, proj_struct)
 
     %{
@@ -143,13 +145,17 @@ defmodule Mix.Tasks.Talon.Gen.Components do
       verbose: bin_opts[:verbose],
       dry_run: bin_opts[:dry_run],
       binding: binding,
+      project_structure: proj_struct,
       view_opts: view_opts,
-      web_path: web_path(verify: true),
+      web_path: opts[:web_path] || web_path(verify: true),
       web_namespace: web_namespace(proj_struct),
       boilerplate: bin_opts[:boilerplate] || Application.get_env(:talon, :boilerplate, true),
       base: bin_opts[:module] || binding[:base],
     }
   end
+
+  defp to_atom(atom) when is_atom(atom), do: atom
+  defp to_atom(string), do: String.to_atom(string)
 
   defp web_namespace(:phx), do: "Web."
   defp web_namespace(_), do: ""

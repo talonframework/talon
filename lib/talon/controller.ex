@@ -22,7 +22,7 @@ defmodule Talon.Controller do
       @spec new(Plug.Conn.t, Map.t) :: Plug.Conn.t
       def new(conn, _params) do
         talon = conn.assigns.talon
-        changeset = talon.talon_resource.schema.changeset(conn.assigns.resource)
+        changeset = talon.talon_resource.schema.changeset(conn.assigns.resource, %{})
         render(conn, "new.html", changeset: changeset)
       end
 
@@ -33,7 +33,7 @@ defmodule Talon.Controller do
 
       @spec edit(Plug.Conn.t, Map.t) :: Plug.Conn.t
       def edit(conn, params) do
-        changeset = conn.assigns.talon.schema.changeset(conn.assigns.resource)
+        changeset = conn.assigns.talon.schema.changeset(conn.assigns.resource, %{})
         render conn, "edit.html", changeset: changeset
       end
 
@@ -79,7 +79,7 @@ defmodule Talon.Controller do
         theme_module = Talon.View.theme_module(conn)
         conn
         |> put_layout(false)
-        |> put_view(Module.concat(theme_module, DatatableView))
+        |> put_view(Module.concat([theme_module, Application.get_env(:talon, :web_namespace), DatatableView]))
         |> render("search.html", conn: conn)
       end
 

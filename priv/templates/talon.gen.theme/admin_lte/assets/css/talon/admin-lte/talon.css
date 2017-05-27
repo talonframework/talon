@@ -8,16 +8,16 @@
   color: #dd4b39 !important;
   font-weight: 600;
 }
-/*#datatables td {
-  width: inherit;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}*/
 table.index_table th.sortable a {
-      background: url("/images/talon/orderable.png") no-repeat 0 4px;
-      padding-left: 13px; }
+  background: url("/images/talon/<%= target_name %>/orderable.png") no-repeat 0 4px;
+  padding-left: 13px;
+}
 table.index_table th.sorted-asc a {
-      background-position: 0 -27px; }
+  background-position: 0 -27px;
+}
 table.index_table th.sorted-desc a {
-      background-position: 0 -56px; }
+  background-position: 0 -56px;
+}
+table.index_table th.selectable {
+  width: 25px;
+}
