@@ -176,7 +176,7 @@ defmodule Mix.Talon do
   defp images_path(:phx), do: Path.join(~w(assets static images))
   defp images_path(_), do: Path.join(~w(web static assets images))
 
-  defp vendor_parent(:phx), do: Path.join(~w(assets))
+  defp vendor_parent(:phx), do: "assets"
   defp vendor_parent(_), do: Path.join(~w(web static))
 
   @doc """

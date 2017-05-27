@@ -44,6 +44,7 @@ defmodule Talon.Router do
       if Application.get_env :talon, :login_user do
         get "/switch_user/:id", TalonController, :switch_user
       end
+      get "/:resource/search/:search_terms", TalonResourceController, :search
       get "/:resource/", TalonResourceController, :index
       # get "/:resource/search/:search_terms", TalonResourceController, :search
       get "/:resource/new", TalonResourceController, :new
