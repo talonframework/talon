@@ -107,7 +107,10 @@ defmodule Talon.Resource do
       end
 
       @spec form_card_title(String.t) :: String.t
-      def form_card_title(name) do
+      def form_card_title(resource) do
+        name =
+          resource
+          |> Map.get(Talon.Resource.default_name_field(resource.__struct__))
         "#{Module.split(@__module__) |> List.last} #{name}"
       end
 
@@ -232,6 +235,7 @@ defmodule Talon.Resource do
 
       def search(schema, _params, _), do: schema
 
+
       defoverridable [
         resource_paths: 1, nav_action_links: 2, params_key: 0, display_schema_columns: 1,
         index_card_title: 0, form_card_title: 1, tool_bar: 0, route_name: 0, repo: 0,
@@ -278,4 +282,31 @@ defmodule Talon.Resource do
     {action, title, path}
   end
 
+    @doc """
+    Infer the default name field from a schema.
+
+    Infers with the following rules:
+
+    * string :name field
+    * first string field
+    * first field
+
+    ## Examples
+
+        Talon.Resource.default_name_field(Post)
+        :title
+    """
+    @spec default_name_field(Struct.t) :: atom
+    def default_name_field(schema) do
+      types = schema.__schema__(:types)
+      if types[:name] == :string do
+        :name
+      else
+        Enum.find(types, &(elem(&1, 1) == :string))
+        |> case do
+          nil -> hd(types) |> elem(0)
+          {field, _} -> field
+        end
+      end
+    end
 end

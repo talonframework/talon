@@ -245,14 +245,21 @@ defmodule Mix.Tasks.Talon.New do
   end
 
   defp print_route_instructions(config) do
+    namespace =
+      if config.project_structure == :phx do
+        "#{config.base}.Web"
+      else
+        config.base
+      end
 
     Mix.shell.info """
 
     Add the talon routes to your web/router.ex:
 
-      use Talson.Router
+      use Talon.Router
+
       # your app's routes
-      scope "/talon", #{inspect config.base}#{config.web_namespace} do
+      scope "/talon", #{namespace} do
         pipe_through :browser
         talon_routes()
       end

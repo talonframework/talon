@@ -1,40 +1,40 @@
 
-    // To add the Talon generated assets to your brunch build, do the following:
-    //
-    // Replace
-    //
-    //     javascripts: {
-    //       joinTo: "js/app.js"
-    //     },
-    //
-    // With
-    //
-    //     javascripts: {
-    //       joinTo: {
-    //         'js/app.js': /^(<%= root_match %>js)|(node_modules)/,
-    //         'js/talon/admin_lte/jquery-2.2.3.min.js': '<%= root_path %>vendor/talon/admin-lte/plugins/jQuery/jquery-2.2.3.min.js',
-    //         'js/talon/admin_lte/bootstrap.min.js': '<%= root_path %>vendor/talon/admin-lte/bootstrap/js/bootstrap.min.js',
-    //         'js/talon/admin_lte/app.min.js': '<%= root_path %>vendor/talon/admin-lte/dist/js/app.min.js'
-    //       }
-    //     },
-    //
-    // Replace
-    //
-    //     stylesheets: {
-    //       joinTo: "css/app.css"
-    //     },
-    //
-    // With
-    //
-    //     stylesheets: {
-    //       joinTo: {
-    //         'css/app.css': /^(<%= root_match %>css)/,
-    //         'css/talon/admin_lte/talon.css': [
-    //           '<%= root_path %>css/talon/admin-lte/talon.css',
-    //           '<%= root_path %>vendor/talon/admin-lte/dist/css/skins/all-skins.css',
-    //           '<%= root_path %>vendor/talon/admin-lte/bootstrap/css/bootstrap.min.css',
-    //           '<%= root_path %>vendor/talon/admin-lte/dist/css/AdminLTE.min.css'
-    //         ]
-    //       }
-    //     },
-    //
+// To add the Talon generated assets to your brunch build, do the following:
+//
+// Replace
+//
+//     javascripts: {
+//       joinTo: "js/app.js"
+//     },
+//
+// With
+//
+//     javascripts: {
+//       joinTo: {
+//         'js/app.js': /^(<%= root_match %>js)|(node_modules)/,
+//         'js/talon/admin_lte/jquery-2.2.3.min.js': '<%= root_path %>vendor/talon/admin-lte/plugins/jQuery/jquery-2.2.3.min.js',
+//         'js/talon/admin_lte/bootstrap.min.js': '<%= root_path %>vendor/talon/admin-lte/bootstrap/js/bootstrap.min.js',
+//         'js/talon/admin_lte/app.min.js': '<%= root_path %>vendor/talon/admin-lte/dist/js/app.min.js'
+//       }
+//     },
+//
+// Replace
+//
+//     stylesheets: {
+//       joinTo: "css/app.css"
+//     },
+//
+// With
+//
+//     stylesheets: {
+//       joinTo: {
+//         'css/app.css': /^(<%= root_match %>css)/,
+//         'css/talon/admin_lte/talon.css': [
+//           '<%= root_path %>css/talon/admin-lte/talon.css',
+//           '<%= root_path %>vendor/talon/admin-lte/dist/css/skins/all-skins.css',
+//           '<%= root_path %>vendor/talon/admin-lte/bootstrap/css/bootstrap.min.css',
+//           '<%= root_path %>vendor/talon/admin-lte/dist/css/AdminLTE.min.css'
+//         ]
+//       }
+//     },
+//
