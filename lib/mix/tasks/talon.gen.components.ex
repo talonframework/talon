@@ -157,9 +157,6 @@ defmodule Mix.Tasks.Talon.Gen.Components do
   defp to_atom(atom) when is_atom(atom), do: atom
   defp to_atom(string), do: String.to_atom(string)
 
-  defp web_namespace(:phx), do: "Web."
-  defp web_namespace(_), do: ""
-
   defp get_available_themes do
     :talon
     |> Application.app_dir("priv/templates/talon.gen.theme/*")

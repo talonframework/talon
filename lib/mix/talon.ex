@@ -8,6 +8,8 @@ defmodule Mix.Talon do
 
   Defaults to the "admin_lte" default them if not configured.
   """
+
+
   @spec themes() :: String.t
   def themes do
     Application.get_env :talon, :themes, ["admin_lte"]
@@ -162,6 +164,7 @@ defmodule Mix.Talon do
     end
   end
 
+  @spec assets_paths(Map.t) :: Map.t
   def assets_paths(config) do
     proj_struct = config.project_structure
     config
@@ -169,9 +172,6 @@ defmodule Mix.Talon do
     |> Map.put(:images_path, images_path(proj_struct))
     |> Map.put(:vendor_parent, vendor_parent(proj_struct))
   end
-
-  defp brunch_path(:phx), do: "assets"
-  defp brunch_path(_), do: ""
 
   defp images_path(:phx), do: Path.join(~w(assets static images))
   defp images_path(_), do: Path.join(~w(web static assets images))
@@ -213,12 +213,43 @@ defmodule Mix.Talon do
     Inflex.camelize(theme)
   end
 
+  @doc """
+  Return the theme namespaced options for `use Talon.Web, :view`
+
+  ## Examples
+
+      iex> Talon.Mix.view_opts("admin_lte", :phx)
+      ~s(, theme: "admin_lte", module: AdminLte.Web)
+      iex> Talon.Mix.view_opts("admin_lte", :phoenix)
+      ~s(, theme: "admin_lte", module: AdminLte)
+  """
   @spec view_opts(String.t, atom) :: String.t
   def view_opts(theme, proj_struct) do
     name = theme_module_name(theme)
     module =
       if proj_struct == :phx, do: Module.concat(name, Web) |> inspect, else: name
     ~s(, theme: "#{theme}", module: #{module})
+  end
+
+  @doc """
+  Return the Web module name space for phx-1.3 projects
+
+  ## Examples
+
+      iex> Talon.Mix.web_namespace(:phx)
+      "Web."
+      iex> Talon.Mix.web_namespace(:phx)
+  """
+  @spec web_namespace(:phx | :phoneix) :: String.t
+  def web_namespace(:phx), do: "Web."
+  def web_namespace(:phoenix), do: ""
+
+  @spec brunch_path(:phx | :phoenix) :: String.t
+  def brunch_path(:phx), do: Path.join(~w(assets brunch-config.js))
+  def brunch_path(:phoenix), do: "brunch-config.js"
+
+  def common_absolute_path(app) do
+    to_app_source app, Path.join(["priv", "templates", "common"])
   end
 end
 
