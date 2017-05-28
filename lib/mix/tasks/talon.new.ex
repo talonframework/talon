@@ -110,15 +110,15 @@ defmodule Mix.Tasks.Talon.New do
 
     File.write path,
       contents
-      |> append_talon_config(fname, contents =~ fname)
       |> append_template_engine(contents =~ "PhoenixSlime.Engine")
+      |> append_talon_config(fname, contents =~ fname)
 
     config
   end
 
   defp append_talon_config(contents, _, true), do: contents
   defp append_talon_config(contents, fname, _) do
-    contents <> "\n" <> ~s(import_config "#{fname}") <> "\n"
+    contents <> "\n" <> ~s(import_config "#{fname}") <> "\n\n"
   end
 
   defp append_template_engine(contents, true), do: contents
@@ -236,10 +236,10 @@ defmodule Mix.Tasks.Talon.New do
 
     Add Scrivener paging to your Repo:
 
-      defmodule #{base}.Repo do
-        use Ecto.Repo, otp_app: :#{String.downcase base}
-        use Scrivener, page_size: 15  # <--- add this
-      end
+    defmodule #{base}.Repo do
+      use Ecto.Repo, otp_app: :#{String.downcase base}
+      use Scrivener, page_size: 15  # <--- add this
+    end
     """
     config
   end

@@ -21,7 +21,7 @@
 // Replace
 //
 //     stylesheets: {
-//       joinTo: "css/app.css"
+//       joinTo: "css/app.css"<%= styles_snippet %>
 //     },
 //
 // With
@@ -35,6 +35,6 @@
 //           '<%= root_path %>vendor/talon/admin-lte/bootstrap/css/bootstrap.min.css',
 //           '<%= root_path %>vendor/talon/admin-lte/dist/css/AdminLTE.min.css'
 //         ]
-//       }
+//       }<%= styles_snippet %>
 //     },
 //
