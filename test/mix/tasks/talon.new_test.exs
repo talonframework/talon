@@ -27,11 +27,11 @@ defmodule Mix.Tasks.Talon.NewTest do
         code_reloader: true,
         root: File.cwd!)
 
-      in_tmp "bootstrap", fn ->
-        Mix.Tasks.Phx.New.run([@app_name, "--no-brunch", "--no-ecto"])
+      in_tmp "phx_blogger", fn ->
+        Mix.Tasks.Phx.New.run([@app_name, "--no-ecto"])
       end
 
-      in_project :phx_blogger, Path.join(tmp_path(), "bootstrap/phx_blogger"), fn _ ->
+      in_project :phx_blogger, Path.join(tmp_path(), "phx_blogger/phx_blogger"), fn _ ->
         Mix.Task.clear
 
         GenNew.run [] #{ }~w(--phx)
@@ -127,11 +127,11 @@ defmodule Mix.Tasks.Talon.NewTest do
         code_reloader: true,
         root: File.cwd!)
 
-      in_tmp "bootstrap", fn ->
-        Mix.Tasks.Phoenix.New.run([@app_name, "--no-brunch", "--no-ecto"])
+      in_tmp "blogger", fn ->
+        Mix.Tasks.Phoenix.New.run([@app_name, "--no-ecto"])
       end
 
-      in_project :blogger, Path.join(tmp_path(), "bootstrap/blogger"), fn _ ->
+      in_project :blogger, Path.join(tmp_path(), "blogger/blogger"), fn _ ->
         Mix.Task.clear
 
         GenNew.run [] #{ }~w(--phx)

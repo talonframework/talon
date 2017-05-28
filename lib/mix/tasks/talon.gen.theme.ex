@@ -312,6 +312,7 @@ defmodule Mix.Tasks.Talon.Gen.Theme do
     bindings = [
       root_match: brunch_snippets(proj, :root_match),
       root_path: brunch_snippets(proj, :root_path),
+      styles_snippet: brunch_snippets(proj, :styles)
     ]
     EEx.eval_string(brunch_boilerplate(), bindings)
   end
@@ -329,6 +330,12 @@ defmodule Mix.Tasks.Talon.Gen.Theme do
   defp brunch_snippets(_, :root_match), do: "web\\/static\\/"
   defp brunch_snippets(:phx, :root_path), do: ""
   defp brunch_snippets(_, :root_path), do: "web/static/"
+  defp brunch_snippets(:phx, :styles), do: ""
+  defp brunch_snippets(_, :styles), do: ~s(,
+//       order: {
+//         after: ["web/static/css/app.css"] // concat app.css last
+//       })
+
 
   # TODO: This should probably be pulled out and placed in Talon.Mix
   #       since most of the code is common between all the installers
