@@ -4,28 +4,45 @@ defmodule Mix.Tasks.Talon.New do
 
       mix talon.install
 
-  Creates the following files:
 
-  * web/views/talon/admin_lte path
-  * web/controllers/talon/talon_resource_controller.ex
-  * web/templates/talon/admin_lte/generators path
-    * edit.html.eex
-    * form.html.eex
-    * index.html.eex
-    * new.html.eex
-    * show.html.eex
-  * lib/my_app/talon/talon.ex
-  * config/talon.exs
-  * assets_path/vendor
+
+  ## Project Structure Support
+
+  Both legacy projects created with `mix phoenix.new` and the new project
+  structure created with `mix phx.new` are supported. The generator will
+  auto-detect the project structure, and if all paths can be correctly
+  detected, the install will continue.
 
   ## Options
 
-  * --no-brunch
-  * --no-assets
-  * --theme=custom_theme -- create the layout file for a custom theme
-  * --all-themes -- create the layout for all configured themes
-  * --dry-run -- print what will be done, but don't create any files
-  * --verbose -- Print extra information
+  ### Argument Switches
+
+  * --theme=theme_name (admin_lte) -- set the theme to be installed
+  * --assets-path (auto detect) -- path to the assets directory
+  * --web-path=path (auto detect) -- set the web path
+
+  ### Boolean Options
+
+  * --dry-run (false) -- print what will be done, but don't create any files
+  * --verbose (false) -- Print extra information
+  * --brunch-instructions-only (false) -- no brunch boilerplate. Print instructions only
+  * --brunch (true) -- generate brunch boilerplate
+  * --layouts (true) -- include layout views and templates
+  * --components (true) -- include component views and templates
+  * --generators (true) -- include CRUD eex templates
+  * --assets (true) -- include JS, CSS, and Images
+  * --assets-only (false) -- generate assets only
+  * --layouts-only (false) -- generate layouts only
+  * --components-only (false) -- generate components only
+  * --generators-only (false) -- generate generators only
+  * --brunch-only (false) -- generate brunch only
+  * --theme (true) -- generate the theme, assets, brunch
+
+  To disable a default boolean option, use the `--no-option` syntax. For example,
+  to disable brunch:
+
+      mix talon.new --no-brunch
+
   """
   use Mix.Task
 
@@ -35,7 +52,8 @@ defmodule Mix.Tasks.Talon.New do
   @default_theme "admin_lte"
 
   # list all supported boolean options
-  @boolean_options ~w(all_themes verbose boilerplate dry_run no_assets no_brunch)a
+  @boolean_options ~w(all_themes verbose boilerplate dry_run no_assets)a  ++
+                   ~w(no_brunch phx phoenix)a
 
   # complete list of supported options
   @switches [
@@ -50,11 +68,9 @@ defmodule Mix.Tasks.Talon.New do
   def run(args) do
     {opts, parsed, _unknown} = OptionParser.parse(args, switches: @switches)
 
-    # TODO: Add args verification
-    # verify_args!(parsed, unknown)
     opts
     |> parse_options(parsed)
-    |> do_config
+    |> do_config(args)
     |> do_run
   end
 
@@ -68,6 +84,7 @@ defmodule Mix.Tasks.Talon.New do
     |> gen_web
     |> gen_messages
     |> gen_theme
+    |> add_compiler
     |> print_instructions
   end
 
@@ -174,31 +191,92 @@ defmodule Mix.Tasks.Talon.New do
    config
   end
 
-  def gen_theme(config) do
-    opts = if config[:verbose], do: ["--verbose"], else: []
-    opts = if config[:dry_run], do: ["--dry-run" | opts], else: opts
+  defp gen_theme(config) do
+    Mix.Tasks.Talon.Gen.Theme.run([@default_theme, @default_theme] ++ config.raw_args)
+    config
+  end
 
-    Mix.Tasks.Talon.Gen.Theme.run([@default_theme, @default_theme] ++ opts)
+  defp add_compiler(config) do
+    case File.read "mix.exs" do
+      {:ok, contents} ->
+        config
+        |> add_compiler("mix.exs", contents)
+        |> Map.put(:compiler_generated, :true)
+      _ ->
+        Mix.shell.info "Could not read mix.exs"
+        config
+    end
+  end
+
+  defp add_compiler(config, path, contents) do
+    unless Regex.match? ~r/compilers:\s+\[.*:talon.*\]/, contents do
+      contents = String.replace(contents, ~r/compilers:\s+\[(.+)\]/, "compilers: [:talon, \\1]")
+      File.write path, contents
+    end
     config
   end
 
   def print_instructions(config) do
+    config
+    |> print_paging_instructions
+    |> print_route_instructions
+    |> print_compiler_notice
+  end
+
+  defp print_compiler_notice(%{compiler_generated: true} = config) do
+    Mix.shell.info "The :talon compiler has been added to your mix.exs file."
+    config
+  end
+  defp print_compiler_notice(config), do: config
+
+  defp print_paging_instructions(config) do
+    base = config.base
+
     Mix.shell.info """
-      TBD...
-      """
+
+    Add Scrivener paging to your Repo:
+
+      defmodule #{base}.Repo do
+        use Ecto.Repo, otp_app: :#{String.downcase base}
+        use Scrivener, page_size: 15  # <--- add this
+      end
+    """
     config
   end
 
-  defp do_config({bin_opts, opts, _parsed} = args) do
+  defp print_route_instructions(config) do
+
+    Mix.shell.info """
+
+    Add the talon routes to your web/router.ex:
+
+      use Talson.Router
+      # your app's routes
+      scope "/talon", #{inspect config.base}#{config.web_namespace} do
+        pipe_through :browser
+        talon_routes()
+      end
+    """
+    config
+  end
+
+  defp do_config({bin_opts, opts, _parsed} = args, raw_args) do
     binding =
       Mix.Project.config
       |> Keyword.fetch!(:app)
       |> Atom.to_string
       |> Mix.Phoenix.inflect
 
-    proj_struct = detect_project_structure()
+    proj_struct =
+      cond do
+        opts[:proj_struct] -> String.to_atom(opts[:proj_struct])
+        bin_opts[:phx] -> :phx
+        bin_opts[:phoenix] -> :phoenix
+        true -> detect_project_structure()
+      end
 
     %{
+      raw_args: raw_args,
       themes: get_themes(args),
       theme: opts[:theme] || @default_theme,
       verbose: bin_opts[:verbose],
@@ -207,7 +285,7 @@ defmodule Mix.Tasks.Talon.New do
       app: Mix.Project.config |> Keyword.fetch!(:app),
       project_structure: proj_struct,
       web_namespace: web_namespace(proj_struct),
-      web_path: web_path(verify: true),
+      web_path: web_path(),
       binding: binding,
       boilerplate: bin_opts[:boilerplate] || Application.get_env(:talon, :boilerplate, true),
       base: bin_opts[:module] || binding[:base],
