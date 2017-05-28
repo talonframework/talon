@@ -177,7 +177,7 @@ defmodule Mix.Tasks.Talon.New do
   end
 
   def gen_messages(config) do
-    fname = "messages.ex"
+    fname = "talon_messages.ex"
     binding = Kernel.binding() ++
       [base: config.base, web_namespace: config.web_namespace]
     target_path = config.web_path
