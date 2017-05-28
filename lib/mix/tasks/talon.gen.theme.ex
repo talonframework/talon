@@ -149,6 +149,7 @@ defmodule Mix.Tasks.Talon.Gen.Theme do
     |> gen_components
     |> verify_brunch
     |> gen_brunch_boilerplate
+    |> add_compiler
     |> print_instructions
   end
 
@@ -284,6 +285,34 @@ defmodule Mix.Tasks.Talon.Gen.Theme do
   end
   defp gen_brunch_boilerplate(config), do: config
 
+  defp add_compiler(config) do
+    case File.read "mix.exs" do
+      {:ok, contents} ->
+        config
+        |> add_compiler("mix.exs", contents)
+        |> Map.put(:compiler_generated, :true)
+      _ ->
+        Mix.shell.info "Could not read mix.exs"
+        config
+    end
+  end
+
+  defp add_compiler(config, path, contents) do
+    unless Regex.match? ~r/compilers:\s+\[.*:talon.*\]/, contents do
+      contents = String.replace(contents, ~r/compilers:\s+\[(.+)\]/, "compilers: [:talon, \\1]")
+      File.write path, contents
+    end
+    config
+  end
+
+  defp print_instructions(config) do
+    config
+    |> print_route_instructions
+    |> print_paging_instructions
+    |> print_compiler_notice
+    |> print_brunch_instructions
+  end
+
   defp print_brunch_instructions(%{print_brunch_error: true} = config) do
     instructions = render_brunch_boilerplate(config) #  |> String.replace("\/\/", "  ")
     Mix.shell.info """
@@ -302,9 +331,41 @@ defmodule Mix.Tasks.Talon.Gen.Theme do
   end
   defp print_brunch_instructions(config), do: config
 
-  defp print_instructions(config) do
+  defp print_compiler_notice(%{compiler_generated: true} = config) do
+    Mix.shell.info "The :talon compiler has been added to your mix.exs file."
     config
-    |> print_brunch_instructions
+  end
+  defp print_compiler_notice(config), do: config
+
+  defp print_paging_instructions(config) do
+    base = config.base
+
+    Mix.shell.info """
+
+    Add Scrivener paging to your Repo:
+
+      defmodule #{base}.Repo do
+        use Ecto.Repo, otp_app: :#{String.downcase base}
+        use Scrivener, page_size: 15  # <--- add this
+      end
+    """
+    config
+  end
+
+  defp print_route_instructions(config) do
+
+    Mix.shell.info """
+
+    Add the talon routes to your web/router.ex:
+
+      use Talson.Router
+      # your app's routes
+      scope "/talon", #{inspect config.base}#{config.web_namespace} do
+        pipe_through :browser
+        talon_routes()
+      end
+    """
+    config
   end
 
   defp render_brunch_boilerplate(config) do
@@ -438,3 +499,5 @@ defmodule Mix.Tasks.Talon.Gen.Theme do
     [".", :talon]
   end
 end
+
+# String.replace(~r/compilers:\s+\[(.+)\]/, "compilers: [:talon, \\1]")

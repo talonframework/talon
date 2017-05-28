@@ -176,14 +176,43 @@ defmodule Mix.Tasks.Talon.Gen.ThemeTest do
           assert file =~ ~s(= AdminLte.PaginateView.paginate)
         end
       end
-
     end
+  end
 
+  test "add compiler", %{parsed: parsed} do
+    in_tmp "add_compiler", fn ->
+      File.write "mix.exs", mix_exs()
+      opts =
+        parsed ++
+        (~w(brunch assets layouts generators components)
+        |> Enum.map(& "--no-#{&1}"))
+
+      GenTheme.run opts ++ [~s(--web-path=web), "--phoenix"]
+      assert_file "mix.exs", fn file ->
+        assert file =~ "compilers: [:talon, :phoenix, :gettext] ++ Mix.compilers,"
+      end
+    end
   end
 
   #################
   # Helpers
 
+  defp mix_exs, do: """
+    defmodule Blogger.Mixfile do
+      use Mix.Project
+
+      def project do
+        [app: :blogger,
+         version: "0.0.1",
+         elixir: "~> 1.4",
+         elixirc_paths: elixirc_paths(Mix.env),
+         compilers: [:phoenix, :gettext] ++ Mix.compilers,
+         start_permanent: Mix.env == :prod,
+         aliases: aliases(),
+         deps: deps()]
+      end
+    end
+    """
   # defp web_path(path, which \\ :phx)
   # defp web_path(path, :phx), do: Path.join(@phx_web_path, path)
   # defp web_path(path, _), do: Path.join(@phoenix_web_path, path)
