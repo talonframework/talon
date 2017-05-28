@@ -42,18 +42,27 @@ defmodule Mix.Tasks.Talon.Gen.Theme do
 
   ## Options
 
+  ### Argument Switches
+
+  * --theme=theme_name (admin_lte) -- set the theme to be installed
+  * --assets-path (auto detect) -- path to the assets directory
+  * --web-path=path (auto detect) -- set the web path
+
   ### Boolean Options
 
   * --dry-run (false) -- print what will be done, but don't create any files
   * --verbose (false) -- Print extra information
   * --brunch-instructions-only (false) -- no brunch boilerplate. Print instructions only
   * --brunch (true) -- generate brunch boilerplate
-
-  ### Argument Options
-
-  * --theme=theme_name (admin_lte) -- set the theme to be installed
-  * --assets-path (auto detect) -- path to the assets directory
-  * --web-path=path (auto detect) -- set the web path
+  * --layouts (true) -- include layout views and templates
+  * --components (true) -- include component views and templates
+  * --generators (true) -- include CRUD eex templates
+  * --assets (true) -- include JS, CSS, and Images
+  * --assets-only (false) -- generate assets only
+  * --layouts-only (false) -- generate layouts only
+  * --components-only (false) -- generate components only
+  * --generators-only (false) -- generate generators only
+  * --brunch-only (false) -- generate brunch only
 
   To disable a default boolean option, use the `--no-option` syntax. For example,
   to disable brunch:
@@ -63,25 +72,40 @@ defmodule Mix.Tasks.Talon.Gen.Theme do
   use Mix.Task
 
   import Mix.Talon
-  # import Mix.Generator
+
+  @only_options_options  ~w(assets layouts components generators brunch)
+  @only_options for only <-@only_options_options, do: only <> "_only"
 
   # list all supported boolean options
   @boolean_options ~w(all_themes verbose boilerplate dry_run phx phoenix)a ++
                    ~w(brunch_instructions_only)
-  @enabled_boolean_options ~w(brunch assets)
 
-  @all_boolean_options @boolean_options ++ @enabled_boolean_options
+  # List of the options that default to yet
+  @enabled_boolean_options ~w(brunch assets layouts generators components)
+
+  # All the boolean options
+  @all_boolean_options @boolean_options ++ @enabled_boolean_options ++ @only_options
 
   # complete list of supported options
   @switches [
-    theme: :string, web_path: :string, assets_path: :string
+    theme: :string,
+    web_path: :string,
+    assets_path: :string,
+    module: :string
   ] ++ Enum.map(@all_boolean_options, &({&1, :boolean}))
 
   @default_theme "admin_lte"
+
+  # Two paths are required here. The relative path is used when when we
+  # call `copy_from` since it calculates the absolute path based on the
+  # app name (:talon). The `@source_path` is an absolute path for reading
+  # files from priv before calling `copy_path`.
   @source_path_relative Path.join(~w(priv templates talon.gen.theme))
   @source_path Path.join(Application.app_dir(:talon), @source_path_relative)
 
   # TODO: Move this to a theme config file.
+  # Two item tuple. First element is the relative path. Second element is a
+  # list of files in that path
   @admin_lte_files [
     {"vendor/talon/admin-lte/plugins/jQuery", ["jquery-2.2.3.min.js"]},
     {"vendor/talon/admin-lte/bootstrap/js", ["bootstrap.min.js"]},
@@ -91,21 +115,23 @@ defmodule Mix.Tasks.Talon.Gen.Theme do
     {"vendor/talon/admin-lte/bootstrap/css", ["bootstrap.min.css"]},
     {"vendor/talon/admin-lte/dist/css", ["AdminLTE.min.css"]},
   ]
+
+  # look for theme name to its list of assets
   @vendor_files %{"admin_lte" =>  @admin_lte_files}
 
+  # translation of of theme name to its resources name space. This list
+  # must contain an entry for every installed theme
   @theme_mapping %{"admin_lte" => "admin-lte"}
 
-  @doc """
-  The entry point of the mix task.
-  """
+  @doc false
   @spec run(List.t) :: any
   def run(args) do
     Mix.shell.info "Running talon.gen.theme"
     {opts, parsed, _unknown} = OptionParser.parse(args, switches: @switches)
 
     # TODO: Add args verification
-    # verify_args!(parsed, unknown)
     opts
+    # |> verify_args!(parsed, unknown)
     |> parse_options(parsed)
     |> do_config
     |> do_run
@@ -120,13 +146,13 @@ defmodule Mix.Tasks.Talon.Gen.Theme do
     |> gen_generators
     |> gen_images
     |> gen_vendor
-    # |> gen_brunch
     |> gen_components
-    # |> gen_brunch_boilerplate
+    |> verify_brunch
+    |> gen_brunch_boilerplate
     |> print_instructions
   end
 
-  defp gen_components(config) do
+  defp gen_components(%{components: true} = config) do
     opts = if config[:verbose], do: ["--verbose"], else: []
     opts = if config[:dry_run], do: ["--dry-run" | opts], else: opts
     opts = ["--web-path=#{config.web_path}", "--proj-struct=#{config.project_structure}" | opts]
@@ -134,8 +160,9 @@ defmodule Mix.Tasks.Talon.Gen.Theme do
     Mix.Tasks.Talon.Gen.Components.run([@default_theme] ++ opts)
     config
   end
+  defp gen_components(config), do: config
 
-  defp gen_layout_view(config) do
+  defp gen_layout_view(%{layouts: true} = config) do
     binding = Kernel.binding() ++ [base: config.base, target_name: config.target_name,
       target_module: config.target_module, web_namespace: config.web_namespace,
       view_opts: config.view_opts]
@@ -150,8 +177,9 @@ defmodule Mix.Tasks.Talon.Gen.Theme do
     end
     config
   end
+  defp gen_layout_view(config), do: config
 
-  defp gen_layout_templates(config) do
+  defp gen_layout_templates(%{layouts: true} = config) do
     binding = Kernel.binding() ++ [web_namespace: config.web_namespace, target_name: config.target_name]
     theme = config.theme
     template_path = Path.join([config.web_path, "templates", "talon", config.theme, "layout"])
@@ -167,8 +195,9 @@ defmodule Mix.Tasks.Talon.Gen.Theme do
     end
     config
   end
+  defp gen_layout_templates(config), do: config
 
-  defp gen_generators(config) do
+  defp gen_generators(%{generators: true} = config) do
     binding = Kernel.binding() ++ [base: config.base, target_name: config.target_name,
       target_module: config.target_module, web_namespace: config.web_namespace]
     theme = config.theme
@@ -186,8 +215,11 @@ defmodule Mix.Tasks.Talon.Gen.Theme do
     end
     config
   end
+  defp gen_generators(config), do: config
 
-  def gen_images(config) do
+  # this is private, but left as `def` for testing
+  @doc false
+  def gen_images(%{assets: true} = config) do
     unless config.dry_run do
       theme_name = @theme_mapping[config.theme]
       path = Path.join [config.theme, "assets", "static", "images", "talon", theme_name]
@@ -207,8 +239,11 @@ defmodule Mix.Tasks.Talon.Gen.Theme do
     end
     config
   end
+  def gen_images(config), do: config
 
-  def gen_vendor(config) do
+  # this is private, but left as `def` for testing
+  @doc false
+  def gen_vendor(%{assets: true} = config) do
     unless config.dry_run do
       source_path = Path.join([@source_path_relative, config.target_name, "assets"])
       target_path = Path.join([config.vendor_parent])
@@ -219,6 +254,7 @@ defmodule Mix.Tasks.Talon.Gen.Theme do
     end
     config
   end
+  def gen_vendor(config), do: config
 
   defp theme_asset_files(theme) do
     @vendor_files[theme]
@@ -229,113 +265,75 @@ defmodule Mix.Tasks.Talon.Gen.Theme do
       end)
     end)
     |> List.flatten
-    # |> IO.inspect(label: "theme #{inspect theme} files")
   end
 
-  # defp verify_brunch(%{brunch: true} = config) do
+  defp verify_brunch(%{brunch: true} = config) do
+    if File.exists?(config.brunch_path) do
+      config
+    else
+      Enum.into([brunch: false, print_brunch_error: true], config)
+    end
+  end
+  defp verify_brunch(config), do: config |> IO.inspect(label: "no verify")
 
-  # end
+  defp gen_brunch_boilerplate(%{brunch: true, brunch_path: path} = config) do
+    boilerplate = render_brunch_boilerplate(config)
+    contents = File.read!(path)
+    File.write!(path, contents <> boilerplate)
+    config
+  end
+  defp gen_brunch_boilerplate(config), do: config
 
-  # defp verify_brunch(config) do
-  #   config
-  # end
-
-  # defp gen_brunch(config) do
-
-  #   config
-  # end
-  # def do_assets(%Config{assets: true, brunch: true} = config) do
-  #   base_path = Path.join(~w(priv static))
-
-  #   File.mkdir_p Path.join ~w{web static vendor}
-  #   File.mkdir_p Path.join ~w{web static assets fonts}
-  #   File.mkdir_p Path.join ~w{web static assets images ex_admin datepicker}
-
-  #   status_msg("creating", "css files")
-  #   ~w(admin_lte2.css admin_lte2.css.map active_admin.css.css active_admin.css.css.map)
-  #   |> Enum.each(&(copy_vendor base_path, "css", &1))
-
-  #   status_msg("creating", "js files")
-  #   ~w(jquery.min.js admin_lte2.js jquery.min.js.map admin_lte2.js.map)
-  #   ++ ~w(ex_admin_common.js ex_admin_common.js.map)
-  #   |> Enum.each(&(copy_vendor base_path, "js", &1))
-
-  #   copy_vendor_r(base_path, "fonts")
-  #   copy_vendor_r(base_path, "images")
-
-  #   case File.read "brunch-config.js" do
-  #     {:ok, file} ->
-  #       File.write! "brunch-config.js", file <> brunch_instructions()
-  #     error ->
-  #       Mix.raise """
-  #       Could not open brunch-config.js file. #{inspect error}
-  #       """
-  #   end
-  #   config
-  # end
-
-  defp print_instructions(config) do
+  defp print_brunch_instructions(%{print_brunch_error: true} = config) do
+    instructions = render_brunch_boilerplate(config) #  |> String.replace("\/\/", "  ")
     Mix.shell.info """
+    Your brunch-config.js file could not be found. Please update your brunch
+    based on these instructions:
 
+    """ <> instructions
+    config
+  end
+  defp print_brunch_instructions(%{brunch: true} = config) do
+    Mix.shell.info """
+    Boilerplate has been added to your brunch-config.js file. Please review this
+    and update your config file appropriately.
     """
     config
   end
+  defp print_brunch_instructions(config), do: config
 
-  # def gen_brunch_boilerplate(config) do
+  defp print_instructions(config) do
+    config
+    |> print_brunch_instructions
+  end
 
-  # end
+  defp render_brunch_boilerplate(config) do
+    proj = config.project_structure
+    bindings = [
+      root_match: brunch_snippets(proj, :root_match),
+      root_path: brunch_snippets(proj, :root_path),
+    ]
+    EEx.eval_string(brunch_boilerplate(), bindings)
+  end
+  # this is private, but left as `def` for testing
+  @doc false
+  defp brunch_boilerplate do
+    path = Path.join common_absolute_path(:talon), "brunch_boilerplate.txt"
+    case File.read(path) do
+      {:ok, contents} -> contents
+      _ -> Mix.raise("Could not find #{path} in any sources")
+    end
+  end
 
-  # def brunch_instructions(mode) do
-  #   """
+  defp brunch_snippets(:phx, :root_match), do: ""
+  defp brunch_snippets(_, :root_match), do: "web\\/static\\/"
+  defp brunch_snippets(:phx, :root_path), do: ""
+  defp brunch_snippets(_, :root_path), do: "web/static/"
 
-  #   // To add the Talon generated assets to your brunch build, do the following:
-  #   //
-  #   // Replace
-  #   //
-  #   //     javascripts: {
-  #   //       joinTo: "js/app.js"
-  #   //     },
-  #   //
-  #   // With
-  #   //
-  #   //     javascripts: {
-  #   //       joinTo: {
-  #   //         "js/app.js": /^(#{brunch_snippets(mode, :root_match)}js)|(node_modules)/,
-  #   //         'js/talon/admin_lte/jquery-2.2.3.min.js': 'web/static/vendor/talon/admin-lte/plugins/jQuery/jquery-2.2.3.min.js',
-  #   //         'js/talon/admin_lte/bootstrap.min.js': 'web/static/vendor/talon/admin-lte/bootstrap/js/bootstrap.min.js',
-  #   //         'js/talon/admin_lte/app.min.js': 'web/static/vendor/talon/admin-lte/dist/js/app.min.js'
-  #   //       }
-  #   //     },
-  #   //
-  #   // Replace
-  #   //
-  #   //     stylesheets: {
-  #   //       joinTo: "css/app.css"
-  #   //     },
-  #   //
-  #   // With
-  #   //
-  #   //     stylesheets: {
-  #   //       joinTo: {
-  #   //         "css/app.css": /^(#{brunch_snippets(mode, :root_match)}css)/,
-  #   //         "css/talon/admin_lte/talon.css": [
-  #   //           "#{brunch_snippets(mode, :root_path)}css/talon/admin-lte/talon.css",
-  #   //           "#{brunch_snippets(mode, :root_path)}vendor/talon/admin-lte/dist/css/skins/all-skins.css",
-  #   //           "#{brunch_snippets(mode, :root_path)}vendor/talon/admin-lte/bootstrap/css/bootstrap.min.css",
-  #   //           "#{brunch_snippets(mode, :root_path)}vendor/talon/admin-lte/dist/css/AdminLTE.min.css"
-  #   //         ]
-  #   //       }
-  #   //     },
-  #   //
-  #   """
-  # end
-
-  # defp brunch_snippets(:phx, :root_match), do: ""
-  # defp brunch_snippets(_, :root_match), do: "web\\/static\\/"
-  # defp brunch_snippets(:phx, :root_path), do: ""
-  # defp brunch_snippets(_, :root_path), do: "web/static/"
-
-  defp do_config({bin_opts, opts, parsed} = _args) do
+  # TODO: This should probably be pulled out and placed in Talon.Mix
+  #       since most of the code is common between all the installers
+  @doc false
+  def do_config({bin_opts, opts, parsed}) do
     themes = get_available_themes()
 
     {theme, target_name} =
@@ -356,6 +354,7 @@ defmodule Mix.Tasks.Talon.Gen.Theme do
       # |> IO.inspect(label: "binding")
     proj_struct =
       cond do
+        opts[:proj_struct] -> String.to_atom(opts[:proj_struct])
         bin_opts[:phx] -> :phx
         bin_opts[:phoenix] -> :phoenix
         true -> detect_project_structure()
@@ -363,24 +362,58 @@ defmodule Mix.Tasks.Talon.Gen.Theme do
 
     view_opts = view_opts(theme, proj_struct)
 
-    %{
-      theme: theme,
-      target_name: target_name,
-      target_module: theme_module_name(theme),
-      verbose: bin_opts[:verbose],
-      dry_run: bin_opts[:dry_run],
-      project_structure: proj_struct,
-      web_namespace: web_namespace(proj_struct),
-      web_path: opts[:web_path] || web_path(verify: true),
-      view_opts: view_opts,
-      binding: binding,
-      boilerplate: bin_opts[:boilerplate] || Application.get_env(:talon, :boilerplate, true),
-      base: bin_opts[:module] || binding[:base],
-    }
+    bin_opts
+    |> enabled_bin_options
+    |> Enum.into(
+      %{
+        theme: theme,
+        target_name: target_name,
+        target_module: theme_module_name(theme),
+        verbose: bin_opts[:verbose],
+        dry_run: bin_opts[:dry_run],
+        project_structure: proj_struct,
+        web_namespace: web_namespace(proj_struct),
+        web_path: opts[:web_path] || web_path(),
+        view_opts: view_opts,
+        binding: binding,
+        boilerplate: bin_opts[:boilerplate] || Application.get_env(:talon, :boilerplate, true),
+        base: opts[:module] || binding[:base],
+      })
+    |> set_config_onlys(bin_opts)
   end
 
-  defp web_namespace(:phx), do: "Web."
-  defp web_namespace(_), do: ""
+  defp enabled_bin_options(bin_opts) do
+    @enabled_boolean_options
+    |> Enum.map(&String.to_atom/1)
+    |> Enum.reduce(%{}, fn option, acc ->
+      value = if bin_opts[option] == false, do: false, else: true
+      Map.put acc, option, value
+    end)
+  end
+
+  defp set_config_onlys(config, bin_opts) do
+    Enum.reduce(@only_options, config, fn opt, acc ->
+      atom = String.to_atom(opt)
+      if bin_opts[atom] do
+        opt
+        |> options_to_remove
+        |> remove_options(acc)
+      else
+        acc
+      end
+    end)
+  end
+
+  defp options_to_remove(only_option) do
+    option = String.replace(only_option, "_only", "")
+    @only_options_options -- [option]
+  end
+
+  defp remove_options(remove_options, config) do
+    Enum.reduce remove_options, config, fn option, config ->
+      Map.put(config, String.to_atom(option), false)
+    end
+  end
 
   defp get_available_themes do
     :talon
@@ -400,10 +433,6 @@ defmodule Mix.Tasks.Talon.Gen.Theme do
     bin_opts = Enum.filter(opts, fn {k,_v} -> k in @boolean_options end)
     {bin_opts, opts -- bin_opts, parsed}
   end
-
-  # defp lib_path do
-  #   Path.join("lib", to_string(Mix.Phoenix.otp_app()))
-  # end
 
   defp paths do
     [".", :talon]

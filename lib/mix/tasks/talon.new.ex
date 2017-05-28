@@ -214,9 +214,6 @@ defmodule Mix.Tasks.Talon.New do
     }
   end
 
-  defp web_namespace(:phx), do: "Web."
-  defp web_namespace(_), do: ""
-
   defp get_themes({opts, bin_opts, _parsed}) do
     cond do
       bin_opts[:all_themes] -> all_themes()
