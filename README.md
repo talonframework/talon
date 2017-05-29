@@ -7,9 +7,7 @@ This is the new ExAdmin project, located under the new Github Group [talonframew
 >
 > This project is still is a work in progress and it not ready for public use yet. Please use this project if you would to contribute to the new archecture.
 >
-> We are considering renaming the Talon project. Personally I, and I suspect others, use Talon for more than backend administrative projects. I use it as the front end on a number of internal IT systems. I find the the 'talon` name gives the perception that its only for talon interfaces. The new archecture is much more decomposible and customizable. So it lends itself more for a generic sie builder than the previous version.
->
-> The project is still in the exploritory stage. Much of the API has not been documented yet, nor any real test coverage added. When we finalized on the overall archtecture, we will go back and complete the docs and tests.
+> The project is still in the exploratory stage. Much of the API has not been documented yet, nor any real test coverage added. When we finalized on the overall architecture, we will go back and complete the docs and tests.
 >
 > Contributors are very welcome. We can use your help!
 
@@ -93,14 +91,14 @@ When you compile the project, the new slim template generated. The talon comiler
 - [X] Default talon-lte template
 - [X] Sidenav bar
 - [X] Gettext archecture similar to Coherence
-- [ ] Move the project over to phx-1.3 architecture
+- [X] Move the project over to phx-1.3 architecture
 - [X] Prototype resource based template overlays
 - [X] Move the theme based layout templates to a generator
 - [ ] --Change the auto generate slime templates to a generator and move the .eex templates to /priv--
 - [X] Create a generator for generating the default template .eex files
 - [X] Implement the create/update/delete actions in the controller
 - [X] Fix the brunch problem pulling the the skins
-- [ ] Add database backended support for the index page datatables
+- [X] Add database backended support for the index page datatables
 - [X] Add a show template
 - [X] Add links to the index page actions
 - [ ] Index page filters (new design required). With live searching on the index page datatables, not sure if the existing Talon design even makes sense anymore.
