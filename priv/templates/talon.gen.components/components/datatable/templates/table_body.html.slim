@@ -1,7 +1,7 @@
 - talon_resource = Talon.View.talon_resource(@conn)
 = for resource <- @resources do
   tr
-    td.selctable
+    td.selectable
       .resource_selection_cell
         input.collection_selection type="checkbox" name="collection_selection[]"
     = for name <- talon_resource.display_schema_columns(:index) do
