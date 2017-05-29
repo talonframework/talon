@@ -9,9 +9,9 @@
       td= value
 
     td.text-right.index-actions
-      button.btn.btn-xs.btn-primary.action-show type="button" data-url="#{Talon.Utils.talon_resource_path(resource, :show)}"
+      button.btn.btn-xs.btn-primary.action-show type="button" href="#{Talon.Utils.talon_resource_path(resource, :show)}"
         i.fa.fa-info-circle
-      button.btn.btn-xs.btn-warning.action-edit type="button" data-url="#{Talon.Utils.talon_resource_path(resource, :edit)}"
+      button.btn.btn-xs.btn-warning.action-edit type="button" href="#{Talon.Utils.talon_resource_path(resource, :edit)}"
         i.fa.fa-pencil-square-o
-      button.btn.btn-xs.btn-danger.action-delete type="button"
+      button.btn.btn-xs.btn-danger.delete-link type="button" href="#{Talon.Utils.talon_resource_path(resource, :delete)}"
         i.fa.fa-times

@@ -111,9 +111,12 @@ defmodule Mix.Tasks.Talon.Gen.Theme do
     {"vendor/talon/admin-lte/bootstrap/js", ["bootstrap.min.js"]},
     {"vendor/talon/admin-lte/dist/js", ["app.min.js"]},
     {"css/talon/admin-lte", ["talon.css"]},
+    {"js/talon/admin-lte", ["talon.js"]},
     {"vendor/talon/admin-lte/dist/css/skins", ["all-skins.css"]},
     {"vendor/talon/admin-lte/bootstrap/css", ["bootstrap.min.css"]},
     {"vendor/talon/admin-lte/dist/css", ["AdminLTE.min.css"]},
+    {"vendor/talon/admin-lte/plugins/sweetalert/dist", ["sweetalert.min.js"]},
+    {"vendor/talon/admin-lte/plugins/sweetalert/dist", ["sweetalert.css"]},
   ]
 
   # look for theme name to its list of assets

@@ -12,6 +12,8 @@ html lang="en"
     link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/ionicons/2.0.1/css/ionicons.min.css"
 
   body.sidebar-mini.skin-purple.hold-transition.sidebar-mini
+    #delete-form style="display: none"
+      = link "", to: "", method: :delete, data: [confirm: "are you sure?"]
     .wrapper
       header.main-header
         a href="#" class="logo"
@@ -40,3 +42,5 @@ html lang="en"
     script src="#{static_path(@conn, "/js/talon/<%= target_name %>/jquery-2.2.3.min.js")}"
     script src="#{static_path(@conn, "/js/talon/<%= target_name %>/bootstrap.min.js")}"
     script src="#{static_path(@conn, "/js/talon/<%= target_name %>/app.min.js")}"
+    script src="#{static_path(@conn, "/js/talon/admin_lte/sweetalert.min.js")}"
+    script src="#{static_path(@conn, "/js/app.js")}"

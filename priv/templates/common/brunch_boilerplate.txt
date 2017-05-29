@@ -14,7 +14,8 @@
 //         'js/app.js': /^(<%= root_match %>js)|(node_modules)/,
 //         'js/talon/admin_lte/jquery-2.2.3.min.js': '<%= root_path %>vendor/talon/admin-lte/plugins/jQuery/jquery-2.2.3.min.js',
 //         'js/talon/admin_lte/bootstrap.min.js': '<%= root_path %>vendor/talon/admin-lte/bootstrap/js/bootstrap.min.js',
-//         'js/talon/admin_lte/app.min.js': '<%= root_path %>vendor/talon/admin-lte/dist/js/app.min.js'
+//         'js/talon/admin_lte/app.min.js': '<%= root_path %>vendor/talon/admin-lte/dist/js/app.min.js',
+//         'js/talon/admin_lte/sweetalert.min.js': '<%= root_path %>vendor/talon/admin-lte/plugins/sweetalert/dist/sweetalert.min.js'
 //       }
 //     },
 //
@@ -33,8 +34,21 @@
 //           '<%= root_path %>css/talon/admin-lte/talon.css',
 //           '<%= root_path %>vendor/talon/admin-lte/dist/css/skins/all-skins.css',
 //           '<%= root_path %>vendor/talon/admin-lte/bootstrap/css/bootstrap.min.css',
-//           '<%= root_path %>vendor/talon/admin-lte/dist/css/AdminLTE.min.css'
+//           '<%= root_path %>vendor/talon/admin-lte/dist/css/AdminLTE.min.css',
+//           '<%= root_path %>vendor/talon/admin-lte/plugins/sweetalert/dist/sweetalert.css'
 //         ]
 //       }<%= styles_snippet %>
 //     },
 //
+// Replace
+//
+//     autoRequire: {
+//       "js/app.js": ["js/app"]
+//     }
+//
+// With
+//
+//     autoRequire: {
+//       "js/app.js": ["js/app", "js/talon/admin-lte/talon"]
+//     }
+
