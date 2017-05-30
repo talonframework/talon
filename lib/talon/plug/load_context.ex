@@ -1,5 +1,7 @@
-defmodule Talon.Plug.TalonResource do
-
+defmodule Talon.Plug.LoadContext do
+  @moduledoc """
+  Creates a new conn.assigns.talon and loads the context into it
+  """
   import Plug.Conn
 
   @behaviour Plug
@@ -10,11 +12,11 @@ defmodule Talon.Plug.TalonResource do
 
 
   def call(conn, opts) do
-    # require IEx
-    # IEx.pry
     talon = conn.assigns[:talon] || %{}
     context = opts[:talon] || talon[:talon] || raise("talon option required")
     schema = context.schema(conn.params["resource"])
+    # require IEx
+    # IEx.pry
     unless schema do
       raise Phoenix.Router.NoRouteError, conn: conn, router: __MODULE__
     end

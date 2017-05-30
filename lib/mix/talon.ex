@@ -9,10 +9,13 @@ defmodule Mix.Talon do
   Defaults to the "admin_lte" default them if not configured.
   """
 
+  require Talon.Config, as: Config
 
   @spec themes() :: String.t
   def themes do
-    Application.get_env :talon, :themes, ["admin_lte"]
+    Config.contexts
+    |> Enum.map(&Config.theme/1)
+    |> Enum.uniq
   end
 
   @doc """

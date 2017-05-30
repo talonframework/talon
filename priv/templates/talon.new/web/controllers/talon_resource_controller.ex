@@ -2,7 +2,7 @@ defmodule <%= base %>.<%= web_namespace %>TalonResourceController do
   use <%= base %>.Web, :controller
   use Talon.Controller, repo: <%= base %>.Repo, context: <%= base %>.Talon
 
-  plug Talon.Plug.TalonResource
+  plug Talon.Plug.LoadContext
   plug Talon.Plug.LoadResource
   plug Talon.Plug.LoadAssociations
   plug Talon.Plug.LoadAssociatedCollections when action in [:new, :edit]

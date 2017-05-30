@@ -22,7 +22,9 @@ defmodule Mix.Tasks.Compile.Talon do
 
   def touch() do
     Mix.Talon.themes()
-    |> compile_templates
+    |> Enum.reduce(:ok, fn theme, _acc ->
+      compile_templates theme
+    end)
     |> case do
       [] -> :noop
       _ -> :ok

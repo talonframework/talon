@@ -32,14 +32,16 @@ config :talon, TestTalon.Talon,
   module: TestTalon,
   theme: "admin_lte"
 
+config :talon, TestTalon.FrontEnd,
+  resources: [
+    TestTalon.FrontEnd.Noid
+  ],
+  schema_adapter: Talon.Schema.Adapters.Ecto,
+  module: TestTalon,
+  theme: "theme2"
 
 config :talon,
   schema_adapter: Talon.Schema.Adapters.Ecto,
-  module: TestTalon,
-  theme: "admin_lte",
-  resources: [
-    TestTalon.Talon.Simple,
-    TestTalon.Talon.Product,
-  ]
+  module: TestTalon
 
 config :logger, level: :error

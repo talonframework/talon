@@ -121,8 +121,6 @@ defmodule Mix.Tasks.Talon.Gen.Components do
     theme_name =
       case parsed do
         [theme] ->
-          unless theme in themes,
-            do: Mix.raise("Invalid theme name. Choices are #{inspect themes}")
           theme
         other ->
           Mix.raise "Invalid arguments #{inspect other}"

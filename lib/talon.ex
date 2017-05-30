@@ -44,6 +44,7 @@ defmodule Talon do
   """
 
   defmacro __using__(opts) do
+    Code.ensure_compiled(Talon.Config)
     otp_app = opts[:otp_app]
     unless otp_app do
       raise "Must provide :otp_app option"
@@ -52,7 +53,9 @@ defmodule Talon do
     repo = opts[:repo]
 
     quote location: :keep do
-      @__resources__  Application.get_env(:talon, :resources, [])
+      require Talon.Config
+
+      @__resources__  Talon.Config.resources(__MODULE__)
 
       @__resource_map__  for mod <- @__resources__, into: %{},
         do: {Module.split(mod) |> List.last() |> to_string |> Inflex.underscore |> Inflex.Pluralize.pluralize, mod}

@@ -2,8 +2,10 @@ defmodule Talon.Utils do
   @moduledoc """
   A collection of utility functions.
   """
-  require Logger
+  use Talon.Config
   alias Talon.Messages
+
+  require Logger
 
   # @module Application.get_env(:talon, :module)
 
@@ -428,5 +430,9 @@ defmodule Talon.Utils do
   @doc false
   def use_authentication do
     false
+  end
+
+  def module_join(pre, post) do
+    Module.concat nil, inspect(pre) <> inspect(post)
   end
 end

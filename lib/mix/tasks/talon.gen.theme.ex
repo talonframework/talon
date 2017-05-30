@@ -107,16 +107,16 @@ defmodule Mix.Tasks.Talon.Gen.Theme do
   # Two item tuple. First element is the relative path. Second element is a
   # list of files in that path
   @admin_lte_files [
-    {"vendor/talon/admin-lte/plugins/jQuery", ["jquery-2.2.3.min.js"]},
-    {"vendor/talon/admin-lte/bootstrap/js", ["bootstrap.min.js"]},
-    {"vendor/talon/admin-lte/dist/js", ["app.min.js"]},
-    {"css/talon/admin-lte", ["talon.css"]},
-    {"js/talon/admin-lte", ["talon.js"]},
-    {"vendor/talon/admin-lte/dist/css/skins", ["all-skins.css"]},
-    {"vendor/talon/admin-lte/bootstrap/css", ["bootstrap.min.css"]},
-    {"vendor/talon/admin-lte/dist/css", ["AdminLTE.min.css"]},
-    {"vendor/talon/admin-lte/plugins/sweetalert/dist", ["sweetalert.min.js"]},
-    {"vendor/talon/admin-lte/plugins/sweetalert/dist", ["sweetalert.css"]},
+    {"vendor/talon/<%= theme %>/plugins/jQuery", ["jquery-2.2.3.min.js"]},
+    {"vendor/talon/<%= theme %>/bootstrap/js", ["bootstrap.min.js"]},
+    {"vendor/talon/<%= theme %>/dist/js", ["app.min.js"]},
+    {"css/talon/<%= theme %>", ["talon.css"]},
+    {"js/talon/<%= theme %>", ["talon.js"]},
+    {"vendor/talon/<%= theme %>/dist/css/skins", ["all-skins.css"]},
+    {"vendor/talon/<%= theme %>/bootstrap/css", ["bootstrap.min.css"]},
+    {"vendor/talon/<%= theme %>/dist/css", ["AdminLTE.min.css"]},
+    {"vendor/talon/<%= theme %>/plugins/sweetalert/dist", ["sweetalert.min.js"]},
+    {"vendor/talon/<%= theme %>/plugins/sweetalert/dist", ["sweetalert.css"]},
   ]
 
   # look for theme name to its list of assets
@@ -160,7 +160,7 @@ defmodule Mix.Tasks.Talon.Gen.Theme do
     opts = if config[:dry_run], do: ["--dry-run" | opts], else: opts
     opts = ["--web-path=#{config.web_path}", "--proj-struct=#{config.project_structure}" | opts]
 
-    Mix.Tasks.Talon.Gen.Components.run([@default_theme] ++ opts)
+    Mix.Tasks.Talon.Gen.Components.run([config.target_name] ++ opts)
     config
   end
   defp gen_components(config), do: config
@@ -185,7 +185,7 @@ defmodule Mix.Tasks.Talon.Gen.Theme do
   defp gen_layout_templates(%{layouts: true} = config) do
     binding = Kernel.binding() ++ [web_namespace: config.web_namespace, target_name: config.target_name]
     theme = config.theme
-    template_path = Path.join([config.web_path, "templates", "talon", config.theme, "layout"])
+    template_path = Path.join([config.web_path, "templates", "talon", config.target_name, "layout"])
     unless config.dry_run do
       File.mkdir_p! template_path
       copy_from paths(),
@@ -204,7 +204,7 @@ defmodule Mix.Tasks.Talon.Gen.Theme do
     binding = Kernel.binding() ++ [base: config.base, target_name: config.target_name,
       target_module: config.target_module, web_namespace: config.web_namespace]
     theme = config.theme
-    template_path = Path.join([config.web_path, "templates", "talon", config.theme, "generators"])
+    template_path = Path.join([config.web_path, "templates", "talon", config.target_name, "generators"])
     unless config.dry_run do
       File.mkdir_p! template_path
       copy_from paths(),
@@ -248,23 +248,27 @@ defmodule Mix.Tasks.Talon.Gen.Theme do
   @doc false
   def gen_vendor(%{assets: true} = config) do
     unless config.dry_run do
-      source_path = Path.join([@source_path_relative, config.target_name, "assets"])
+      source_path = Path.join([@source_path_relative, config.theme, "assets"])
       target_path = Path.join([config.vendor_parent])
+      IO.inspect target_path, label: "target_path"
 
       File.mkdir_p! target_path
       copy_from paths(), source_path, target_path, [target_name: config.target_name],
-        theme_asset_files(config.target_name), config
+        theme_asset_files(config.theme, config.target_name), config
     end
     config
   end
   def gen_vendor(config), do: config
 
-  defp theme_asset_files(theme) do
-    @vendor_files[theme]
+  defp theme_asset_files(source_theme, target_theme) do
+    # IO.inspect theme, label: "assets theme"
+    @vendor_files[source_theme]
     |> Enum.map(fn {path, files} ->
       Enum.map(files, fn file ->
         fpath = Path.join(path, file)
-        {:eex, fpath, fpath}
+        spath = EEx.eval_string(fpath, theme: @theme_mapping[source_theme])
+        tpath = EEx.eval_string(fpath, theme: target_theme)
+        {:eex, spath, tpath}
       end)
     end)
     |> List.flatten
@@ -315,7 +319,8 @@ defmodule Mix.Tasks.Talon.Gen.Theme do
     bindings = [
       root_match: brunch_snippets(proj, :root_match),
       root_path: brunch_snippets(proj, :root_path),
-      styles_snippet: brunch_snippets(proj, :styles)
+      styles_snippet: brunch_snippets(proj, :styles),
+      theme: config.target_name
     ]
     EEx.eval_string(brunch_boilerplate(), bindings)
   end
@@ -370,7 +375,7 @@ defmodule Mix.Tasks.Talon.Gen.Theme do
         true -> detect_project_structure()
       end
 
-    view_opts = view_opts(theme, proj_struct)
+    view_opts = view_opts(target_name, proj_struct)
 
     bin_opts
     |> enabled_bin_options
@@ -378,7 +383,7 @@ defmodule Mix.Tasks.Talon.Gen.Theme do
       %{
         theme: theme,
         target_name: target_name,
-        target_module: theme_module_name(theme),
+        target_module: theme_module_name(target_name),
         verbose: bin_opts[:verbose],
         dry_run: bin_opts[:dry_run],
         project_structure: proj_struct,
