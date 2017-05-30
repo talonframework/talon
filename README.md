@@ -1,4 +1,15 @@
-[![Stories in Ready](https://badge.waffle.io/ex-admin/ex_admin.png?label=ready&title=Ready)](https://waffle.io/ex-admin/ex_admin?utm_source=badge)
+
+[![Build Status][travis-img]][travis] [![Stories in Ready][waffle-img][waffle] [![License][license-img]][license]
+
+[travis-img]: https://travis-ci.org/smpallen99/ex_admin.svg?branch=master
+[travis]: https://travis-ci.org/smpallen99/ex_admin
+[hex-img]: https://img.shields.io/hexpm/v/ex_admin.svg
+[hex]: https://hex.pm/packages/ex_admin
+[license-img]: http://img.shields.io/badge/license-MIT-brightgreen.svg
+[license]: http://opensource.org/licenses/MIT
+[waffle-img]: https://badge.waffle.io/talonframeword/talon.png?label=ready&title=Ready)
+[waffle]: https://waffle.io/ex-admin/ex_admin?utm_source=badge
+
 # Talon
 
 This is the new ExAdmin project, located under the new Github Group [talonframework](https://github.com/talonframework). This is a complete redesign of ExAdmin, renamed Talon. See the justification and goals below.
@@ -94,7 +105,6 @@ When you compile the project, the new slim template generated. The talon comiler
 - [X] Move the project over to phx-1.3 architecture
 - [X] Prototype resource based template overlays
 - [X] Move the theme based layout templates to a generator
-- [ ] --Change the auto generate slime templates to a generator and move the .eex templates to /priv--
 - [X] Create a generator for generating the default template .eex files
 - [X] Implement the create/update/delete actions in the controller
 - [X] Fix the brunch problem pulling the the skins
@@ -121,6 +131,7 @@ Before starting to work on anything, please have a quick conversation with @smpa
 * skype `wedge99` (one-on-one voice/video)
 
 Please review [CONTRIUBITING](CONTRIBUTING.md) and [CODE OF CONDUCT](CODE_OF_CONDUCT.md) for additional information.
+
 ## License
 
 `talon` is Copyright (c) 2017 E-MetroTel
