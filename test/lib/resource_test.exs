@@ -3,8 +3,8 @@ defmodule TestTalon.Resource do
   doctest Talon.Resource
   alias Talon.Resource
 
-  test "default_name_field" do
-    assert Resource.default_name_field(TestTalon.User) == :name
-    assert Resource.default_name_field(TestTalon.Product) == :title
+  test "name_field" do
+    assert Resource.name_field(TestTalon.User) == :name
+    assert Resource.name_field(TestTalon.Product) == :title
   end
 end

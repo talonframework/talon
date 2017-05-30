@@ -125,6 +125,28 @@ defmodule Talon do
         Keyword.get(talon_resource.schema_types(), field, type)
       end
 
+      def primary_key(schema) do
+        Map.get schema, talon_resource(schema).adapter().primary_key(schema)
+      end
+
+      @doc """
+      Retrieve the name value form a model.
+
+      ## Examples
+
+          %TestTalon.Talon.Noid{description: "test", company: "Acme"} |>
+          Talon.Context.display_name()
+          Acme
+      """
+      def display_name(schema) do
+        talon_resource = talon_resource(schema)
+        if function_exported?(talon_resource, :display_name, 1) do
+          talon_resource.display_name(schema)
+        else
+          Map.get schema, talon_resource.name_field()
+        end
+      end
+
       defoverridable [
           base: 0, repo: 0, resource_map: 0, schema: 1, schema_names: 0, talon_resource: 1,
           resource_schema: 1, controller_action: 1, template_path_name: 1, schema_field_type: 3

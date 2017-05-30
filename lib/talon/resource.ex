@@ -110,7 +110,7 @@ defmodule Talon.Resource do
       def form_card_title(resource) do
         name =
           resource
-          |> Map.get(Talon.Resource.default_name_field(resource.__struct__))
+          |> Map.get(Talon.Resource.name_field(resource.__struct__))
         "#{Module.split(@__module__) |> List.last} #{name}"
       end
 
@@ -247,12 +247,24 @@ defmodule Talon.Resource do
       @spec schema_types() :: List.t
       def schema_types, do: []
 
+      @doc """
+      Find the display name field.
+
+      Used for getting the name to display in belongs_to associations.
+
+      Check to see if the schema has a name field. If not, finds
+      the first string field
+      """
+      @spec name_field() :: atom
+      def name_field do
+        Talon.Resource.name_field @__module__
+      end
 
       defoverridable [
         resource_paths: 1, nav_action_links: 2, params_key: 0, display_schema_columns: 1,
         index_card_title: 0, form_card_title: 1, tool_bar: 0, route_name: 0, repo: 0,
         adapter: 0, render_column_name: 2, get_schema_field: 3, preload: 3, context: 0,
-        paginate: 3, query: 3, search: 1, search: 3, schema_types: 0
+        paginate: 3, query: 3, search: 1, search: 3, schema_types: 0, name_field: 0
       ]
     end
 
@@ -294,31 +306,38 @@ defmodule Talon.Resource do
     {action, title, path}
   end
 
-    @doc """
-    Infer the default name field from a schema.
+  @doc """
+  Infer the name field from a schema.
 
-    Infers with the following rules:
+  Infers with the following rules:
 
-    * string :name field
-    * first string field
-    * first field
+  * string :name field
+  * first string field
+  * first field
 
-    ## Examples
+  ## Examples
 
-        Talon.Resource.default_name_field(Post)
-        :title
-    """
-    @spec default_name_field(Struct.t) :: atom
-    def default_name_field(schema) do
-      types = schema.__schema__(:types)
-      if types[:name] == :string do
-        :name
-      else
-        Enum.find(types, &(elem(&1, 1) == :string))
-        |> case do
-          nil -> hd(types) |> elem(0)
-          {field, _} -> field
-        end
+      Talon.Resource.name_field(Post)
+      :title
+
+      Talon.Resource.name_field(%Post{})
+      :title
+  """
+  @spec name_field(Struct.t | Module.t) :: atom
+
+  def name_field(schema) when is_map(schema) do
+    name_field schema.__struct__
+  end
+  def name_field(schema) when is_atom(schema) do
+    types = schema.__schema__(:types)
+    if types[:name] == :string do
+      :name
+    else
+      Enum.find(types, &(elem(&1, 1) == :string))
+      |> case do
+        nil -> hd(types) |> elem(0)
+        {field, _} -> field
       end
     end
+  end
 end
