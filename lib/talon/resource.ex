@@ -232,15 +232,27 @@ defmodule Talon.Resource do
       def search(schema, params, :search) do
         search(schema, params)
       end
-
       def search(schema, _params, _), do: schema
+
+      @doc """
+      Override schema type.
+
+      Use this function to override field type rendering.
+
+      ## Examples
+
+          # define a string field as a textaread
+          def schema_types, do: [body: :text]
+      """
+      @spec schema_types() :: List.t
+      def schema_types, do: []
 
 
       defoverridable [
         resource_paths: 1, nav_action_links: 2, params_key: 0, display_schema_columns: 1,
         index_card_title: 0, form_card_title: 1, tool_bar: 0, route_name: 0, repo: 0,
         adapter: 0, render_column_name: 2, get_schema_field: 3, preload: 3, context: 0,
-        paginate: 3, query: 3, search: 1, search: 3
+        paginate: 3, query: 3, search: 1, search: 3, schema_types: 0
       ]
     end
 

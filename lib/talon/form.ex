@@ -2,6 +2,8 @@ defmodule Talon.Form do
   import Phoenix.HTML.Form
   def input_builder({f, a}, field, opts) do
     # a.adapter().input_builder(a, resource, opts)
+
+    context = a.talon
     struct = f.data.__struct__
     associations = Talon.Schema.associations(struct)
     type =
@@ -9,11 +11,16 @@ defmodule Talon.Form do
         nil   -> struct.__schema__(:type, field)
         assoc -> assoc
       end
+    type = context.schema_field_type struct, field, type
     build_input({a, f}, field, type, opts)
   end
 
   defp build_input({_a, f}, field, :string, opts) do
     text_input(f, field, opts)
+  end
+
+  defp build_input({_a, f}, field, :text, opts) do
+    textarea(f, field, opts)
   end
 
   defp build_input({_a, f}, field, type, opts) when type in ~w(integer id)a do

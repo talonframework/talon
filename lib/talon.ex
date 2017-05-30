@@ -116,9 +116,18 @@ defmodule Talon do
         @__view_path_names__[resource_name]
       end
 
+      @doc """
+      Look update field type overrides
+      """
+      @spec schema_field_type(Module.t | Struct.t, atom, atom) :: atom
+      def schema_field_type(schema, field, type) do
+        talon_resource = talon_resource(schema)
+        Keyword.get(talon_resource.schema_types(), field, type)
+      end
+
       defoverridable [
           base: 0, repo: 0, resource_map: 0, schema: 1, schema_names: 0, talon_resource: 1,
-          resource_schema: 1, controller_action: 1, template_path_name: 1
+          resource_schema: 1, controller_action: 1, template_path_name: 1, schema_field_type: 3
         ]
     end
   end
