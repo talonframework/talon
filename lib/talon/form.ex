@@ -32,9 +32,11 @@ defmodule Talon.Form do
   end
 
   defp build_input({a, f}, field, %Ecto.Association.BelongsTo{} = _assoc, opts) do
+    context = a.talon
     {collection, opts} = Keyword.pop(opts, :collection)
     assoc_list = Keyword.get(a[:associations] || [], field, [])
-    collection = for item <- collection || assoc_list, do: {item.name, item.id}
+    collection = for item <- collection || assoc_list,
+      do: collection_tuple(context, item)
     select(f, field, collection, opts)
   end
 
@@ -43,6 +45,9 @@ defmodule Talon.Form do
     text_input(f, field, opts)
   end
 
+  defp collection_tuple(context, item) do
+    {context.display_name(item), context.primary_key(item)}
+  end
   # defp defn_and_adapter(%{__struct__: module}),
   #   do: defn_and_adapter(module)
 
