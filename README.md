@@ -1,5 +1,5 @@
 
-[![Build Status][travis-img]][travis] [![Stories in Ready][waffle-img][waffle] [![License][license-img]][license]
+[![Build Status][travis-img]][travis] [![Stories in Ready][waffle-img]][waffle] [![License][license-img]][license]
 
 [travis-img]: https://travis-ci.org/talonframework/talon.svg?branch=master
 [travis]: https://travis-ci.org/talonframework/talon
