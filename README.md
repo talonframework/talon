@@ -1,14 +1,13 @@
 
 [![Build Status][travis-img]][travis] [![Stories in Ready][waffle-img][waffle] [![License][license-img]][license]
 
-[travis-img]: https://travis-ci.org/smpallen99/ex_admin.svg?branch=master
-[travis]: https://travis-ci.org/smpallen99/ex_admin
-[hex-img]: https://img.shields.io/hexpm/v/ex_admin.svg
-[hex]: https://hex.pm/packages/ex_admin
+[travis-img]: https://travis-ci.org/talonframework/talon.svg?branch=master
+[travis]: https://travis-ci.org/talonframework/talon
+[waffle-img]: https://badge.waffle.io/talonframeword/talon.png?label=ready&title=Ready
+[waffle]: https://waffle.io/talonframework/talon?utm_source=badge
 [license-img]: http://img.shields.io/badge/license-MIT-brightgreen.svg
 [license]: http://opensource.org/licenses/MIT
-[waffle-img]: https://badge.waffle.io/talonframeword/talon.png?label=ready&title=Ready)
-[waffle]: https://waffle.io/ex-admin/ex_admin?utm_source=badge
+
 
 # Talon
 
