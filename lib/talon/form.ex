@@ -40,9 +40,22 @@ defmodule Talon.Form do
     select(f, field, collection, opts)
   end
 
+  # TODO: This is a hack and does not work with updates/changes. Need a solution
+  defp build_input({_a, f}, field, :map, opts) do
+    source = f.source
+    resource = source.data
+    resource = Map.put(resource, field, Poison.encode!(Map.get(resource, field)))
+    new_f =
+      f
+      |> struct(data: resource)
+      |> struct(source: struct(source, data: resource))
+
+    text_input new_f, field, opts
+  end
+
   defp build_input({_a, f}, field, type, opts) do
     IO.puts "build_input unknow #{inspect type} for #{inspect field}"
-    text_input(f, field, opts)
+    "unknown type"
   end
 
   defp collection_tuple(context, item) do
