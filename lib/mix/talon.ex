@@ -6,7 +6,7 @@ defmodule Mix.Talon do
   @doc """
   Get the configured themes.
 
-  Defaults to the "admin_lte" default them if not configured.
+  Defaults to the "admin_lte" default theme if not configured.
   """
 
   require Talon.Config, as: Config
