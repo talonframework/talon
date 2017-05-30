@@ -119,6 +119,13 @@ When you compile the project, the new slim template generated. The talon comiler
 - [ ] Multi-language support
 - [ ] Much more
 
+## Examples
+
+Refer to the following projects for examples of using Talon.
+
+* [Talon Demo](https://github.com/talonframework/talon_demo)
+* [Talon Blog Demo](https://github.com/talonframework/talon_blog_demo)
+
 ## Contributing
 
 The new Talon architecture is under very active development. So, expect significant changes as we explore architectural and feature ideas.
