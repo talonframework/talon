@@ -36,7 +36,7 @@ defmodule Talon.Plug.LoadResource do
     |> assign(:resource, schema)
   end
 
-  defp handle_action(action, conn, repo, schema) when action in [:show, :edit, :delete] do
+  defp handle_action(action, conn, repo, schema) when action in [:show, :edit, :delete, :update] do
     talon_resource = Talon.View.talon_resource(conn)
     resource =
       schema
