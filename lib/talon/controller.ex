@@ -71,7 +71,7 @@ defmodule Talon.Controller do
       def delete(conn, params) do
         repo = Talon.View.repo(conn)
         repo.delete! conn.assigns.resource
-        redirect conn, "index.html"
+        redirect conn, to: Talon.Utils.talon_resource_path(conn.assigns.resource.__struct__, :index)
       end
 
       @spec search(Plug.Conn.t, Map.t) :: Plug.Conn.t
