@@ -8,27 +8,27 @@ defmodule Talon.Resource do
   @type module_or_struct :: atom | struct
 
   defmacro __using__(opts) do
-    schema = opts[:schema]
-    unless schema do
-      raise ":schema is required"
-    end
-
-    context = opts[:context]
-
-    schema_adapter = opts[:adapter] || Application.get_env(:talon, :schema_adapter)
-    unless schema_adapter do
-      raise "schema_adapter required"
-    end
 
     repo = opts[:repo]
-    paginate = opts[:paginate] || Application.get_env(:talon, :paginage)
 
     quote do
-      @__module__ unquote(schema)
-      @__adapter__ unquote(schema_adapter)
-      @__context__ unquote(context) || (Module.split(__MODULE__) |> hd |> Module.concat(nil))
-      @__repo__ unquote(repo) || @__context__.repo() ||  Module.concat(@__context__, Repo)
-      @__paginate__ unquote(paginate) || true
+      require Talon.Config, as: Config
+
+      opts = unquote(opts)
+      @__concern__ opts[:concern]
+
+      @__module__ opts[:schema]
+      unless @__module__ do
+        raise ":schema is required"
+      end
+
+      @__adapter__ opts[:adapter] || Config.schema_adapter(@__concern__)
+      unless @__adapter__ do
+        raise "schema_adapter required"
+      end
+
+      @__repo__ unquote(repo) || @__concern__.repo()# ||  Module.concat(@__context__, Repo)
+      @__paginate__ opts[:paginate] || Config.paginate(__MODULE__) || true
       @__params_key__  Module.split(@__module__) |> List.last |> to_string |> Inflex.underscore
       @__route_name__ @__params_key__ |> Inflex.Pluralize.pluralize
 
@@ -145,13 +145,13 @@ defmodule Talon.Resource do
       """
       @spec nav_action_links(atom, Struct.t | Module.t) :: List.t
       def nav_action_links(action, resource) when action in [:index, :edit] do
-        [Talon.Resource.nav_action_link(:new, resource)]
+        [Talon.Resource.nav_action_link(__MODULE__, :new, resource)]
       end
       def nav_action_links(:show, resource) do
         [
-          Talon.Resource.nav_action_link(:edit, resource),
-          Talon.Resource.nav_action_link(:new, resource),
-          Talon.Resource.nav_action_link(:delete, resource)
+          Talon.Resource.nav_action_link(__MODULE__, :edit, resource),
+          Talon.Resource.nav_action_link(__MODULE__, :new, resource),
+          Talon.Resource.nav_action_link(__MODULE__, :delete, resource)
         ]
       end
       def nav_action_links(_action, _resource) do
@@ -168,7 +168,7 @@ defmodule Talon.Resource do
         talon.resources()
         |> Enum.map(fn talon_resource ->
           schema = talon_resource.schema()
-          {Talon.Utils.titleize(schema) |> Inflex.Pluralize.pluralize, Talon.Utils.talon_resource_path(schema, :index)}
+          {Talon.Utils.titleize(schema) |> Inflex.Pluralize.pluralize, talon.resource_path(schema, :index)}
         end)
       end
 
@@ -207,10 +207,10 @@ defmodule Talon.Resource do
       end
 
       @doc """
-      Returrn the Talon context.
+      Returrn the Talon concern.
       """
-      @spec context() :: atom
-      def context, do: @__context__
+      @spec concern() :: atom
+      def concern, do: @__concern__
 
       @doc """
       Return the Repo
@@ -260,11 +260,16 @@ defmodule Talon.Resource do
         Talon.Resource.name_field @__module__
       end
 
+      def themes do
+        Config.themes(@__concern__)
+      end
+
       defoverridable [
         resource_paths: 1, nav_action_links: 2, params_key: 0, display_schema_columns: 1,
         index_card_title: 0, form_card_title: 1, tool_bar: 0, route_name: 0, repo: 0,
-        adapter: 0, render_column_name: 2, get_schema_field: 3, preload: 3, context: 0,
-        paginate: 3, query: 3, search: 1, search: 3, schema_types: 0, name_field: 0
+        adapter: 0, render_column_name: 2, get_schema_field: 3, preload: 3, concern: 0,
+        paginate: 3, query: 3, search: 1, search: 3, schema_types: 0, name_field: 0,
+        themes: 0
       ]
     end
 
@@ -277,20 +282,20 @@ defmodule Talon.Resource do
 
   ## Examples
 
-      iex> Talon.Resource.nav_action_link(:new, TestTalon.Simple)
+      iex> Talon.Resource.nav_action_link(TestTalon.Talon, :new, TestTalon.Simple)
       {:new, "New Simple", "/talon/simples/new"}
 
-      iex> Talon.Resource.nav_action_link(:new, %TestTalon.Simple{id: 1})
+      iex> Talon.Resource.nav_action_link(TestTalon.Talon, :new, %TestTalon.Simple{id: 1})
       {:new, "New Simple", "/talon/simples/new"}
 
-      iex> Talon.Resource.nav_action_link(:edit, %TestTalon.Simple{id: 1})
+      iex> Talon.Resource.nav_action_link(TestTalon.Talon, :edit, %TestTalon.Simple{id: 1})
       {:edit, "Edit Simple", "/talon/simples/1/edit"}
 
-      iex> Talon.Resource.nav_action_link(:delete, %TestTalon.Simple{id: 1})
+      iex> Talon.Resource.nav_action_link(TestTalon.Talon, :delete, %TestTalon.Simple{id: 1})
       {:delete, "Delete Simple", "/talon/simples/1"}
   """
-  @spec nav_action_link(atom, atom | struct) :: {atom, String.t, String.t}
-  def nav_action_link(action, resource_or_module) do
+  @spec nav_action_link(atom, atom, atom | struct) :: {atom, String.t, String.t}
+  def nav_action_link(concern, action, resource_or_module) do
     {resource, module} =
       case resource_or_module do
         %{__struct__: module} -> {resource_or_module, module}
@@ -298,9 +303,9 @@ defmodule Talon.Resource do
       end
     path =
       case action do
-        :new -> Talon.Utils.talon_resource_path(module, :new)
-        :edit ->Talon.Utils.talon_resource_path(resource, :edit)
-        :delete -> Talon.Utils.talon_resource_path(resource, :delete)
+        :new -> concern.resource_path(module, :new)
+        :edit -> concern.resource_path(resource, :edit)
+        :delete -> concern.resource_path(resource, :delete)
       end
     title = String.capitalize(to_string(action)) <> " " <> Talon.Utils.titleize(resource)
     {action, title, path}

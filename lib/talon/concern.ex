@@ -34,7 +34,7 @@ defmodule Talon.Concern do
       TestTalon.Talon.Simple
 
       iex> TestTalon.Talon.controller_action("simples")
-      {TestTalon.Simple, :simples, "admin_lte"}
+      {TestTalon.Simple, :simples, "admin-lte"}
 
       iex> TestTalon.Talon.base()
       TestTalon
@@ -42,6 +42,8 @@ defmodule Talon.Concern do
       iex> TestTalon.Talon.template_path_name("simples")
       "simple"
   """
+
+  require Talon.Config, as: Config
 
   defmacro __using__(opts) do
     Code.ensure_compiled(Talon.Config)
@@ -53,9 +55,9 @@ defmodule Talon.Concern do
     repo = opts[:repo]
 
     quote location: :keep do
-      require Talon.Config
+      require Talon.Config, as: Config
 
-      @__resources__  Talon.Config.resources(__MODULE__)
+      @__resources__  Config.resources(__MODULE__)
 
       @__resource_map__  for mod <- @__resources__, into: %{},
         do: {Module.split(mod) |> List.last() |> to_string |> Inflex.underscore |> Inflex.Pluralize.pluralize, mod}
@@ -64,9 +66,22 @@ defmodule Talon.Concern do
 
       # @__resource_to_talon__ for resource <- @__resources__, do: {resource.schema(), resource}
 
-      @__base__ Module.split(__MODULE__) |> hd |> Module.concat(nil)
+      # @__base__ Module.split(__MODULE__) |> hd |> Module.concat(nil)
+      @__base__ Config.module()
 
-      @__repo__ unquote(repo) || Module.concat(@__base__, Repo)
+      @__repo__ unquote(repo) || Config.repo(__MODULE__)
+
+      @__router__ Config.router(__MODULE__)
+
+      @__router_helpers__ Module.concat(@__router__, Helpers)
+
+      @__endpoint__ Config.endpoint(__MODULE__)
+
+      @__resource_path_fn__ ((__MODULE__
+        |> Module.split
+        |> List.last
+        |> Inflex.underscore) <>
+        "_resource_path") |> String.to_atom
 
       @spec base() :: atom
       def base, do: @__base__
@@ -150,11 +165,93 @@ defmodule Talon.Concern do
         end
       end
 
+      @doc """
+
+      ## Examples:
+
+          iex> Talon.Utils.resource_path(TestTalon.Product)
+          "/talon/products"
+
+          iex> Talon.Utils.resource_path(%TestTalon.Product{})
+          "/talon/products/new"
+
+          iex> Talon.Utils.resource_path(%TestTalon.Product{id: 1})
+          "/talon/products/1"
+
+          iex> Talon.Utils.resource_path(%TestTalon.Product{id: 1}, :edit)
+          "/talon/products/1/edit"
+
+          iex> Talon.Utils.resource_path(%TestTalon.Product{id: 1}, :update)
+          "/talon/products/1"
+
+          iex> Talon.Utils.resource_path(%TestTalon.Product{id: 1}, :destroy)
+          "/talon/products/1"
+
+          iex> Talon.Utils.resource_path(TestTalon.Product, :create)
+          "/talon/products"
+
+          iex> Talon.Utils.resource_path(TestTalon.Product, :batch_action)
+          "/talon/products/batch_action"
+
+          iex> Talon.Utils.resource_path(TestTalon.Product, :csv)
+          "/talon/products/csv"
+
+          iex> Talon.Utils.resource_path(%Plug.Conn{assigns: %{resource: %TestTalon.Product{}}}, :index, [[scope: "active"]])
+          "/talon/products?scope=active"
+      """
+      def resource_path(schema, action, opts \\ [])
+      def resource_path(%{} = schema, action, opts) do
+        # route_path = Talon.Resource.talon_resource(schema).route_name()
+        route_path = talon_resource(schema).route_name()
+        apply @__router_helpers__, @__resource_path_fn__, [@__endpoint__, action,
+          route_path, primary_key(schema) | opts]
+      end
+      def resource_path(schema_mod, action, opts) when is_atom(schema_mod) do
+        route_path = talon_resource(schema_mod).route_name()
+        # route_path = Talon.Resource.talon_resource(schema_mod).route_name()
+        apply @__router_helpers__, @__resource_path_fn__, [@__endpoint__, action,
+          route_path | opts]
+      end
+
       defoverridable [
           base: 0, repo: 0, resource_map: 0, schema: 1, schema_names: 0, talon_resource: 1,
           resource_schema: 1, controller_action: 1, template_path_name: 1, schema_field_type: 3
         ]
     end
+  end
+
+  @doc """
+  Return the app's base module.
+
+  ## Examples
+
+      iex> Talon.app_module(TestTalon.Talon)
+      TestTalon
+  """
+  @spec app_module(atom) :: atom
+  def app_module(talon) do
+    talon.base()
+  end
+
+  @spec web_namespace() :: Module.t | nil
+  def web_namespace do
+    Config.web_namespace()
+  end
+
+  @spec web_path() :: String.t
+  def web_path do
+    case web_namespace() do
+      nil -> "web"
+      _ ->
+        Path.join(["lib", Inflex.underscore(Config.module()), "web"])
+    end
+  end
+
+  def context(conn) do
+    conn.assigns.talon.talon
+  end
+  def resource_path(conn, action, opts) do
+    context(conn).resource_path(conn.assigns.resource, action, opts)
   end
 
 end

@@ -8,8 +8,12 @@ defmodule Talon.Mixfile do
      elixirc_paths: elixirc_paths(Mix.env),
      build_embedded: Mix.env == :prod,
      start_permanent: Mix.env == :prod,
+     # compilers: compilers(Mix.env),
      deps: deps()]
   end
+
+  # defp compilers(:test), do: [:talon, :phoenix, :gettext] ++ Mix.compilers
+  # defp compilers(_), do: []
 
   def application do
     [extra_applications: [:logger],

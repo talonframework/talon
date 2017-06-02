@@ -47,7 +47,7 @@ defmodule Talon.Components.Datatable do
       end
     page = conn.params["page"] || "1"
 
-    Talon.Utils.talon_resource_path(conn, :index, [[order: "#{name}" <> order, page: page]])
+    Talon.Concern.resource_path(conn, :index, [[order: "#{name}" <> order, page: page]])
   end
 
   @doc """

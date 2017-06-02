@@ -81,7 +81,7 @@ Run `mix help gen.talon.template` for more options.
 
 Once the override template generator is created, simply edit the .eex template and customize it as designed.
 
-When you compile the project, the new slim template generated. The talon comiler first checks to see if a template is defined in the `templates/admin_lte/theme/resource/generators` path. It will be compiled instead of the global template if it exists.
+When you compile the project, the new slim template generated. The talon compiler first checks to see if a template is defined in the `templates/admin-lte/theme/resource/generators` path. It will be compiled instead of the global template if it exists.
 
 ## TODO
 - [X] Prototype a theme based template generator for master site

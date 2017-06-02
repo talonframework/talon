@@ -5,10 +5,18 @@ defmodule Mix.Tasks.Talon.Gen.Resource do
   Creates the resource files needed to manage a schema with Talon.
 
       mix talon.gen.resource User
+      mix talon.gen.resource FrontEnd Blogs.Blog
+
+  Two arguments can be passed to the task. The first is an optional
+  Talon concern. The second argument is a schema to be managed with
+  Talon.
+
+  If the concern argument is omitted, the fist concern from the
+  `concerns` configuration list will be used.
 
   Creates the following files:
 
-  * web/layout/talon/admin_lte/user_view.ex
+  * web/layout/talon/admin-lte/user_view.ex
   * lib/my_app/talon/user.ex
 
   ## Options
@@ -25,14 +33,14 @@ defmodule Mix.Tasks.Talon.Gen.Resource do
   require Talon.Config, as: Config
   # import Mix.Generator
 
-  @default_theme "admin_lte"
+  @default_theme "admin-lte"
 
   # list all supported boolean options
   @boolean_options ~w(all_themes verbose boilerplate dry_run)a
 
   # complete list of supported options
   @switches [
-    theme: :string, context: :string, module: :string
+    theme: :string, concern: :string, module: :string
   ] ++ Enum.map(@boolean_options, &({&1, :boolean}))
 
 
@@ -62,10 +70,9 @@ defmodule Mix.Tasks.Talon.Gen.Resource do
   def create_resource_file(config) do
     binding = config.binding ++ [base: config[:base], boilerplate: config.boilerplate,
       resource: config.resource, scoped_resource: config.scoped_resource, module: config.module,
-      context: config.context]
+      concern: config.concern]
     name = Inflex.underscore config.resource
-    ctx = Inflex.underscore config.context
-    target_path = Path.join([config.lib_path, "talon", ctx])
+    target_path = Path.join([config.lib_path, "talon", concern_path(config)])
     unless config.dry_run do
       copy_from paths(),
         "priv/templates/talon.gen.resource", target_path, binding, [
@@ -97,7 +104,7 @@ defmodule Mix.Tasks.Talon.Gen.Resource do
   def print_instructions(config) do
     Mix.shell.info """
       Remember to update your config/talon.exs file with the resource module
-        config :talon, #{config.context},
+        config :talon, #{config.concern},
           :resources, [
             ...
             #{config.base}.#{inspect config.module}
@@ -106,18 +113,29 @@ defmodule Mix.Tasks.Talon.Gen.Resource do
     config
   end
 
+  defp get_default_concern(binding) do
+    IO.inspect binding, label: :binding
+    Talon
+  end
 
-  defp do_config({bin_opts, opts, parsed} = args) do
+  def normalize_module(module, _binding) do
+    module
+  end
+
+  defp do_config({bin_opts, opts, parsed}) do
     binding =
       Mix.Project.config
       |> Keyword.fetch!(:app)
       |> Atom.to_string
       |> Mix.Phoenix.inflect
 
-    scoped_resource =
+    {concern, scoped_resource} =
       case parsed do
         [resource] ->
-          resource
+          {get_default_concern(binding), normalize_module(resource, binding)}
+        [concern, resource] ->
+          {normalize_module(concern, binding),
+            normalize_module(resource, binding)}
         other ->
           Mix.raise "Invalid arguments #{inspect other}"
       end
@@ -133,19 +151,19 @@ defmodule Mix.Tasks.Talon.Gen.Resource do
         _ -> scoped_resource
       end
 
-    contexts = Config.contexts()
-    unless contexts, do: Mix.raise("You must add :talon, :contexts to your config/talon.exs file")
+    # concerns = Config.concerns() || [concern]
+    # unless concerns, do: Mix.raise("You must add :talon, :concerns to your config/talon.exs file")
 
-    # IO.inspect hd(contexts), label: "context"
-    IO.inspect {opts[:context], hd(contexts)}, label: "...."
-    context = Module.concat(opts[:context] || hd(contexts), nil)
+    # IO.inspect {opts[:concern], hd(concerns)}, label: "...."
+    # concern = Module.concat(opts[:concern] || hd(concerns), nil)
 
-    module = opts[:module] || Module.concat(context, scoped_resource)
+    # TODO: not sure if this is right
+    module = opts[:module] || Module.concat(concern, scoped_resource)
 
     %{
       # themes: get_themes(args),
       theme: opts[:theme] || @default_theme,
-      context: context,
+      concern: concern,
       module: module,
       verbose: bin_opts[:verbose],
       resource: resource,

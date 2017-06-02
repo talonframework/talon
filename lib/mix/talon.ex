@@ -6,16 +6,14 @@ defmodule Mix.Talon do
   @doc """
   Get the configured themes.
 
-  Defaults to the "admin_lte" default theme if not configured.
+  Defaults to the "admin-lte" default theme if not configured.
   """
 
   require Talon.Config, as: Config
 
   @spec themes() :: String.t
   def themes do
-    Config.contexts
-    |> Enum.map(&Config.theme/1)
-    |> Enum.uniq
+    Config.themes() || []
   end
 
   @doc """
@@ -221,10 +219,10 @@ defmodule Mix.Talon do
 
   ## Examples
 
-      iex> Talon.Mix.view_opts("admin_lte", :phx)
-      ~s(, theme: "admin_lte", module: AdminLte.Web)
-      iex> Talon.Mix.view_opts("admin_lte", :phoenix)
-      ~s(, theme: "admin_lte", module: AdminLte)
+      iex> Talon.Mix.view_opts("admin-lte", :phx)
+      ~s(, theme: "admin-lte", module: AdminLte.Web)
+      iex> Talon.Mix.view_opts("admin-lte", :phoenix)
+      ~s(, theme: "admin-lte", module: AdminLte)
   """
   @spec view_opts(String.t, atom) :: String.t
   def view_opts(theme, proj_struct) do
@@ -254,6 +252,23 @@ defmodule Mix.Talon do
   def common_absolute_path(app) do
     to_app_source app, Path.join(["priv", "templates", "common"])
   end
+
+  def concern_path(%{concern: concern}) when is_atom(concern) do
+    concern
+    |> Module.split
+    |> List.last
+    |> Inflex.underscore
+  end
+
+  def concern_path(%{concern: concern}) when is_binary(concern) do
+    concern
+    |> String.split(".")
+    |> List.last
+    |> Inflex.underscore
+  end
+
+  def to_s(module) when is_binary(module), do: module
+  def to_s(module), do: inspect(module)
 end
 
 

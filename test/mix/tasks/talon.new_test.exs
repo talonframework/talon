@@ -3,7 +3,7 @@ Code.require_file "../../mix_helpers.exs", __DIR__
 defmodule Mix.Tasks.Talon.NewTest do
   use ExUnit.Case
   import MixHelper
-  import Talon.TestHelpers
+  # import Talon.TestHelpers
   # import ExUnit.CaptureIO
 
   alias Mix.Tasks.Talon.New, as: GenNew
@@ -13,7 +13,7 @@ defmodule Mix.Tasks.Talon.NewTest do
   setup do
     send self(), {:mix_shell_input, :yes?, false}
     send self(), {:mix_shell_input, :yes?, false}
-    {:ok, parsed: ~w(admin_lte admin_lte)}
+    {:ok, parsed: ~w(admin-lte admin-lte)}
   end
 
   @app_name "phx_blogger"
@@ -53,7 +53,7 @@ defmodule Mix.Tasks.Talon.NewTest do
           "config :talon,",
           "module: PhxBlogger,",
           "essages_backend: PhxBlogger.Web.Gettext,",
-          ~s/theme: "admin_lte",/,
+          ~s/theme: "admin-lte",/,
           "web_namespace: Web,",
           "schema_adapter: Talon.Schema.Adapters.Ecto"
         ]
@@ -67,7 +67,7 @@ defmodule Mix.Tasks.Talon.NewTest do
         assert_file "lib/phx_blogger/web/controllers/talon/talon_resource_controller.ex", [
           "defmodule PhxBlogger.Web.TalonResourceController do",
           "use PhxBlogger.Web, :controller",
-          "use Talon.Controller, repo: PhxBlogger.Repo, context: PhxBlogger.Talon"
+          "use Talon.Controller, repo: PhxBlogger.Repo, concern: PhxBlogger.Talon"
         ]
 
         assert_file "lib/phx_blogger/web/talon_messages.ex", [
@@ -78,39 +78,39 @@ defmodule Mix.Tasks.Talon.NewTest do
         #########
         # Views
 
-        assert_file "lib/phx_blogger/web/views/talon/admin_lte/layout_view.ex", [
+        assert_file "lib/phx_blogger/web/views/talon/admin-lte/layout_view.ex", [
           "defmodule AdminLte.Web.LayoutView do",
-          ~s/use Talon.Web, which: :view, theme: "admin_lte", module: AdminLte.Web/
+          ~s/use Talon.Web, which: :view, theme: "admin-lte", module: AdminLte.Web/
         ]
 
-        assert_file "lib/phx_blogger/web/views/talon/admin_lte/components/datatable_view.ex", [
+        assert_file "lib/phx_blogger/web/views/talon/admin-lte/components/datatable_view.ex", [
           "defmodule AdminLte.Web.DatatableView do",
-          ~s/use Talon.Web, which: :component_view, theme: "admin_lte", module: AdminLte.Web/,
+          ~s/use Talon.Web, which: :component_view, theme: "admin-lte", module: AdminLte.Web/,
           "use Talon.Components.Datatable, __MODULE__"
         ]
 
-        assert_file "lib/phx_blogger/web/views/talon/admin_lte/components/paginate_view.ex", [
+        assert_file "lib/phx_blogger/web/views/talon/admin-lte/components/paginate_view.ex", [
           "defmodule AdminLte.Web.PaginateView do",
-          ~s/use Talon.Web, which: :component_view, theme: "admin_lte", module: AdminLte.Web/
+          ~s/use Talon.Web, which: :component_view, theme: "admin-lte", module: AdminLte.Web/
         ]
 
         #########
         # templates
 
-        assert_file "lib/phx_blogger/web/templates/talon/admin_lte/generators/edit.html.eex"
-        assert_file "lib/phx_blogger/web/templates/talon/admin_lte/generators/form.html.eex"
-        assert_file "lib/phx_blogger/web/templates/talon/admin_lte/generators/index.html.eex", [
+        assert_file "lib/phx_blogger/web/templates/talon/admin-lte/generators/edit.html.eex"
+        assert_file "lib/phx_blogger/web/templates/talon/admin-lte/generators/form.html.eex"
+        assert_file "lib/phx_blogger/web/templates/talon/admin-lte/generators/index.html.eex", [
           "= AdminLte.Web.DatatableView.render_table(@conn, @resources)"
         ]
-        assert_file "lib/phx_blogger/web/templates/talon/admin_lte/generators/new.html.eex"
-        assert_file "lib/phx_blogger/web/templates/talon/admin_lte/generators/show.html.eex"
+        assert_file "lib/phx_blogger/web/templates/talon/admin-lte/generators/new.html.eex"
+        assert_file "lib/phx_blogger/web/templates/talon/admin-lte/generators/show.html.eex"
 
-        assert_file "lib/phx_blogger/web/templates/talon/admin_lte/components/datatable/datatable.html.slim", [
+        assert_file "lib/phx_blogger/web/templates/talon/admin-lte/components/datatable/datatable.html.slim", [
           "= AdminLte.Web.PaginateView.paginate(@conn)"
         ]
-        assert_file "lib/phx_blogger/web/templates/talon/admin_lte/components/datatable/table_body.html.slim"
+        assert_file "lib/phx_blogger/web/templates/talon/admin-lte/components/datatable/table_body.html.slim"
         for file <- ~w(app nav_action_link nav_resource_link sidebar) do
-          assert_file "lib/phx_blogger/web/templates/talon/admin_lte/layout/#{file}.html.slim"
+          assert_file "lib/phx_blogger/web/templates/talon/admin-lte/layout/#{file}.html.slim"
         end
       end
     end
@@ -153,7 +153,7 @@ defmodule Mix.Tasks.Talon.NewTest do
           "config :talon,",
           "module: Blogger,",
           "essages_backend: Blogger.Gettext,",
-          ~s/theme: "admin_lte",/,
+          ~s/theme: "admin-lte",/,
           "schema_adapter: Talon.Schema.Adapters.Ecto"
         ]
 
@@ -166,7 +166,7 @@ defmodule Mix.Tasks.Talon.NewTest do
         assert_file "web/controllers/talon/talon_resource_controller.ex", [
           "defmodule Blogger.TalonResourceController do",
           "use Blogger.Web, :controller",
-          "use Talon.Controller, repo: Blogger.Repo, context: Blogger.Talon"
+          "use Talon.Controller, repo: Blogger.Repo, concern: Blogger.Talon"
         ]
 
         assert_file "web/talon_messages.ex", [
@@ -174,38 +174,38 @@ defmodule Mix.Tasks.Talon.NewTest do
           "import Blogger.Gettext"
         ]
 
-        assert_file "web/views/talon/admin_lte/layout_view.ex", [
+        assert_file "web/views/talon/admin-lte/layout_view.ex", [
           "defmodule AdminLte.LayoutView do",
-          ~s/use Talon.Web, which: :view, theme: "admin_lte", module: AdminLte/
+          ~s/use Talon.Web, which: :view, theme: "admin-lte", module: AdminLte/
         ]
 
-        assert_file "web/views/talon/admin_lte/components/datatable_view.ex", [
+        assert_file "web/views/talon/admin-lte/components/datatable_view.ex", [
           "defmodule AdminLte.DatatableView do",
-          ~s/use Talon.Web, which: :component_view, theme: "admin_lte", module: AdminLte/,
+          ~s/use Talon.Web, which: :component_view, theme: "admin-lte", module: AdminLte/,
           "use Talon.Components.Datatable, __MODULE__"
         ]
 
-        assert_file "web/views/talon/admin_lte/components/paginate_view.ex", [
+        assert_file "web/views/talon/admin-lte/components/paginate_view.ex", [
           "defmodule AdminLte.PaginateView do",
-          ~s/use Talon.Web, which: :component_view, theme: "admin_lte", module: AdminLte/
+          ~s/use Talon.Web, which: :component_view, theme: "admin-lte", module: AdminLte/
         ]
 
         #########
         # templates
 
-        assert_file "web/templates/talon/admin_lte/generators/edit.html.eex"
-        assert_file "web/templates/talon/admin_lte/generators/form.html.eex"
-        assert_file "web/templates/talon/admin_lte/generators/index.html.eex", [
+        assert_file "web/templates/talon/admin-lte/generators/edit.html.eex"
+        assert_file "web/templates/talon/admin-lte/generators/form.html.eex"
+        assert_file "web/templates/talon/admin-lte/generators/index.html.eex", [
           "= AdminLte.DatatableView.render_table(@conn, @resources)"
         ]
-        assert_file "web/templates/talon/admin_lte/generators/new.html.eex"
-        assert_file "web/templates/talon/admin_lte/generators/show.html.eex"
-        assert_file "web/templates/talon/admin_lte/components/datatable/datatable.html.slim", [
+        assert_file "web/templates/talon/admin-lte/generators/new.html.eex"
+        assert_file "web/templates/talon/admin-lte/generators/show.html.eex"
+        assert_file "web/templates/talon/admin-lte/components/datatable/datatable.html.slim", [
           "= AdminLte.PaginateView.paginate(@conn)"
         ]
-        assert_file "web/templates/talon/admin_lte/components/datatable/table_body.html.slim"
+        assert_file "web/templates/talon/admin-lte/components/datatable/table_body.html.slim"
         for file <- ~w(app nav_action_link nav_resource_link sidebar) do
-          assert_file "web/templates/talon/admin_lte/layout/#{file}.html.slim"
+          assert_file "web/templates/talon/admin-lte/layout/#{file}.html.slim"
         end
       end
     end

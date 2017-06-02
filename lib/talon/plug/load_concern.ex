@@ -1,4 +1,4 @@
-defmodule Talon.Plug.LoadContext do
+defmodule Talon.Plug.LoadConcern do
   @moduledoc """
   Creates a new conn.assigns.talon and loads the context into it
   """
@@ -13,14 +13,14 @@ defmodule Talon.Plug.LoadContext do
 
   def call(conn, opts) do
     talon = conn.assigns[:talon] || %{}
-    context = opts[:talon] || talon[:talon] || raise("talon option required")
-    schema = context.schema(conn.params["resource"])
+    concern = opts[:concern] || talon[:concern] || raise("concern option required")
+    schema = concern.schema(conn.params["resource"])
     # require IEx
     # IEx.pry
     unless schema do
       raise Phoenix.Router.NoRouteError, conn: conn, router: __MODULE__
     end
-    talon_resource = context.talon_resource(conn.params["resource"])
+    talon_resource = concern.talon_resource(conn.params["resource"])
     assign conn, :talon, Enum.into([talon_resource: talon_resource, schema: schema], talon)
   end
 

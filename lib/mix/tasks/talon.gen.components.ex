@@ -17,6 +17,8 @@ defmodule Mix.Tasks.Talon.Gen.Components do
 
   import Mix.Talon
 
+  require Talon.Config, as: Config
+
   # list all supported boolean options
   @boolean_options ~w(verbose dry_run)a
 
@@ -116,7 +118,7 @@ defmodule Mix.Tasks.Talon.Gen.Components do
   end
 
   defp do_config({bin_opts, opts, parsed} = _args) do
-    themes = get_available_themes()
+    # themes = get_available_themes()
 
     theme_name =
       case parsed do
@@ -147,20 +149,13 @@ defmodule Mix.Tasks.Talon.Gen.Components do
       view_opts: view_opts,
       web_path: opts[:web_path] || web_path(verify: true),
       web_namespace: web_namespace(proj_struct),
-      boilerplate: bin_opts[:boilerplate] || Application.get_env(:talon, :boilerplate, true),
+      boilerplate: bin_opts[:boilerplate] || Config.boilerplate() || true,
       base: bin_opts[:module] || binding[:base],
     }
   end
 
   defp to_atom(atom) when is_atom(atom), do: atom
   defp to_atom(string), do: String.to_atom(string)
-
-  defp get_available_themes do
-    :talon
-    |> Application.app_dir("priv/templates/talon.gen.theme/*")
-    |> Path.wildcard()
-    |> Enum.map(& Path.split(&1) |> List.last)
-  end
 
   defp parse_options([], parsed) do
     {[], [], parsed}

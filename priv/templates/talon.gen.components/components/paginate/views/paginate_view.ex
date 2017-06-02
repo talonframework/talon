@@ -11,7 +11,7 @@ defmodule <%= theme_module %>.<%= web_namespace %>PaginateView do
       conn.assigns[:resource]
       |> Module.split
       |> List.last
-    link = Talon.Utils.talon_resource_path conn.assigns[:resource], :index, [[order: nil]]
+    link = Talon.Concern.resource_path conn, :index, [[order: nil]]
 
     paginate(link, page_number, page.page_size, page.total_pages, page.total_entries, model_name, show_information: true)
   end

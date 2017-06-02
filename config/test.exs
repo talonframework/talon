@@ -30,9 +30,10 @@ config :talon, TestTalon.Talon,
   ],
   schema_adapter: Talon.Schema.Adapters.Ecto,
   module: TestTalon,
-  endpoint: Talon.Endpoint,
-  repo: Talon.Repo,
-  theme: "admin_lte"
+  endpoint: TestTalon.Endpoint,
+  repo: TestTalon.Repo,
+  router: TestTalon.Router,
+  theme: "admin-lte"
 
 config :talon, TestTalon.FrontEnd,
   resources: [
@@ -40,11 +41,13 @@ config :talon, TestTalon.FrontEnd,
   ],
   schema_adapter: Talon.Schema.Adapters.Ecto,
   module: TestTalon,
-  endpoint: Talon.Endpoint,
-  repo: Talon.Repo,
+  endpoint: TestTalon.Endpoint,
+  repo: TestTalon.Repo,
+  router: TestTalon.Router,
   theme: "theme2"
 
 config :talon,
+  concerns: [TestTalon.Talon, TestTalon.FrontEnd],
   schema_adapter: Talon.Schema.Adapters.Ecto,
   module: TestTalon
 

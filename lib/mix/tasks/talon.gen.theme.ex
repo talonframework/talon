@@ -15,12 +15,12 @@ defmodule Mix.Tasks.Talon.Gen.Theme do
   The generator takes 2 arguments plus a number of optional switches as
   described below
 
-  * `theme` - one of the Talon installed themes i.e. `admin_lte`
+  * `theme` - one of the Talon installed themes i.e. `admin-lte`
   * `target_name` - the new name of theme when installed in your project.
 
   This generator serves three purposes. First, its called automatically
   from the `mix talon.new` mix task to handle the installation of the
-  default `admin_lte` theme.
+  default `admin-lte` theme.
 
   Secondly, it can be used to install another theme into your project,
   if a second theme is included in the Talon package
@@ -31,7 +31,7 @@ defmodule Mix.Tasks.Talon.Gen.Theme do
   Lastly, it can be used to create a theme template to assist in building
   your own custom theme.
 
-      mix talon.gen.theme admin_lte my_theme
+      mix talon.gen.theme admin-lte my_theme
 
   ## Project Structure Support
 
@@ -44,7 +44,7 @@ defmodule Mix.Tasks.Talon.Gen.Theme do
 
   ### Argument Switches
 
-  * --theme=theme_name (admin_lte) -- set the theme to be installed
+  * --theme=theme_name (admin-lte) -- set the theme to be installed
   * --assets-path (auto detect) -- path to the assets directory
   * --web-path=path (auto detect) -- set the web path
 
@@ -67,7 +67,7 @@ defmodule Mix.Tasks.Talon.Gen.Theme do
   To disable a default boolean option, use the `--no-option` syntax. For example,
   to disable brunch:
 
-      mix talon.gen.theme admin_lte my_theme --no-brunch
+      mix talon.gen.theme admin-lte my_theme --no-brunch
   """
   use Mix.Task
 
@@ -94,7 +94,7 @@ defmodule Mix.Tasks.Talon.Gen.Theme do
     module: :string
   ] ++ Enum.map(@all_boolean_options, &({&1, :boolean}))
 
-  @default_theme "admin_lte"
+  # @default_theme "admin-lte"
 
   # Two paths are required here. The relative path is used when when we
   # call `copy_from` since it calculates the absolute path based on the
@@ -120,11 +120,11 @@ defmodule Mix.Tasks.Talon.Gen.Theme do
   ]
 
   # look for theme name to its list of assets
-  @vendor_files %{"admin_lte" =>  @admin_lte_files}
+  @vendor_files %{"admin-lte" =>  @admin_lte_files}
 
   # translation of of theme name to its resources name space. This list
   # must contain an entry for every installed theme
-  @theme_mapping %{"admin_lte" => "admin-lte"}
+  # @theme_mapping %{"admin-lte" => "admin-lte"}
 
   @doc false
   @spec run(List.t) :: any
@@ -224,7 +224,7 @@ defmodule Mix.Tasks.Talon.Gen.Theme do
   @doc false
   def gen_images(%{assets: true} = config) do
     unless config.dry_run do
-      theme_name = @theme_mapping[config.theme]
+      theme_name = config.theme
       path = Path.join [config.theme, "assets", "static", "images", "talon", theme_name]
       source_path = Path.join([@source_path, path])
       source_path_relative = Path.join(@source_path_relative, path)
@@ -250,7 +250,6 @@ defmodule Mix.Tasks.Talon.Gen.Theme do
     unless config.dry_run do
       source_path = Path.join([@source_path_relative, config.theme, "assets"])
       target_path = Path.join([config.vendor_parent])
-      IO.inspect target_path, label: "target_path"
 
       File.mkdir_p! target_path
       copy_from paths(), source_path, target_path, [target_name: config.target_name],
@@ -266,7 +265,7 @@ defmodule Mix.Tasks.Talon.Gen.Theme do
     |> Enum.map(fn {path, files} ->
       Enum.map(files, fn file ->
         fpath = Path.join(path, file)
-        spath = EEx.eval_string(fpath, theme: @theme_mapping[source_theme])
+        spath = EEx.eval_string(fpath, theme: source_theme)
         tpath = EEx.eval_string(fpath, theme: target_theme)
         {:eex, spath, tpath}
       end)

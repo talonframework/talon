@@ -11,6 +11,7 @@ defmodule Mix.Tasks.Compile.Talon do
   - Does not work with live reload. You need to manually compile the project and live reload will pickup the changes.
   """
   use Mix.Task
+  require Talon.Config, as: Config
   @recursive true
 
   def run(_args) do
@@ -37,7 +38,7 @@ defmodule Mix.Tasks.Compile.Talon do
 
   defp compile_templates(theme) do
     try do
-      base = Application.get_env :talon, :module
+      base = Config.module()
       base_path = templates_path(theme)
       unless base, do: Mix.raise(":module configuration required")
 
@@ -49,10 +50,10 @@ defmodule Mix.Tasks.Compile.Talon do
 
         for action <- [:index, :edit, :form, :new, :show] do
           unless compile_custom_template(action, resource_name, talon_resource, theme) do
-            if Application.get_env :talon, :verbose_compile do
+            if Config.compiler_opts()[:verbose_compile] do
               IO.puts "compiling global emplate for #{resource_name} #{action}"
             end
-            base_path = Path.join([Talon.web_path(), "templates", "talon", theme])
+            base_path = Path.join([Talon.Concern.web_path(), "templates", "talon", theme])
             templ = EEx.eval_file(Path.join([base_path, "generators", "#{action}.html.eex"]), assigns: [talon_resource: talon_resource])
             File.mkdir_p(Path.join(base_path, resource_name))
             Path.join([base_path, resource_name, "#{action}.html.slim"])
@@ -72,7 +73,7 @@ defmodule Mix.Tasks.Compile.Talon do
       path = Path.join([base_path, resource_name, "generators"])
       template = Path.join path, "#{action}.html.eex"
       if File.exists? template do
-        if Application.get_env :talon, :verbose_compile do
+        if Config.compiler_opts()[:verbose_compile] do
           IO.puts "compiling override template for #{resource_name} #{action}"
         end
         templ = EEx.eval_file(template, assigns: [talon_resource: talon_resource])

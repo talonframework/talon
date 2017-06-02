@@ -17,7 +17,7 @@ defmodule Mix.Tasks.Talon.New do
 
   ### Argument Switches
 
-  * --theme=theme_name (admin_lte) -- set the theme to be installed
+  * --theme=theme_name (admin-lte) -- set the theme to be installed
   * --assets-path (auto detect) -- path to the assets directory
   * --web-path=path (auto detect) -- set the web path
 
@@ -49,7 +49,7 @@ defmodule Mix.Tasks.Talon.New do
   import Mix.Talon
   # import Mix.Generator
 
-  @default_theme "admin_lte"
+  @default_theme "admin-lte"
 
   # list all supported boolean options
   @boolean_options ~w(all_themes verbose boilerplate dry_run no_assets)a  ++

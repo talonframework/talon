@@ -81,7 +81,7 @@ defmodule Talon.View do
 
   ## Examples
 
-      iex> Talon.View.theme_module(%{assigns: %{talon: %{theme: "admin_lte"}}})
+      iex> Talon.View.theme_module(%{assigns: %{talon: %{theme: "admin-lte"}}})
       AdminLte
   """
   @spec theme_module(Plug.Conn.t) :: atom

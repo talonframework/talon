@@ -1,8 +1,8 @@
 defmodule TestTalon.TalonResourceController do
   use TestTalon.Web, :controller
-  use Talon.Controller, repo: TestTalon.Repo, context: TestTalon.Talon
+  use Talon.Controller, repo: TestTalon.Repo, concern: TestTalon.Talon
 
-  plug Talon.Plug.LoadContext
+  plug Talon.Plug.LoadConcern
   plug Talon.Plug.LoadResource
   plug Talon.Plug.LoadAssociations
   plug Talon.Plug.LoadAssociatedCollections when action in [:new, :edit]
