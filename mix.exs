@@ -8,6 +8,7 @@ defmodule Talon.Mixfile do
      elixirc_paths: elixirc_paths(Mix.env),
      build_embedded: Mix.env == :prod,
      start_permanent: Mix.env == :prod,
+      compilers: compilers(Mix.env),
      deps: deps()]
   end
 
@@ -34,5 +35,8 @@ defmodule Talon.Mixfile do
       # {:ecto_talon, path: "../ecto_talon", only: :test},
     ]
   end
+
+  defp compilers(:test), do: [:phoenix] ++ Mix.compilers # TODO: add :talon, :gettext ?
+  defp compilers(_), do: nil
 end
 
