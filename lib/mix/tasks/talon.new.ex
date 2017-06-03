@@ -20,6 +20,7 @@ defmodule Mix.Tasks.Talon.New do
   * --theme=theme_name (admin-lte) -- set the theme to be installed
   * --assets-path (auto detect) -- path to the assets directory
   * --web-path=path (auto detect) -- set the web path
+  * --concern=concern (Admin) -- set the concern module name
 
   ### Boolean Options
 
@@ -50,6 +51,7 @@ defmodule Mix.Tasks.Talon.New do
   # import Mix.Generator
 
   @default_theme "admin-lte"
+  @default_concern "Admin"
 
   # list all supported boolean options
   @boolean_options ~w(all_themes verbose boilerplate dry_run no_assets)a  ++
@@ -57,7 +59,7 @@ defmodule Mix.Tasks.Talon.New do
 
   # complete list of supported options
   @switches [
-    theme: :string
+    theme: :string, concern: :string
   ] ++ Enum.map(@boolean_options, &({&1, :boolean}))
 
 
@@ -251,6 +253,9 @@ defmodule Mix.Tasks.Talon.New do
       else
         config.base
       end
+    full_concern = Module.concat config.base, config.concern
+
+    route_scope = Inflex.underscore(config.concern)
 
     Mix.shell.info """
 
@@ -259,9 +264,9 @@ defmodule Mix.Tasks.Talon.New do
       use Talon.Router
 
       # your app's routes
-      scope "/talon", #{namespace} do
+      scope "/#{route_scope}", #{namespace} do
         pipe_through :browser
-        talon_routes()
+        talon_routes(#{to_s full_concern})
       end
     """
     config
@@ -282,10 +287,13 @@ defmodule Mix.Tasks.Talon.New do
         true -> detect_project_structure()
       end
 
+    concern = opts[:concern] || @default_concern
+
     %{
       raw_args: raw_args,
       themes: get_themes(args),
       theme: opts[:theme] || @default_theme,
+      concern: concern,
       verbose: bin_opts[:verbose],
       dry_run: bin_opts[:dry_run],
       package_path: get_package_path(),
