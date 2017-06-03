@@ -1,6 +1,6 @@
-defmodule <%= base %>.Talon do
+defmodule <%= base %>.<%= concern %> do
   @moduledoc """
-  Admmin Endpoint/Context.
+  Admmin Endpoint/Concern.
 
   This module contains a number of default functions which are all
   overridable. It is also used for namespacing configuration.

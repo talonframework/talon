@@ -19,8 +19,10 @@ defmodule Mix.Tasks.Talon.New do
 
   * --theme=theme_name (admin-lte) -- set the theme to be installed
   * --assets-path (auto detect) -- path to the assets directory
-  * --web-path=path (auto detect) -- set the web path
-  * --concern=concern (Admin) -- set the concern module name
+  * --web-path=(auto detect) -- set the web path
+  * --concern=(Admin) -- set the concern module name
+  * --root-path=(lib/my_app/talon) - the path where talon files are stored
+  * --path_prefix=("") -- the path prefix for `controllers`, `templates`, `views`
 
   ### Boolean Options
 
@@ -52,6 +54,9 @@ defmodule Mix.Tasks.Talon.New do
 
   @default_theme "admin-lte"
   @default_concern "Admin"
+  @default_root_path "talon"
+  @default_path_prefix ""
+
 
   # list all supported boolean options
   @boolean_options ~w(all_themes verbose boilerplate dry_run no_assets)a  ++
@@ -81,7 +86,7 @@ defmodule Mix.Tasks.Talon.New do
     config
     |> gen_config
     |> verify_project!
-    |> gen_talon_context
+    |> gen_talon_concern
     |> gen_controller
     |> gen_web
     |> gen_messages
@@ -132,15 +137,17 @@ defmodule Mix.Tasks.Talon.New do
       """
   end
 
-  def gen_talon_context(config) do
-    fname = "talon.ex"
-    binding = Kernel.binding() ++ [base: config.base, app: config.app, boilerplate: config.boilerplate]
-    target_path = "lib/#{config.app}/talon"
+  def gen_talon_concern(config) do
+    concern_path = Inflex.underscore(config.concern)
+    fname = concern_path <> ".ex"
+    binding = Kernel.binding() ++ [base: config.base, app: config.app,
+      boilerplate: config.boilerplate, concern: to_s(config.concern)]
+    target_path = Path.join config.root_path, concern_path
     unless config.dry_run do
-      File.mkdir_p! target_path
+      # File.mkdir_p! target_path
       copy_from paths(),
-        "priv/templates/talon.new/lib", target_path, binding, [
-          {:eex, "talon_context.ex", fname},
+        "priv/templates/talon.new/web", target_path, binding, [
+          {:eex, "talon_concern.ex", fname},
         ], config
     end
    config
@@ -150,7 +157,7 @@ defmodule Mix.Tasks.Talon.New do
     fname = "talon_resource_controller.ex"
     binding = Kernel.binding() ++ [base: config.base,
       boilerplate: config[:boilerplate], web_namespace: config.web_namespace]
-    target_path = Path.join([config.web_path, "controllers", "talon"])
+    target_path = Path.join([config.root_path, "controllers", config.path_prefix])
     unless config.dry_run do
       File.mkdir_p! target_path
       copy_from paths(),
@@ -166,13 +173,14 @@ defmodule Mix.Tasks.Talon.New do
     theme = config.theme
     binding = Kernel.binding() ++
       [base: config.base, web_namespace: config.web_namespace, theme: theme,
-        theme_module: Inflex.camelize(theme), web_path: config.web_path]
-    target_path = config.web_path
+        theme_module: Inflex.camelize(theme), root_path: config.root_path,
+        path_prefix: config.path_prefix]
+    target_path = Path.join config.root_path, config.path_prefix
     unless config.dry_run do
-      File.mkdir_p! target_path
+      # File.mkdir_p! target_path
       copy_from paths(),
         "priv/templates/talon.new/web", target_path, binding, [
-          {:eex, fname, fname},
+          {:eex, fname, "web.ex"},
         ], config
     end
    config
@@ -182,12 +190,12 @@ defmodule Mix.Tasks.Talon.New do
     fname = "talon_messages.ex"
     binding = Kernel.binding() ++
       [base: config.base, web_namespace: config.web_namespace]
-    target_path = config.web_path
+    target_path = Path.join config.root_path, config.path_prefix
     unless config.dry_run do
-      File.mkdir_p! target_path
+      # File.mkdir_p! target_path
       copy_from paths(),
         "priv/templates/talon.new/web", target_path, binding, [
-          {:eex, fname, fname},
+          {:eex, fname, "messages.ex"},
         ], config
     end
    config
@@ -288,19 +296,25 @@ defmodule Mix.Tasks.Talon.New do
       end
 
     concern = opts[:concern] || @default_concern
+    app = opts[:app_name] || Mix.Project.config |> Keyword.fetch!(:app)
+    app_path_name = app |> to_string |> Inflex.underscore
+    root_path = opts[:root_path] || Path.join(["lib", app_path_name, @default_root_path])
 
     %{
       raw_args: raw_args,
+      root_path: root_path,
+      path_prefix: opts[:path_prefix] || @default_path_prefix,
       themes: get_themes(args),
       theme: opts[:theme] || @default_theme,
       concern: concern,
       verbose: bin_opts[:verbose],
       dry_run: bin_opts[:dry_run],
       package_path: get_package_path(),
-      app: Mix.Project.config |> Keyword.fetch!(:app),
+      app: app,
+      app_path_name: app_path_name,
       project_structure: proj_struct,
       web_namespace: web_namespace(proj_struct),
-      web_path: web_path(),
+      # web_path: web_path(),
       binding: binding,
       boilerplate: bin_opts[:boilerplate] || Application.get_env(:talon, :boilerplate, true),
       base: bin_opts[:module] || binding[:base],
