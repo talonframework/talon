@@ -50,8 +50,8 @@ defmodule Mix.Tasks.Talon.Gen.ThemeTest do
         assert_file "assets/vendor/talon/admin-lte/bootstrap/css/bootstrap.min.css"
         assert_file "lib/blogger/web/templates/talon/admin_lte/layout/app.html.slim"
         assert_file "lib/blogger/web/views/talon/admin_lte/layout_view.ex", fn file ->
-          file =~ "defmodule AdminLte.Web.LayoutView do"
-          file =~ ~s(use Talon.Web, which: :view, theme: "admin_lte", module: AdminLte.Web)
+          assert file =~ "defmodule AdminLte.Web.LayoutView do"
+          assert file =~ ~s(use Talon.Web, which: :view, theme: "admin_lte", module: AdminLte.Web)
         end
         assert_file "lib/blogger/web/templates/talon/admin_lte/generators/index.html.eex", fn file ->
           assert file =~ ~s(= AdminLte.Web.DatatableView.render_table)
@@ -163,8 +163,8 @@ defmodule Mix.Tasks.Talon.Gen.ThemeTest do
         assert_file "web/static/vendor/talon/admin-lte/bootstrap/css/bootstrap.min.css"
         assert_file "web/templates/talon/admin_lte/layout/app.html.slim"
         assert_file "web/views/talon/admin_lte/layout_view.ex", fn file ->
-          file =~ "defmodule AdminLte.LayoutView do"
-          file =~ ~s(use Talon.Web, which: :view, theme: "admin_lte", module: AdminLte)
+          assert file =~ "defmodule AdminLte.LayoutView do"
+          assert file =~ ~s(use Talon.Web, which: :view, theme: "admin_lte", module: AdminLte)
         end
         assert_file "web/templates/talon/admin_lte/generators/index.html.eex", fn file ->
           assert file =~ ~s(= AdminLte.DatatableView.render_table)
