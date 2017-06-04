@@ -49,16 +49,16 @@ defmodule Mix.Tasks.Talon.Gen.ThemeTest do
         assert_file "assets/css/talon/admin-lte/talon.css"
         assert_file "assets/vendor/talon/admin-lte/bootstrap/css/bootstrap.min.css"
         assert_file "lib/blogger/web/templates/talon/admin_lte/layout/app.html.slim"
-        assert_file "lib/blogger/web/views/talon/admin_lte/layout_view.ex", fn file ->
-          assert file =~ "defmodule AdminLte.Web.LayoutView do"
-          assert file =~ ~s(use Talon.Web, which: :view, theme: "admin_lte", module: AdminLte.Web)
-        end
-        assert_file "lib/blogger/web/templates/talon/admin_lte/generators/index.html.eex", fn file ->
-          assert file =~ ~s(= AdminLte.Web.DatatableView.render_table)
-        end
-        assert_file "lib/blogger/web/templates/talon/admin_lte/components/datatable/datatable.html.slim", fn file ->
-          assert file =~ ~s(= AdminLte.Web.PaginateView.paginate)
-        end
+        assert_file "lib/blogger/web/views/talon/admin_lte/layout_view.ex", [
+          "defmodule AdminLte.Web.LayoutView do",
+          ~s(use Talon.Web, which: :view, theme: "admin_lte", module: AdminLte.Web)
+        ]
+        assert_file "lib/blogger/web/templates/talon/admin_lte/generators/index.html.eex", [
+          ~s(= AdminLte.Web.DatatableView.render_table)
+        ]
+        assert_file "lib/blogger/web/templates/talon/admin_lte/components/datatable/datatable.html.slim", [
+          ~s(= AdminLte.Web.PaginateView.paginate)
+        ]
       end
 
     end
@@ -121,14 +121,14 @@ defmodule Mix.Tasks.Talon.Gen.ThemeTest do
 
         GenTheme.run  parsed ++ ["--proj-struct=phx", "--brunch-only"]
 
-        assert_file brunch_file(:phx), fn file ->
-          assert file =~ "'js/app.js': /^(js)|(node_modules)/,"
-          assert file =~ "'js/talon/admin_lte/jquery-2.2.3.min.js': 'vendor/talon/admin-lte/plugins/jQuery/jquery-2.2.3.min.js',"
+        assert_file brunch_file(:phx), [
+          "'js/app.js': /^(js)|(node_modules)/,",
+          "'js/talon/admin_lte/jquery-2.2.3.min.js': 'vendor/talon/admin-lte/plugins/jQuery/jquery-2.2.3.min.js',",
 
-          assert file =~ "'css/app.css': /^(css)/,"
-          assert file =~ "'css/talon/admin_lte/talon.css': ["
-          assert file =~ "'css/talon/admin-lte/talon.css',"
-        end
+          "'css/app.css': /^(css)/,",
+          "'css/talon/admin_lte/talon.css': [",
+          "'css/talon/admin-lte/talon.css',"
+        ]
       end
     end
   end
@@ -140,14 +140,14 @@ defmodule Mix.Tasks.Talon.Gen.ThemeTest do
 
         GenTheme.run  parsed ++ ["--proj-struct=phoenix", "--brunch-only"]
 
-        assert_file brunch_file(:phoenix), fn file ->
-          assert file =~ "'js/app.js': /^(web\\/static\\/js)|(node_modules)/,"
-          assert file =~ "'js/talon/admin_lte/jquery-2.2.3.min.js': 'web/static/vendor/talon/admin-lte/plugins/jQuery/jquery-2.2.3.min.js',"
+        assert_file brunch_file(:phoenix), [
+          "'js/app.js': /^(web\\/static\\/js)|(node_modules)/,",
+          "'js/talon/admin_lte/jquery-2.2.3.min.js': 'web/static/vendor/talon/admin-lte/plugins/jQuery/jquery-2.2.3.min.js',",
 
-          assert file =~ "'css/app.css': /^(web\\/static\\/css)/,"
-          assert file =~ "'css/talon/admin_lte/talon.css': ["
-          assert file =~ "'web/static/css/talon/admin-lte/talon.css',"
-        end
+          "'css/app.css': /^(web\\/static\\/css)/,",
+          "'css/talon/admin_lte/talon.css': [",
+          "'web/static/css/talon/admin-lte/talon.css',"
+        ]
       end
     end
 
@@ -162,16 +162,16 @@ defmodule Mix.Tasks.Talon.Gen.ThemeTest do
         assert_file "web/static/css/talon/admin-lte/talon.css"
         assert_file "web/static/vendor/talon/admin-lte/bootstrap/css/bootstrap.min.css"
         assert_file "web/templates/talon/admin_lte/layout/app.html.slim"
-        assert_file "web/views/talon/admin_lte/layout_view.ex", fn file ->
-          assert file =~ "defmodule AdminLte.LayoutView do"
-          assert file =~ ~s(use Talon.Web, which: :view, theme: "admin_lte", module: AdminLte)
-        end
-        assert_file "web/templates/talon/admin_lte/generators/index.html.eex", fn file ->
-          assert file =~ ~s(= AdminLte.DatatableView.render_table)
-        end
-        assert_file "web/templates/talon/admin_lte/components/datatable/datatable.html.slim", fn file ->
-          assert file =~ ~s(= AdminLte.PaginateView.paginate)
-        end
+        assert_file "web/views/talon/admin_lte/layout_view.ex", [
+          "defmodule AdminLte.LayoutView do",
+          ~s(use Talon.Web, which: :view, theme: "admin_lte", module: AdminLte)
+        ]
+        assert_file "web/templates/talon/admin_lte/generators/index.html.eex", [
+          ~s(= AdminLte.DatatableView.render_table)
+        ]
+        assert_file "web/templates/talon/admin_lte/components/datatable/datatable.html.slim", [
+          ~s(= AdminLte.PaginateView.paginate)
+        ]
       end
     end
   end
