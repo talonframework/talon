@@ -34,7 +34,7 @@ defmodule <%= base %>.Talon.<%= scoped_resource %> do
   # end
 
   # @doc """
-  # Override the default columm nam redering.
+  # Override the default columm name rendering.
   # """
   # def render_column_name(_page, :zip_code), do: "Zip"
   # def render_column_name(_page, :street_num), do: "Num"
