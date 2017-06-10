@@ -46,7 +46,9 @@ defmodule Mix.Tasks.Talon.Gen.Theme do
 
   * --theme=theme_name (admin-lte) -- set the theme to be installed
   * --assets-path (auto detect) -- path to the assets directory
-  * --web-path=path (auto detect) -- set the web path
+  * --concern=(Admin) -- set the concern module name
+  * --root-path=(lib/my_app/talon) - the path where talon files are stored
+  * --path_prefix=("") -- the path prefix for `controllers`, `templates`, `views`
 
   ### Boolean Options
 
@@ -89,7 +91,8 @@ defmodule Mix.Tasks.Talon.Gen.Theme do
   # complete list of supported options
   @switches [
     theme: :string,
-    web_path: :string,
+    root_path: :string,
+    path_prefix: :string,
     assets_path: :string,
     module: :string
   ] ++ Enum.map(@all_boolean_options, &({&1, :boolean}))
@@ -136,7 +139,7 @@ defmodule Mix.Tasks.Talon.Gen.Theme do
     opts
     # |> verify_args!(parsed, unknown)
     |> parse_options(parsed)
-    |> do_config
+    |> do_config(args)
     |> do_run
   end
 
@@ -156,11 +159,12 @@ defmodule Mix.Tasks.Talon.Gen.Theme do
   end
 
   defp gen_components(%{components: true} = config) do
-    opts = if config[:verbose], do: ["--verbose"], else: []
-    opts = if config[:dry_run], do: ["--dry-run" | opts], else: opts
-    opts = ["--web-path=#{config.web_path}", "--proj-struct=#{config.project_structure}" | opts]
+    # opts = if config[:verbose], do: ["--verbose"], else: []
+    # opts = if config[:dry_run], do: ["--dry-run" | opts], else: opts
+    # opts = ["--root-path=#{config.root_path}", "--proj-struct=#{config.project_structure}" | opts]
 
-    Mix.Tasks.Talon.Gen.Components.run([config.target_name] ++ opts)
+    # Mix.Tasks.Talon.Gen.Components.run([config.target_name] ++ opts)
+    Mix.Tasks.Talon.Gen.Components.run(config.raw_args)
     config
   end
   defp gen_components(config), do: config
@@ -168,9 +172,10 @@ defmodule Mix.Tasks.Talon.Gen.Theme do
   defp gen_layout_view(%{layouts: true} = config) do
     binding = Kernel.binding() ++ [base: config.base, target_name: config.target_name,
       target_module: config.target_module, web_namespace: config.web_namespace,
-      view_opts: config.view_opts]
+      view_opts: config.view_opts, concern: config.concern]
     theme = config.theme
-    view_path = Path.join([config.web_path, "views", "talon", config.target_name])
+    view_path = Path.join([config.root_path, "views", config.path_prefix,
+      config.concern_path, config.target_name])
     unless config.dry_run do
       File.mkdir_p! view_path
       copy_from paths(),
@@ -183,9 +188,12 @@ defmodule Mix.Tasks.Talon.Gen.Theme do
   defp gen_layout_view(config), do: config
 
   defp gen_layout_templates(%{layouts: true} = config) do
-    binding = Kernel.binding() ++ [web_namespace: config.web_namespace, target_name: config.target_name]
+    binding = Kernel.binding() ++ [web_namespace: config.web_namespace,
+      target_name: config.target_name, concern: config.concern,
+      concern_path: config.concern_path]
     theme = config.theme
-    template_path = Path.join([config.web_path, "templates", "talon", config.target_name, "layout"])
+    template_path = Path.join([config.root_path, "templates", config.path_prefix,
+        config.concern_path, config.target_name, "layout"])
     unless config.dry_run do
       File.mkdir_p! template_path
       copy_from paths(),
@@ -202,9 +210,10 @@ defmodule Mix.Tasks.Talon.Gen.Theme do
 
   defp gen_generators(%{generators: true} = config) do
     binding = Kernel.binding() ++ [base: config.base, target_name: config.target_name,
-      target_module: config.target_module, web_namespace: config.web_namespace]
+      target_module: config.target_module, web_namespace: config.web_namespace, concern: config.concern]
     theme = config.theme
-    template_path = Path.join([config.web_path, "templates", "talon", config.target_name, "generators"])
+    template_path = Path.join([config.root_path, "templates", config.path_prefix,
+      config.concern_path, config.target_name, "generators"])
     unless config.dry_run do
       File.mkdir_p! template_path
       copy_from paths(),
@@ -347,18 +356,11 @@ defmodule Mix.Tasks.Talon.Gen.Theme do
   # TODO: This should probably be pulled out and placed in Talon.Mix
   #       since most of the code is common between all the installers
   @doc false
-  def do_config({bin_opts, opts, parsed}) do
-    themes = get_available_themes()
+  def do_config({bin_opts, opts, _parsed}, raw_args) do
+    # themes = get_available_themes()
 
-    {theme, target_name} =
-      case parsed do
-        [theme, target] ->
-          unless theme in themes,
-            do: Mix.raise("Invalid theme name. Choices are #{inspect themes}")
-          {theme, target}
-        other ->
-          Mix.raise "Invalid arguments #{inspect other}"
-      end
+    {concern, theme} = process_concern_theme(opts)
+    target_name = Keyword.get(opts, :target_theme, theme)
 
     binding =
       Mix.Project.config
@@ -366,6 +368,8 @@ defmodule Mix.Tasks.Talon.Gen.Theme do
       |> Atom.to_string
       |> Mix.Phoenix.inflect
       # |> IO.inspect(label: "binding")
+    base = opts[:module] || binding[:base]
+
     proj_struct =
       cond do
         opts[:proj_struct] -> String.to_atom(opts[:proj_struct])
@@ -374,24 +378,35 @@ defmodule Mix.Tasks.Talon.Gen.Theme do
         true -> detect_project_structure()
       end
 
-    view_opts = view_opts(target_name, proj_struct)
+    view_opts =
+      %{target_name: target_name, base: base, concern: concern}
+      |> view_opts(proj_struct)
+
+    app = opts[:app_name] || Mix.Project.config |> Keyword.fetch!(:app)
+    app_path_name = app |> to_string |> Inflex.underscore
+    root_path = opts[:root_path] || Path.join(["lib", app_path_name, default_root_path()])
 
     bin_opts
     |> enabled_bin_options
     |> Enum.into(
       %{
+        raw_args: raw_args,
         theme: theme,
+        concern: concern,
+        concern_path: concern_path(concern),
+        app: app,
+        root_path: root_path,
+        path_prefix: opts[:path_prefix] || default_path_prefix(),
         target_name: target_name,
         target_module: theme_module_name(target_name),
         verbose: bin_opts[:verbose],
         dry_run: bin_opts[:dry_run],
         project_structure: proj_struct,
         web_namespace: web_namespace(proj_struct),
-        web_path: opts[:web_path] || web_path(),
         view_opts: view_opts,
         binding: binding,
         boilerplate: bin_opts[:boilerplate] || Application.get_env(:talon, :boilerplate, true),
-        base: opts[:module] || binding[:base],
+        base: base,
       })
     |> set_config_onlys(bin_opts)
   end
@@ -429,12 +444,12 @@ defmodule Mix.Tasks.Talon.Gen.Theme do
     end
   end
 
-  defp get_available_themes do
-    :talon
-    |> Application.app_dir("priv/templates/talon.gen.theme/*")
-    |> Path.wildcard()
-    |> Enum.map(& Path.split(&1) |> List.last)
-  end
+  # defp get_available_themes do
+  #   :talon
+  #   |> Application.app_dir("priv/templates/talon.gen.theme/*")
+  #   |> Path.wildcard()
+  #   |> Enum.map(& Path.split(&1) |> List.last)
+  # end
 
   # defp all_themes do
   #   Application.get_env :talon, :themes, [@default_theme]

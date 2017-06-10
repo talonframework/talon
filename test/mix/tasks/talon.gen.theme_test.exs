@@ -6,58 +6,52 @@ defmodule Mix.Tasks.Talon.Gen.ThemeTest do
   import Talon.TestHelpers
 
   alias Mix.Tasks.Talon.Gen.Theme, as: GenTheme
+  alias Mix.Tasks.Talon.New, as: GenNew
 
-
-  # @default_phx_config %{
-  #   base: "Blogger",
-  #   binding: [
-  #     alias: "Blogger",
-  #     human: "Blogger",
-  #     base: "Blogger",
-  #     web_module: "Blogger.Web",
-  #     module: "Blogger.Blogger",
-  #     scoped: "Blogger",
-  #     singular: "blogger",
-  #     path: "blogger"
-  #   ],
-  #   boilerplate: true,
-  #   web_path: "lib/blogger/web",
-  #   dry_run: nil,
-  #   resource: "Blog",
-  #   scoped_resource: "Blogs.Blog",
-  #   themes: ["admin-lte"],
-  #   project_structure: :phx,
-  #   verbose: false,
-  #   lib_path: "lib/blogger",
-  #   web_namespace: "Web."
-  # }
-
-  # @default_phoenix_config Enum.into([web_path: "web", scoped_resource: "Blog",
-  #   project_structure: :phoenix, web_namespace: ""], @default_phx_config)
+  @app_name "phx_blogger"
 
   setup do
+    send self(), {:mix_shell_input, :yes?, false}
+    send self(), {:mix_shell_input, :yes?, false}
+    send self(), {:mix_shell_input, :yes?, false}
+    send self(), {:mix_shell_input, :yes?, false}
     {:ok, parsed: ~w(admin-lte admin-lte)}
   end
 
   describe "phx 1.3 structure" do
     test "new_1.3" do
-      in_tmp "new_1.3", fn ->
-        mk_web_path()
-        mk_assets_path()
-        GenTheme.run ~w(admin-lte admin-lte) ++ [~s(--web-path=lib/blogger/web), "--verbose", "--phx"]
+      Logger.disable(self())
+
+      Application.put_env(:phx_blogger, PhxBlogger.Web.Endpoint,
+        secret_key_base: String.duplicate("abcdefgh", 8),
+        code_reloader: true,
+        root: File.cwd!)
+
+      in_tmp "theme_phx_blogger_defaults", fn ->
+        Mix.Tasks.Phx.New.run([@app_name, "--no-ecto"])
+      end
+
+      in_project :phx_blogger, Path.join(tmp_path(), "theme_phx_blogger_defaults/phx_blogger"), fn _ ->
+        Mix.Task.clear
+        GenNew.run ["--no-theme"] #{ }~w(--phx)
+        Mix.Task.clear
+        # mk_web_path()
+        # mk_assets_path()
+        GenTheme.run ["--verbose", "--phx"]
+
         assert_file assets_path("static/images/talon/admin-lte/orderable.png")
         assert_file "assets/css/talon/admin-lte/talon.css"
         assert_file "assets/vendor/talon/admin-lte/bootstrap/css/bootstrap.min.css"
-        assert_file "lib/blogger/web/templates/talon/admin-lte/layout/app.html.slim"
-        assert_file "lib/blogger/web/views/talon/admin-lte/layout_view.ex", fn file ->
-          file =~ "defmodule AdminLte.Web.LayoutView do"
-          file =~ ~s(use Talon.Web, which: :view, theme: "admin-lte", module: AdminLte.Web)
+        assert_file "lib/phx_blogger/talon/templates/admin/admin-lte/layout/app.html.slim"
+        assert_file "lib/phx_blogger/talon/views/admin/admin-lte/layout_view.ex", fn file ->
+          file =~ "defmodule PhxBlogger.Admin.AdminLte.Web.LayoutView do"
+          file =~ ~s(use Talon.Web, which: :view, theme: "admin-lte", module: PhxBlogger.Admin.AdminLte.Web)
         end
-        assert_file "lib/blogger/web/templates/talon/admin-lte/generators/index.html.eex", fn file ->
-          assert file =~ ~s(= AdminLte.Web.DatatableView.render_table)
+        assert_file "lib/phx_blogger/talon/templates/admin/admin-lte/generators/index.html.eex", fn file ->
+          assert file =~ ~s(= PhxBlogger.Admin.AdminLte.Web.DatatableView.render_table)
         end
-        assert_file "lib/blogger/web/templates/talon/admin-lte/components/datatable/datatable.html.slim", fn file ->
-          assert file =~ ~s(= AdminLte.Web.PaginateView.paginate)
+        assert_file "lib/phx_blogger/talon/templates/admin/admin-lte/components/datatable/datatable.html.slim", fn file ->
+          assert file =~ ~s(= PhxBlogger.Admin.AdminLte.Web.PaginateView.paginate)
         end
       end
 
@@ -68,7 +62,7 @@ defmodule Mix.Tasks.Talon.Gen.ThemeTest do
       # {bin_opts, opts, parsed}
       in_tmp @name, fn ->
         mk_web_path()
-        config = GenTheme.do_config {[phx: true], [], parsed}
+        config = GenTheme.do_config {[phx: true], [], parsed}, []
         Enum.each ~w(brunch assets layouts generators components)a, fn option ->
           assert config[option]
         end
@@ -82,7 +76,7 @@ defmodule Mix.Tasks.Talon.Gen.ThemeTest do
         # {bin_opts, opts, parsed}
         in_tmp @name, fn ->
           mk_web_path()
-          config = GenTheme.do_config {[{@opt, false} | [phx: true]], [], parsed}
+          config = GenTheme.do_config {[{@opt, false} | [phx: true]], [], parsed}, []
           Enum.each ~w(brunch assets layouts generators components)a, fn option ->
             if option == @opt do
               refute config[option]
@@ -102,7 +96,7 @@ defmodule Mix.Tasks.Talon.Gen.ThemeTest do
         in_tmp @name, fn ->
           mk_web_path()
           only_opt = {String.to_atom("#{@opt}_only"), true}
-          config = GenTheme.do_config {[only_opt | [phx: true]], [], parsed}
+          config = GenTheme.do_config {[only_opt | [phx: true]], [], parsed}, []
           Enum.each ~w(brunch assets layouts generators components)a, fn option ->
             if option == @opt do
               assert config[option]
@@ -133,12 +127,23 @@ defmodule Mix.Tasks.Talon.Gen.ThemeTest do
     end
   end
   describe "phoenix structure" do
-    test "brunch boilerplate appended", %{parsed: parsed} do
-      in_tmp "brunch boilerplate appended phoenix", fn ->
-        mk_web_path()
-        mk_brunch_file(:phoenix)
+    test "brunch boilerplate appended" do
+      Logger.disable(self())
 
-        GenTheme.run  parsed ++ ["--proj-struct=phoenix", "--brunch-only"]
+      Application.put_env(:blogger, Blogger.Endpoint,
+        secret_key_base: String.duplicate("abcdefgh", 8),
+        code_reloader: true,
+        root: File.cwd!)
+
+      in_tmp "theme_blogger_brunch", fn ->
+        Mix.Tasks.Phoenix.New.run(["blogger", "--no-ecto"])
+      end
+
+      in_project :blogger, Path.join(tmp_path(), "theme_blogger_brunch/blogger"), fn _ ->
+        Mix.Task.clear
+        GenNew.run ["--no-theme"] #{ }~w(--phx)
+        Mix.Task.clear
+        GenTheme.run  ["--proj-struct=phoenix", "--brunch-only"]
 
         assert_file brunch_file(:phoenix), fn file ->
           assert file =~ "'js/app.js': /^(web\\/static\\/js)|(node_modules)/,"
@@ -152,25 +157,36 @@ defmodule Mix.Tasks.Talon.Gen.ThemeTest do
     end
 
     test "new_phoenix" do
-      in_tmp "new_phoenix", fn ->
+      Logger.disable(self())
 
-        mk_phoenix_project()
-        # mk_web_path(@phoenix_web_path)
-        # mk_assets_path(@phoenix_assets_path)
-        GenTheme.run ~w(admin-lte admin-lte) ++ [~s(--web-path=web), "--verbose", "--phoenix"]
+      Application.put_env(:blogger, Blogger.Endpoint,
+        secret_key_base: String.duplicate("abcdefgh", 8),
+        code_reloader: true,
+        root: File.cwd!)
+
+      in_tmp "theme_blogger_defaults", fn ->
+        Mix.Tasks.Phoenix.New.run(["blogger", "--no-ecto"])
+      end
+
+      in_project :blogger, Path.join(tmp_path(), "theme_blogger_defaults/blogger"), fn _ ->
+        Mix.Task.clear
+        GenNew.run ["--no-theme"] #{ }~w(--phx)
+        Mix.Task.clear
+        GenTheme.run [~s(--root-path=web),"--path-prefix=talon", "--verbose", "--phoenix"]
+
         assert_file assets_path("assets/images/talon/admin-lte/orderable.png", :phoenix)
         assert_file "web/static/css/talon/admin-lte/talon.css"
         assert_file "web/static/vendor/talon/admin-lte/bootstrap/css/bootstrap.min.css"
-        assert_file "web/templates/talon/admin-lte/layout/app.html.slim"
-        assert_file "web/views/talon/admin-lte/layout_view.ex", fn file ->
-          file =~ "defmodule AdminLte.LayoutView do"
-          file =~ ~s(use Talon.Web, which: :view, theme: "admin-lte", module: AdminLte)
+        assert_file "web/templates/talon/admin/admin-lte/layout/app.html.slim"
+        assert_file "web/views/talon/admin/admin-lte/layout_view.ex", fn file ->
+          file =~ "defmodule Blogger.Admin.AdminLte.LayoutView do"
+          file =~ ~s(use Talon.Web, which: :view, theme: "admin-lte", module: Blogger.Admin.AdminLte)
         end
-        assert_file "web/templates/talon/admin-lte/generators/index.html.eex", fn file ->
-          assert file =~ ~s(= AdminLte.DatatableView.render_table)
+        assert_file "web/templates/talon/admin/admin-lte/generators/index.html.eex", fn file ->
+          assert file =~ ~s(= Blogger.Admin.AdminLte.DatatableView.render_table)
         end
-        assert_file "web/templates/talon/admin-lte/components/datatable/datatable.html.slim", fn file ->
-          assert file =~ ~s(= AdminLte.PaginateView.paginate)
+        assert_file "web/templates/talon/admin/admin-lte/components/datatable/datatable.html.slim", fn file ->
+          assert file =~ ~s(= Blogger.Admin.AdminLte.PaginateView.paginate)
         end
       end
     end

@@ -31,4 +31,4 @@
                   th.text-right data-orderable="false" Actions
 
         .box-footer.clear-fix
-          = <%= theme_module %>.<%= web_namespace %>PaginateView.paginate(@conn)
+          = <%= base %>.<%= concern %>.<%= theme_module %>.<%= web_namespace %>PaginateView.paginate(@conn)

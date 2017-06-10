@@ -19,7 +19,6 @@ defmodule Mix.Tasks.Talon.New do
 
   * --theme=theme_name (admin-lte) -- set the theme to be installed
   * --assets-path (auto detect) -- path to the assets directory
-  * --web-path=(auto detect) -- set the web path
   * --concern=(Admin) -- set the concern module name
   * --root-path=(lib/my_app/talon) - the path where talon files are stored
   * --path_prefix=("") -- the path prefix for `controllers`, `templates`, `views`
@@ -52,21 +51,19 @@ defmodule Mix.Tasks.Talon.New do
   import Mix.Talon
   # import Mix.Generator
 
-  @default_theme "admin-lte"
-  @default_concern "Admin"
-  @default_root_path "talon"
-  @default_path_prefix ""
-
 
   # list all supported boolean options
   @boolean_options ~w(all_themes verbose boilerplate dry_run no_assets)a  ++
                    ~w(no_brunch phx phoenix)a
 
+  @enabled_boolean_options ~w(brunch assets layouts generators components theme)a
+
+  @all_boolean_options @boolean_options ++ @enabled_boolean_options
+
   # complete list of supported options
   @switches [
-    theme: :string, concern: :string
-  ] ++ Enum.map(@boolean_options, &({&1, :boolean}))
-
+    theme_name: :string, concern: :string, root_path: :string, path_prefix: :string
+  ] ++ Enum.map(@all_boolean_options, &({&1, :boolean}))
 
   @doc """
   The entry point of the mix task.
@@ -102,7 +99,7 @@ defmodule Mix.Tasks.Talon.New do
 
   def gen_config(config) do
     fname = "talon.exs"
-    binding = Kernel.binding() ++ [base: config.base, theme: config.theme,
+    binding = Kernel.binding() ++ [base: config.base, theme: config.theme_name,
       web_namespace: config.web_namespace]
     unless config.dry_run do
       copy_from paths(),
@@ -155,7 +152,7 @@ defmodule Mix.Tasks.Talon.New do
 
   def gen_controller(config) do
     fname = "talon_resource_controller.ex"
-    binding = Kernel.binding() ++ [base: config.base,
+    binding = Kernel.binding() ++ [base: config.base, concern: config.concern,
       boilerplate: config[:boilerplate], web_namespace: config.web_namespace]
     target_path = Path.join([config.root_path, "controllers", config.path_prefix])
     unless config.dry_run do
@@ -170,7 +167,7 @@ defmodule Mix.Tasks.Talon.New do
 
   def gen_web(config) do
     fname = "talon_web.ex"
-    theme = config.theme
+    theme = config.theme_name
     binding = Kernel.binding() ++
       [base: config.base, web_namespace: config.web_namespace, theme: theme,
         theme_module: Inflex.camelize(theme), root_path: config.root_path,
@@ -201,10 +198,11 @@ defmodule Mix.Tasks.Talon.New do
    config
   end
 
-  defp gen_theme(config) do
-    Mix.Tasks.Talon.Gen.Theme.run([@default_theme, @default_theme] ++ config.raw_args)
+  defp gen_theme(%{theme: true} = config) do
+    Mix.Tasks.Talon.Gen.Theme.run(config.raw_args)
     config
   end
+  defp gen_theme(config), do: config
 
   defp add_compiler(config) do
     case File.read "mix.exs" do
@@ -281,44 +279,65 @@ defmodule Mix.Tasks.Talon.New do
   end
 
   defp do_config({bin_opts, opts, _parsed} = args, raw_args) do
+
+    {concern, theme_name} = process_concern_theme(opts)
+
+    theme_module = Inflex.camelize(theme_name)
+    target_name = Keyword.get(opts, :target_theme, theme_name)
+    target_module = Inflex.camelize(target_name)
+
     binding =
       Mix.Project.config
       |> Keyword.fetch!(:app)
       |> Atom.to_string
       |> Mix.Phoenix.inflect
 
-    proj_struct =
-      cond do
-        opts[:proj_struct] -> String.to_atom(opts[:proj_struct])
-        bin_opts[:phx] -> :phx
-        bin_opts[:phoenix] -> :phoenix
-        true -> detect_project_structure()
-      end
+    base = bin_opts[:module] || binding[:base]
+    proj_struct = to_atom(opts[:proj_struct] || detect_project_structure())
 
-    concern = opts[:concern] || @default_concern
+    # view_opts =
+    #   %{target_name: target_name, base: base, concern: concern}
+    #   |> view_opts(proj_struct)
+
     app = opts[:app_name] || Mix.Project.config |> Keyword.fetch!(:app)
     app_path_name = app |> to_string |> Inflex.underscore
-    root_path = opts[:root_path] || Path.join(["lib", app_path_name, @default_root_path])
+    root_path = opts[:root_path] || Path.join(["lib", app_path_name, default_root_path()])
 
-    %{
-      raw_args: raw_args,
-      root_path: root_path,
-      path_prefix: opts[:path_prefix] || @default_path_prefix,
-      themes: get_themes(args),
-      theme: opts[:theme] || @default_theme,
-      concern: concern,
-      verbose: bin_opts[:verbose],
-      dry_run: bin_opts[:dry_run],
-      package_path: get_package_path(),
-      app: app,
-      app_path_name: app_path_name,
-      project_structure: proj_struct,
-      web_namespace: web_namespace(proj_struct),
-      # web_path: web_path(),
-      binding: binding,
-      boilerplate: bin_opts[:boilerplate] || Application.get_env(:talon, :boilerplate, true),
-      base: bin_opts[:module] || binding[:base],
-    }
+    bin_opts
+    |> enabled_bin_options
+    |> Enum.into(
+      %{
+        raw_args: raw_args,
+        root_path: root_path,
+        path_prefix: opts[:path_prefix] || default_path_prefix(),
+        themes: get_themes(args),
+        theme_name: target_name,
+        theme_module: target_module,
+        concern: concern,
+        verbose: bin_opts[:verbose],
+        dry_run: bin_opts[:dry_run],
+        package_path: get_package_path(),
+        # view_opts: view_opts,
+        app: app,
+        app_path_name: app_path_name,
+        project_structure: proj_struct,
+        web_namespace: web_namespace(proj_struct),
+        binding: binding,
+        boilerplate: bin_opts[:boilerplate] || Application.get_env(:talon, :boilerplate, true),
+        base: bin_opts[:module] || binding[:base],
+      })
+    # |> IO.inspect(label: "new config")
+  end
+
+  defp to_atom(atom) when is_atom(atom), do: atom
+  defp to_atom(string), do: String.to_atom(string)
+
+  defp enabled_bin_options(bin_opts) do
+    @enabled_boolean_options
+    |> Enum.reduce(%{}, fn option, acc ->
+      value = if bin_opts[option] == false, do: false, else: true
+      Map.put acc, option, value
+    end)
   end
 
   defp get_themes({opts, bin_opts, _parsed}) do
@@ -330,14 +349,14 @@ defmodule Mix.Tasks.Talon.New do
   end
 
   defp all_themes do
-    Application.get_env :talon, :themes, [@default_theme]
+    Application.get_env :talon, :themes, [default_theme()]
   end
 
   defp parse_options([], parsed) do
     {[], [], parsed}
   end
   defp parse_options(opts, parsed) do
-    bin_opts = Enum.filter(opts, fn {k,_v} -> k in @boolean_options end)
+    bin_opts = Enum.filter(opts, fn {k,_v} -> k in @all_boolean_options end)
     {bin_opts, opts -- bin_opts, parsed}
   end
 

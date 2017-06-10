@@ -11,6 +11,11 @@ defmodule Mix.Talon do
 
   require Talon.Config, as: Config
 
+  @default_theme "admin-lte"
+  @default_concern "Admin"
+  @default_root_path "talon"
+  @default_path_prefix ""
+
   @spec themes() :: String.t
   def themes do
     Config.themes() || []
@@ -224,11 +229,18 @@ defmodule Mix.Talon do
       iex> Talon.Mix.view_opts("admin-lte", :phoenix)
       ~s(, theme: "admin-lte", module: AdminLte)
   """
-  @spec view_opts(String.t, atom) :: String.t
+  @spec view_opts(String.t | Struct.t, atom) :: String.t
+  def view_opts(%{} = config, proj_struct) do
+    name = Module.concat([config.base, config.concern, theme_module_name(config.target_name)])
+    prefix = if proj_struct == :phx, do: Web, else: nil
+    module = Module.concat(name, prefix) |> inspect
+    ~s(, theme: "#{config.target_name}", module: #{module})
+  end
+
   def view_opts(theme, proj_struct) do
     name = theme_module_name(theme)
-    module =
-      if proj_struct == :phx, do: Module.concat(name, Web) |> inspect, else: name
+    prefix = if proj_struct == :phx, do: Web, else: nil
+    module = Module.concat(name, prefix) |> inspect
     ~s(, theme: "#{theme}", module: #{module})
   end
 
@@ -267,8 +279,32 @@ defmodule Mix.Talon do
     |> Inflex.underscore
   end
 
+  def concern_path(concern) do
+    # IO.inspect concern, label: "concern..."
+    Inflex.underscore concern
+  end
+
   def to_s(module) when is_binary(module), do: module
   def to_s(module), do: inspect(module)
+
+  def default_concern, do: @default_concern
+  def default_root_path, do: @default_root_path
+  def default_path_prefix, do: @default_path_prefix
+  def default_theme, do: @default_theme
+
+  def process_concern_theme(opts) do
+    # IO.inspect opts, label: "opts...."
+    concern = Keyword.get(opts, :concern, default_concern())
+    theme = Keyword.get(opts, :theme_name, default_theme())
+    {concern, theme}
+  end
+  # def process_concern_theme([theme]) do
+  #   {default_concern(), theme}
+  # end
+  # def process_concern_theme([concern, theme]) do
+  #   {concern, theme}
+  # end
+
 end
 
 

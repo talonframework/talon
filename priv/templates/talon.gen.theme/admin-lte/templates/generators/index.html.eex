@@ -1,7 +1,7 @@
 .container-fluid
   .row
     .col-md-12#datatable-view
-      = <%= target_module %>.<%= web_namespace %>DatatableView.render_table(@conn, @resources)
+      = <%= base %>.<%= concern %>.<%= target_module %>.<%= web_namespace %>DatatableView.render_table(@conn, @resources)
 javascript:
 
   function search_path(value) {
