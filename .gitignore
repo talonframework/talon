@@ -24,6 +24,3 @@ erl_crash.dump
 
 /.idea
 *.iml
-
-# Other
-tokens.sh
