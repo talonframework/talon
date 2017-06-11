@@ -54,8 +54,12 @@ defmodule Talon do
     quote location: :keep do
       @__resources__  Application.get_env(:talon, :resources, [])
 
+      @__dashboard__  Application.get_env(:talon, :dashboard, []) # TODO: support more than one dashboard (DJS)
+
       @__resource_map__  for mod <- @__resources__, into: %{},
         do: {Module.split(mod) |> List.last() |> to_string |> Inflex.underscore |> Inflex.Pluralize.pluralize, mod}
+
+      @__page_map__ %{} # TODO: (DJS)
 
       @__view_path_names__ for {plural, _} <- @__resource_map__, into: %{}, do: {plural, Inflex.singularize(plural)}
 
@@ -76,6 +80,14 @@ defmodule Talon do
       def resources, do: @__resources__
 
       def resource_names, do: @__resource_map__ |> Map.keys
+
+
+      def dashboard_names, do: [__MODULE__. dashboard_name]
+
+      def dashboard_name, do: "dashboard"
+
+      def dashboard(), do: @__dashboard__
+
 
       def schema(resource_name) do
         try do
@@ -101,6 +113,11 @@ defmodule Talon do
       def talon_resource(resource) when is_map(resource) do
         talon_resource(resource.__struct__)
       end
+
+      def talon_page(page_name) when is_binary(page_name) do
+        @__page_map__[page_name] || dashboard()
+      end
+      def talon_page(_), do: dashboard()
 
       def resource_schema(resource_name) when is_binary(resource_name) do
         {String.to_atom(resource_name), talon_resource(resource_name)}
