@@ -69,6 +69,22 @@ defmodule Mix.Tasks.Talon.NewTest do
           "use Talon.Controller, repo: PhxBlogger.Repo, context: PhxBlogger.Talon"
         ]
 
+        assert_file "lib/phx_blogger/web/controllers/talon/talon_page_controller.ex", [
+          "defmodule PhxBlogger.Web.TalonPageController do",
+          "use PhxBlogger.Web, :controller",
+          "use Talon.PageController, context: PhxBlogger.Talon",
+          "plug Talon.Plug.TalonResource",
+          "plug Talon.Plug.Theme",
+          "plug Talon.Plug.Layout",
+          "plug Talon.Plug.View"
+        ]
+
+        assert_file "lib/phx_blogger/talon/dashboard.ex", [
+          "defmodule PhxBlogger.Talon.Dashboard",
+          "use Talon.Page, context: PhxBlogger.Talon"
+          # TODO: test for boilerplate
+        ]
+
         assert_file "lib/phx_blogger/web/talon_messages.ex", [
           "defmodule PhxBlogger.Web.Talon.Messages do",
           "import PhxBlogger.Web.Gettext"
@@ -93,6 +109,11 @@ defmodule Mix.Tasks.Talon.NewTest do
           ~s/use Talon.Web, which: :component_view, theme: "admin_lte", module: AdminLte.Web/
         ]
 
+        assert_file "lib/phx_blogger/web/views/talon/admin_lte/dashboard_view.ex", [
+          "defmodule AdminLte.Web.DashboardView do",
+          ~s/use Talon.Web, which: :view, theme: "admin_lte", module: AdminLte.Web/
+        ]
+
         #########
         # templates
 
@@ -111,6 +132,11 @@ defmodule Mix.Tasks.Talon.NewTest do
         for file <- ~w(app nav_action_link nav_resource_link sidebar) do
           assert_file "lib/phx_blogger/web/templates/talon/admin_lte/layout/#{file}.html.slim"
         end
+
+        assert_file "lib/phx_blogger/web/templates/talon/admin_lte/dashboard/dashboard.html.slim", [
+          "Welcome to Talon",
+          "To add dashboard sections, checkout"
+        ]
       end
     end
   end
