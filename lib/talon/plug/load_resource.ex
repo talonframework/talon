@@ -13,6 +13,10 @@ defmodule Talon.Plug.LoadResource do
     repo = opts[:repo] || talon[:repo]
     context = opts[:talon] || talon[:talon] || raise("talon option required")
     schema = context.schema(conn.params["resource"])
+    unless schema do
+      raise Phoenix.Router.NoRouteError, conn: conn, router: __MODULE__
+    end
+    conn = conn |> assign :talon, Enum.into([schema: schema], talon)
     conn
     |> Phoenix.Controller.action_name
     |> handle_action(conn, repo, schema)
