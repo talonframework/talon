@@ -81,6 +81,8 @@ defmodule Mix.Tasks.Talon.New do
     |> verify_project!
     |> gen_talon_context
     |> gen_controller
+    |> gen_page_controller
+    |> gen_dashboard_page
     |> gen_web
     |> gen_messages
     |> gen_theme
@@ -144,6 +146,7 @@ defmodule Mix.Tasks.Talon.New do
    config
   end
 
+  # TODO: use gen resouce controller (DJS)
   def gen_controller(config) do
     fname = "talon_resource_controller.ex"
     binding = Kernel.binding() ++ [base: config.base,
@@ -158,6 +161,34 @@ defmodule Mix.Tasks.Talon.New do
     end
    config
   end
+
+  def gen_page_controller(config) do
+    fname = "talon_page_controller.ex"
+    binding = Kernel.binding() ++ [base: config.base,
+      boilerplate: config[:boilerplate], web_namespace: config.web_namespace]
+    target_path = Path.join([config.web_path, "controllers", "talon"])
+    unless config.dry_run do
+      File.mkdir_p! target_path
+      copy_from paths(),
+        "priv/templates/talon.new/web/controllers", target_path, binding, [
+          {:eex, fname, fname},
+        ], config
+    end
+   config
+  end
+
+  defp gen_dashboard_page(%{dashboard: true} = config) do
+    fname = "dashboard.ex"
+    binding = Kernel.binding() ++ [base: config.base, boilerplate: config[:boilerplate]]
+    source_path = "priv/templates/talon.new/talon"
+    target_path = "lib/#{config.app}/talon"
+    unless config.dry_run do
+      File.mkdir_p! target_path
+      copy_from paths(), source_path, target_path, binding, [{:eex, fname, fname}], config
+    end
+   config
+  end
+  defp gen_dashboard_page(config), do: config
 
   def gen_web(config) do
     fname = "talon_web.ex"
@@ -288,6 +319,7 @@ defmodule Mix.Tasks.Talon.New do
       theme: opts[:theme] || @default_theme,
       verbose: bin_opts[:verbose],
       dry_run: bin_opts[:dry_run],
+      dashboard: bin_opts[:dashboard] || Application.get_env(:talon, :dashboard, true),
       package_path: get_package_path(),
       app: Mix.Project.config |> Keyword.fetch!(:app),
       project_structure: proj_struct,
