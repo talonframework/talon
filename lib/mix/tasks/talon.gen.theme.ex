@@ -72,6 +72,7 @@ defmodule Mix.Tasks.Talon.Gen.Theme do
   use Mix.Task
 
   import Mix.Talon
+  import Talon.Gettext
 
   @only_options_options  ~w(assets layouts components generators brunch)
   @only_options for only <-@only_options_options, do: only <> "_only"
@@ -81,7 +82,7 @@ defmodule Mix.Tasks.Talon.Gen.Theme do
                    ~w(brunch_instructions_only)
 
   # List of the options that default to yet
-  @enabled_boolean_options ~w(brunch assets layouts generators components)
+  @enabled_boolean_options ~w(brunch assets layouts generators components dashboard)
 
   # All the boolean options
   @all_boolean_options @boolean_options ++ @enabled_boolean_options ++ @only_options
@@ -146,6 +147,8 @@ defmodule Mix.Tasks.Talon.Gen.Theme do
     |> assets_paths
     |> gen_layout_view
     |> gen_layout_templates
+    |> gen_dashboard_template
+    |> gen_dashboard_view
     |> gen_generators
     |> gen_images
     |> gen_vendor
@@ -203,7 +206,7 @@ defmodule Mix.Tasks.Talon.Gen.Theme do
   defp gen_generators(%{generators: true} = config) do
     binding = Kernel.binding() ++ [base: config.base, target_name: config.target_name,
       target_module: config.target_module, web_namespace: config.web_namespace]
-    theme = config.theme
+    theme = config.theme # TODO: used?
     template_path = Path.join([config.web_path, "templates", "talon", config.theme, "generators"])
     unless config.dry_run do
       File.mkdir_p! template_path
@@ -219,6 +222,41 @@ defmodule Mix.Tasks.Talon.Gen.Theme do
     config
   end
   defp gen_generators(config), do: config
+
+  def gen_dashboard_template(%{dashboard: true} = config) do
+    binding = Kernel.binding() ++
+      [title_txt: gettext("Dashboard"),
+       welcome_txt: (gettext "Welcome to Talon. This is the default dashboard page."),
+       add_txt:  (gettext "To add dashboard sections, checkout 'lib/talon/dashboard.ex'")]
+    theme = config.theme
+    template_path = Path.join([config.web_path, "templates", "talon", theme, "dashboard"])
+    unless config.dry_run do
+      File.mkdir_p! template_path
+      copy_from paths(),
+        "priv/templates/talon.gen.theme/#{theme}/templates/dashboard", template_path, binding, [
+          {:eex, "dashboard.html.slim", "dashboard.html.slim"}
+        ], config
+    end
+    config
+  end
+  def gen_dashboard(config), do: config
+
+  defp gen_dashboard_view(%{dashboard: true} = config) do
+    binding = Kernel.binding() ++ [base: config.base, target_name: config.target_name,
+      target_module: config.target_module, web_namespace: config.web_namespace,
+      view_opts: config.view_opts]
+    theme = config.theme
+    view_path = Path.join([config.web_path, "views", "talon", config.target_name])
+    unless config.dry_run do
+      File.mkdir_p! view_path
+      copy_from paths(),
+        "priv/templates/talon.gen.theme/#{theme}/views", view_path, binding, [
+          {:eex, "dashboard_view.ex", "dashboard_view.ex"}
+        ], config
+    end
+    config
+  end
+  defp gen_dashboard_view(config), do: config
 
   # this is private, but left as `def` for testing
   @doc false
