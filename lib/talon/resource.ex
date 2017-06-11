@@ -158,6 +158,15 @@ defmodule Talon.Resource do
         []
       end
 
+      # TODO: refactor to common module or context (DJS)
+      @spec dashboard_paths(Map.t) :: [Tuple.t]
+      def dashboard_paths(%{talon: talon} = _talon) do
+        talon.dashboard_names()
+        |> Enum.map(fn dashboard ->
+          {Talon.Utils.titleize(dashboard),  "/talon/#{dashboard}"} # TODO: Talon.Utils.talon_dashboard_path (DJS)
+        end)
+      end
+
       @doc """
       Returns a list of links for each of the Talon managed resources.
 
