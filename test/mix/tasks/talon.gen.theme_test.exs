@@ -53,6 +53,10 @@ defmodule Mix.Tasks.Talon.Gen.ThemeTest do
           "defmodule AdminLte.Web.LayoutView do",
           ~s(use Talon.Web, which: :view, theme: "admin_lte", module: AdminLte.Web)
         ]
+        assert_file "lib/blogger/web/views/talon/admin_lte/dashboard_view.ex", fn file ->
+          assert file =~ "defmodule AdminLte.Web.DashboardView do"
+          assert file =~ ~s(use Talon.Web, which: :view, theme: "admin_lte", module: AdminLte.Web)
+        end
         assert_file "lib/blogger/web/templates/talon/admin_lte/generators/index.html.eex", [
           ~s(= AdminLte.Web.DatatableView.render_table)
         ]
