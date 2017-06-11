@@ -5,5 +5,5 @@ defmodule TestTalon.TalonPageController do
   plug Talon.Plug.TalonResource
   plug Talon.Plug.Theme
   plug Talon.Plug.Layout
-  plug Talon.Plug.PageView
+  plug Talon.Plug.View  # TODO: PageView? (DJS)
 end
