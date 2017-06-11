@@ -2,7 +2,6 @@ defmodule TestTalon.Router do
   use Phoenix.Router
   use Talon.Router
 
-
   pipeline :browser do
     plug :accepts, ["html"]
     plug :fetch_session
@@ -11,7 +10,7 @@ defmodule TestTalon.Router do
     plug :put_secure_browser_headers
   end
 
-  scope "/talon", Talon do
+  scope "/talon", TestTalon do
     pipe_through :browser
     talon_routes()
   end
