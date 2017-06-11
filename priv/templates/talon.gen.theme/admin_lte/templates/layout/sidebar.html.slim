@@ -1,11 +1,19 @@
 aside.main-sidebar
   section.sidebar style="height: auto;"
     ul.sidebar-menu
+      li.header.text-uppercase Dashboard
+      / TODO: use talon_context to get page/dashboard_paths (DJS)
+      - resource_or_page = @talon_resource || @talon_page
+      = if resource_or_page do
+        = for dashboard_path <- resource_or_page.dashboard_paths(@conn.assigns.talon) do
+          = render "nav_resource_link.html", conn: @conn, resource_path: dashboard_path
       li.header.text-uppercase Resources
-      = if @talon_resource do
-        = for resource_path <- @talon_resource.resource_paths(@conn.assigns.talon) do
+      / TODO: use talon_context to get resource_paths (DJS)
+      = if resource_or_page do
+        = for resource_path <- resource_or_page.resource_paths(@conn.assigns.talon) do
           = render "nav_resource_link.html", conn: @conn, resource_path: resource_path
       li.header.text-uppercase Actions
       = if @talon_resource do
-        = for action_path <- @talon_resource.nav_action_links(Phoenix.Controller.action_name(@conn), @conn.assigns.resource) do
+        / TODO: move nav_action_links to view (DJS)
+        = for action_path <- @talon_resource.nav_action_links(Phoenix.Controller.action_name(@conn), @conn.assigns[:resource]) do
           = render "nav_action_link.html", conn: @conn, action_path: action_path
