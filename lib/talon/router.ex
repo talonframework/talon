@@ -37,12 +37,16 @@ defmodule Talon.Router do
   """
   defmacro talon_routes(_opts \\ []) do
     quote do
-      get "/", TalonController, :dashboard
-      get "/dashboard", TalonController, :dashboard
-      get "/page/:page", TalonController, :page
-      get "/select_theme/:id", TalonController, :select_theme
+      get "/", TalonPageController, :dashboard
+      get "/dashboard", TalonPageController, :dashboard
+      get "/page/:page", TalonPageController, :page  # TODO: these are scoped under /page
+
+      # get "/dashboard", TalonPageController, :page, page: :dashboard  # TODO: preferred way, not working
+      # get "/", TalonPageController, :page, page: :dashboard,
+
+      get "/select_theme/:id", TalonPageController, :select_theme
       if Application.get_env :talon, :login_user do
-        get "/switch_user/:id", TalonController, :switch_user
+        get "/switch_user/:id", TalonPageController, :switch_user
       end
       get "/:resource/search/:search_terms", TalonResourceController, :search
       get "/:resource/", TalonResourceController, :index
