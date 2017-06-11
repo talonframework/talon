@@ -63,6 +63,10 @@ defmodule Mix.Tasks.Talon.Gen.ThemeTest do
         assert_file "lib/blogger/web/templates/talon/admin_lte/components/datatable/datatable.html.slim", [
           ~s(= AdminLte.Web.PaginateView.paginate)
         ]
+        assert_file "lib/blogger/web/templates/talon/admin_lte/dashboard/dashboard.html.slim", [
+          "Welcome to Talon",
+          "To add dashboard sections, checkout 'lib/talon/dashboard.ex'"
+        ]
       end
 
     end
