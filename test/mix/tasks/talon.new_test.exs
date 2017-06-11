@@ -51,7 +51,7 @@ defmodule Mix.Tasks.Talon.NewTest do
         assert_file "config/talon.exs", [
           "config :talon,",
           "module: PhxBlogger,",
-          "essages_backend: PhxBlogger.Web.Gettext,",
+          "messages_backend: PhxBlogger.Web.Gettext,",
           ~s/theme: "admin_lte",/,
           "web_namespace: Web,",
           "schema_adapter: Talon.Schema.Adapters.Ecto"
@@ -177,7 +177,7 @@ defmodule Mix.Tasks.Talon.NewTest do
         assert_file "config/talon.exs", [
           "config :talon,",
           "module: Blogger,",
-          "essages_backend: Blogger.Gettext,",
+          "messages_backend: Blogger.Gettext,",
           ~s/theme: "admin_lte",/,
           "schema_adapter: Talon.Schema.Adapters.Ecto"
         ]
