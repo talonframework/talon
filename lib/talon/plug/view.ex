@@ -12,8 +12,12 @@ defmodule Talon.Plug.View do
         nil ->
           talon = conn.assigns[:talon]
           theme = Inflex.camelize talon.theme
-          schema = talon.schema |> Module.split |> List.last
-          Module.concat [theme, Talon.web_namespace(), schema <> "View"]
+          prefix = case talon[:schema] do  # TODO: really get from schema? Get from resource/page (DJS)
+            nil ->  "Dashboard" #  "Page" # TODO (DJS)
+              _ -> talon.schema |> Module.split |> List.last
+          end
+          # schema = talon[:schema] |> Module.split |> List.last
+          Module.concat [theme, Talon.web_namespace(), prefix <> "View"]
         view ->
           view
       end

@@ -62,7 +62,17 @@ defmodule Talon.View do
   """
   @spec talon_resource(Plug.Conn.t) :: atom
   def talon_resource(conn) do
-    conn.assigns.talon.talon_resource
+    conn.assigns.talon[:talon_resource]
+  end
+
+  @doc """
+  Helper to return the current `talon_page` module.
+
+  Extract the `talon_page` module from the conn.assigns
+  """
+  @spec talon_page(Plug.Conn.t) :: atom
+  def talon_page(conn) do
+    conn.assigns.talon[:talon_page]
   end
 
   @doc """
