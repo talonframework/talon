@@ -1,4 +1,4 @@
-defmodule Talon.Controller do
+defmodule Talon.Controller do # TODO: rename to ResourceController (DJS)
 
   defmacro __using__(opts) do
     quote do
