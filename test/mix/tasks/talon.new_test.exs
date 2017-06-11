@@ -3,7 +3,6 @@ Code.require_file "../../mix_helpers.exs", __DIR__
 defmodule Mix.Tasks.Talon.NewTest do
   use ExUnit.Case
   import MixHelper
-  import Talon.TestHelpers
   # import ExUnit.CaptureIO
 
   alias Mix.Tasks.Talon.New, as: GenNew
