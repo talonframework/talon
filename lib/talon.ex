@@ -52,9 +52,9 @@ defmodule Talon do
     repo = opts[:repo]
 
     quote location: :keep do
-      @__resources__  Application.get_env(:talon, :resources, [])
+      @__resources__  Application.get_env(:talon, :resources, []) # TODO: make easier to inject/test (DJS)
 
-      @__dashboard__  Application.get_env(:talon, :dashboard, []) # TODO: support more than one dashboard (DJS)
+      @__dashboard__  Application.get_env(:talon, :dashboard, nil) # TODO: support more than one dashboard (DJS)
 
       @__resource_map__  for mod <- @__resources__, into: %{},
         do: {Module.split(mod) |> List.last() |> to_string |> Inflex.underscore |> Inflex.Pluralize.pluralize, mod}
