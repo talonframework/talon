@@ -99,8 +99,12 @@ defmodule Mix.Tasks.Talon.New do
 
   def gen_config(config) do
     fname = "talon.exs"
+    concern_config_path = Application.app_dir(:talon,
+      "priv/templates/talon.new/config/concern_config.exs")
     binding = Kernel.binding() ++ [base: config.base, theme: config.theme_name,
-      web_namespace: config.web_namespace]
+      web_namespace: config.web_namespace, app: config.app, concern: config.concern,
+      app: config.app, path: concern_config_path
+    ]
     unless config.dry_run do
       copy_from paths(),
         "priv/templates/talon.new/config", "config", binding, [
@@ -245,7 +249,7 @@ defmodule Mix.Tasks.Talon.New do
     Add Scrivener paging to your Repo:
 
     defmodule #{base}.Repo do
-      use Ecto.Repo, otp_app: :#{String.downcase base}
+      use Ecto.Repo, otp_app: :#{config.app}
       use Scrivener, page_size: 15  # <--- add this
     end
     """
@@ -282,7 +286,6 @@ defmodule Mix.Tasks.Talon.New do
 
     {concern, theme_name} = process_concern_theme(opts)
 
-    theme_module = Inflex.camelize(theme_name)
     target_name = Keyword.get(opts, :target_theme, theme_name)
     target_module = Inflex.camelize(target_name)
 
@@ -292,7 +295,6 @@ defmodule Mix.Tasks.Talon.New do
       |> Atom.to_string
       |> Mix.Phoenix.inflect
 
-    base = bin_opts[:module] || binding[:base]
     proj_struct = to_atom(opts[:proj_struct] || detect_project_structure())
 
     # view_opts =

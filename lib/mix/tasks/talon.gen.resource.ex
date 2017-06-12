@@ -68,7 +68,7 @@ defmodule Mix.Tasks.Talon.Gen.Resource do
   def create_resource_file(config) do
     binding = config.binding ++ [base: config[:base], boilerplate: config.boilerplate,
       resource: config.resource, scoped_resource: config.scoped_resource, module: config.module,
-      concern: config.concern]
+      concern: config.concern, app: config.app]
     name = Inflex.underscore config.resource
     target_path = Path.join([config.root_path, config.path_prefix, config.concern_path])
     unless config.dry_run do
@@ -102,7 +102,7 @@ defmodule Mix.Tasks.Talon.Gen.Resource do
   def print_instructions(config) do
     Mix.shell.info """
       Remember to update your config/talon.exs file with the resource module
-        config :talon, #{config.concern},
+        config :#{config.app}, #{config.base}.#{config.concern},
           :resources, [
             ...
             #{config.base}.#{inspect config.module}
@@ -167,6 +167,7 @@ defmodule Mix.Tasks.Talon.Gen.Resource do
 
     %{
       # themes: get_themes(args),
+      app: app,
       raw_args: raw_args,
       theme: opts[:theme] || @default_theme,
       concern: concern,

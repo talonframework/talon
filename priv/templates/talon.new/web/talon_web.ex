@@ -1,4 +1,4 @@
-defmodule Talon.Web do
+defmodule <%= base %>.Talon.Web do
   @moduledoc """
   A module defining __using__ hooks for controllers,
   views and so on.

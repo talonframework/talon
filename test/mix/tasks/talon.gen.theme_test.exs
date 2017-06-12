@@ -43,10 +43,10 @@ defmodule Mix.Tasks.Talon.Gen.ThemeTest do
         assert_file "assets/css/talon/admin-lte/talon.css"
         assert_file "assets/vendor/talon/admin-lte/bootstrap/css/bootstrap.min.css"
         assert_file "lib/phx_blogger/talon/templates/admin/admin-lte/layout/app.html.slim"
-        assert_file "lib/phx_blogger/talon/views/admin/admin-lte/layout_view.ex", fn file ->
-          file =~ "defmodule PhxBlogger.Admin.AdminLte.Web.LayoutView do"
-          file =~ ~s(use Talon.Web, which: :view, theme: "admin-lte", module: PhxBlogger.Admin.AdminLte.Web)
-        end
+        assert_file "lib/phx_blogger/talon/views/admin/admin-lte/layout_view.ex", [
+          "defmodule PhxBlogger.Admin.AdminLte.Web.LayoutView do",
+          ~s(use PhxBlogger.Talon.Web, which: :view, theme: "admin-lte", module: PhxBlogger.Admin.AdminLte.Web)
+        ]
         assert_file "lib/phx_blogger/talon/templates/admin/admin-lte/generators/index.html.eex", fn file ->
           assert file =~ ~s(= PhxBlogger.Admin.AdminLte.Web.DatatableView.render_table)
         end
@@ -178,10 +178,10 @@ defmodule Mix.Tasks.Talon.Gen.ThemeTest do
         assert_file "web/static/css/talon/admin-lte/talon.css"
         assert_file "web/static/vendor/talon/admin-lte/bootstrap/css/bootstrap.min.css"
         assert_file "web/templates/talon/admin/admin-lte/layout/app.html.slim"
-        assert_file "web/views/talon/admin/admin-lte/layout_view.ex", fn file ->
-          file =~ "defmodule Blogger.Admin.AdminLte.LayoutView do"
-          file =~ ~s(use Talon.Web, which: :view, theme: "admin-lte", module: Blogger.Admin.AdminLte)
-        end
+        assert_file "web/views/talon/admin/admin-lte/layout_view.ex", [
+          "defmodule Blogger.Admin.AdminLte.LayoutView do",
+          ~s(use Blogger.Talon.Web, which: :view, theme: "admin-lte", module: Blogger.Admin.AdminLte)
+        ]
         assert_file "web/templates/talon/admin/admin-lte/generators/index.html.eex", fn file ->
           assert file =~ ~s(= Blogger.Admin.AdminLte.DatatableView.render_table)
         end

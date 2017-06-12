@@ -50,12 +50,10 @@ defmodule Mix.Tasks.Talon.NewTest do
         end
 
         assert_file "config/talon.exs", [
-          "config :talon,",
+          "config :phx_blogger,",
           "module: PhxBlogger,",
-          "essages_backend: PhxBlogger.Web.Gettext,",
-          ~s/theme: "admin-lte",/,
-          "web_namespace: Web,",
-          "schema_adapter: Talon.Schema.Adapters.Ecto"
+          "messages_backend: PhxBlogger.Web.Gettext",
+          "web_namespace: Web"
         ]
 
         assert_file "lib/phx_blogger/talon/web.ex", [
@@ -80,18 +78,18 @@ defmodule Mix.Tasks.Talon.NewTest do
 
         assert_file "lib/phx_blogger/talon/views/admin/admin-lte/layout_view.ex", [
           "defmodule PhxBlogger.Admin.AdminLte.Web.LayoutView do",
-          ~s/use Talon.Web, which: :view, theme: "admin-lte", module: PhxBlogger.Admin.AdminLte.Web/
+          ~s/use PhxBlogger.Talon.Web, which: :view, theme: "admin-lte", module: PhxBlogger.Admin.AdminLte.Web/
         ]
 
         assert_file "lib/phx_blogger/talon/views/admin/admin-lte/components/datatable_view.ex", [
           "defmodule PhxBlogger.Admin.AdminLte.Web.DatatableView do",
-          ~s/use Talon.Web, which: :component_view, theme: "admin-lte", module: PhxBlogger.Admin.AdminLte.Web/,
+          ~s/use PhxBlogger.Talon.Web, which: :component_view, theme: "admin-lte", module: PhxBlogger.Admin.AdminLte.Web/,
           "use Talon.Components.Datatable, __MODULE__"
         ]
 
         assert_file "lib/phx_blogger/talon/views/admin/admin-lte/components/paginate_view.ex", [
           "defmodule PhxBlogger.Admin.AdminLte.Web.PaginateView do",
-          ~s/use Talon.Web, which: :component_view, theme: "admin-lte", module: PhxBlogger.Admin.AdminLte.Web/
+          ~s/use PhxBlogger.Talon.Web, which: :component_view, theme: "admin-lte", module: PhxBlogger.Admin.AdminLte.Web/
         ]
 
         #########
@@ -153,7 +151,7 @@ defmodule Mix.Tasks.Talon.NewTest do
         end
 
         assert_file "config/talon.exs", [
-          "config :talon,",
+          "config :blogger,",
           "module: Blogger,",
           "messages_backend: Blogger.Gettext,",
           ~s/theme: "admin-lte",/,
@@ -179,18 +177,18 @@ defmodule Mix.Tasks.Talon.NewTest do
 
         assert_file "lib/blogger/talon/views/admin/admin-lte/layout_view.ex", [
           "defmodule Blogger.Admin.AdminLte.LayoutView do",
-          ~s/use Talon.Web, which: :view, theme: "admin-lte", module: Blogger.Admin.AdminLte/
+          ~s/use Blogger.Talon.Web, which: :view, theme: "admin-lte", module: Blogger.Admin.AdminLte/
         ]
 
         assert_file "lib/blogger/talon/views/admin/admin-lte/components/datatable_view.ex", [
           "defmodule Blogger.Admin.AdminLte.DatatableView do",
-          ~s/use Talon.Web, which: :component_view, theme: "admin-lte", module: Blogger.Admin.AdminLte/,
+          ~s/use Blogger.Talon.Web, which: :component_view, theme: "admin-lte", module: Blogger.Admin.AdminLte/,
           "use Talon.Components.Datatable, __MODULE__"
         ]
 
         assert_file "lib/blogger/talon/views/admin/admin-lte/components/paginate_view.ex", [
           "defmodule Blogger.Admin.AdminLte.PaginateView do",
-          ~s/use Talon.Web, which: :component_view, theme: "admin-lte", module: Blogger.Admin.AdminLte/
+          ~s/use Blogger.Talon.Web, which: :component_view, theme: "admin-lte", module: Blogger.Admin.AdminLte/
         ]
 
         #########

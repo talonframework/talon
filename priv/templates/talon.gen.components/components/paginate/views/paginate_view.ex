@@ -1,5 +1,5 @@
 defmodule <%= base %>.<%= concern %>.<%= theme_module %>.<%= web_namespace %>PaginateView do
-  use Talon.Web, which: :component_view<%= view_opts %>
+  use <%= base %>.Talon.Web, which: :component_view<%= view_opts %>
 
   import Talon.Components.Paginate
   import Talon.Utils, only: [to_integer: 1]

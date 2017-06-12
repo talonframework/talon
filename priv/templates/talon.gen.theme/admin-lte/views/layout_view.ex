@@ -1,4 +1,4 @@
 defmodule <%= base %>.<%= concern %>.<%= target_module %>.<%= web_namespace %>LayoutView do
-  use Talon.Web, which: :view<%= view_opts %>
+  use <%= base %>.Talon.Web, which: :view<%= view_opts %>
 
 end

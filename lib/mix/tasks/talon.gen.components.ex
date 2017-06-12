@@ -120,11 +120,10 @@ defmodule Mix.Tasks.Talon.Gen.Components do
     config
   end
 
-  defp do_config({bin_opts, opts, parsed} = _args) do
+  defp do_config({bin_opts, opts, _parsed} = _args) do
     # themes = get_available_themes()
     {concern, theme_name} = process_concern_theme(opts)
 
-    theme_module = Inflex.camelize(theme_name)
     target_name = Keyword.get(opts, :target_theme, theme_name)
     target_module = Inflex.camelize(target_name)
 

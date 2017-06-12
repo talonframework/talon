@@ -1,13 +1,13 @@
 use Mix.Config
 
-config :talon, resources: [
-  ],
+config :<%= app %>, :talon,
   module: <%= base %>,
   messages_backend: <%= base %>.<%= web_namespace %>Gettext,
-  theme: "<%= theme %>",
   <%= if web_namespace == "" do %>
-  web_namespace: nil,
+  web_namespace: nil
   <% else %>
-  web_namespace: Web,
+  web_namespace: Web
   <% end %>
-  schema_adapter: Talon.Schema.Adapters.Ecto
+
+<%= EEx.eval_file path, app: app, base: base, concern: concern,
+  theme: theme %>
