@@ -81,13 +81,16 @@ defmodule Talon do
 
       def resource_names, do: @__resource_map__ |> Map.keys
 
-
       def dashboard_names, do: [__MODULE__. dashboard_name]
 
-      def dashboard_name, do: "dashboard"
+      def dashboard_name do
+        case dashboard() do
+          nil -> "dashboard"
+          other -> other |> Module.split |> List.last() |> to_string |> Inflex.underscore
+        end
+      end
 
       def dashboard(), do: @__dashboard__
-
 
       def schema(resource_name) do
         try do
