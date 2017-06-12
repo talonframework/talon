@@ -3,7 +3,7 @@ defmodule Talon.Controller do # TODO: rename to ResourceController (DJS)
   defmacro __using__(opts) do
     quote do
       opts = unquote(opts)
-      repo = opts[:repo]   || raise("repo option required")
+      repo = opts[:repo] || raise("repo option required")
       talon = opts[:context] || raise("context option required")
       plug :set_repo, repo: repo, talon: talon
 

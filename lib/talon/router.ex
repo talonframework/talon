@@ -39,7 +39,7 @@ defmodule Talon.Router do
     quote do
       get "/", TalonPageController, :dashboard
       get "/dashboard", TalonPageController, :dashboard
-      get "/page/:page", TalonPageController, :page  # TODO: these are scoped under /page
+      get "/page/:page", TalonPageController, :page
 
       # get "/dashboard", TalonPageController, :page, page: :dashboard  # TODO: preferred way, not working
       # get "/", TalonPageController, :page, page: :dashboard,
