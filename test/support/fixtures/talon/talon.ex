@@ -1,4 +1,6 @@
 defmodule TestTalon.Talon do
-  use Talon, otp_app: :talon
 
+  Application.put_env(:talon, :dashboard, TestTalon.Talon.Dashboard) # TODO: allow easier injection (DJS)
+
+  use Talon, otp_app: :talon
 end
