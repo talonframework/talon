@@ -181,7 +181,7 @@ defmodule Mix.Tasks.Talon.New do
     fname = "dashboard.ex"
     binding = Kernel.binding() ++ [base: config.base, boilerplate: config[:boilerplate]]
     source_path = "priv/templates/talon.new/talon"
-    target_path = "lib/#{config.app}/talon"
+    target_path = Path.join(config.lib_path, "talon")
     unless config.dry_run do
       File.mkdir_p! target_path
       copy_from paths(), source_path, target_path, binding, [{:eex, fname, fname}], config
@@ -325,6 +325,7 @@ defmodule Mix.Tasks.Talon.New do
       project_structure: proj_struct,
       web_namespace: web_namespace(proj_struct),
       web_path: web_path(),
+      lib_path: lib_path(),
       binding: binding,
       boilerplate: bin_opts[:boilerplate] || Application.get_env(:talon, :boilerplate, true),
       base: bin_opts[:module] || binding[:base],
@@ -351,9 +352,9 @@ defmodule Mix.Tasks.Talon.New do
     {bin_opts, opts -- bin_opts, parsed}
   end
 
-  # defp lib_path do
-  #   Path.join("lib", to_string(Mix.Phoenix.otp_app()))
-  # end
+  defp lib_path do
+    Path.join("lib", to_string(Mix.Phoenix.otp_app()))
+  end
 
   defp paths do
     [".", :talon]

@@ -215,6 +215,22 @@ defmodule Mix.Tasks.Talon.NewTest do
           ~s/use Talon.Web, which: :component_view, theme: "admin_lte", module: AdminLte/
         ]
 
+        assert_file "web/controllers/talon/talon_page_controller.ex", [
+          "defmodule Blogger.TalonPageController do",
+          "use Blogger.Web, :controller",
+          "use Talon.PageController, context: Blogger.Talon",
+          "plug Talon.Plug.TalonResource",
+          "plug Talon.Plug.Theme",
+          "plug Talon.Plug.Layout",
+          "plug Talon.Plug.View"
+        ]
+
+        assert_file "lib/blogger/talon/dashboard.ex", [
+          "defmodule Blogger.Talon.Dashboard",
+          "use Talon.Page, context: Blogger.Talon"
+          # TODO: test for boilerplate
+        ]
+
         #########
         # templates
 
