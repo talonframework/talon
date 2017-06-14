@@ -203,6 +203,11 @@ defmodule Mix.Talon do
     path
   end
 
+  @spec lib_path() :: String.t
+  def lib_path() do
+    Path.join("lib", to_string(Mix.Phoenix.otp_app()))
+  end
+
   @spec theme_module(String.t) :: Module.t
   def theme_module(theme) do
     theme |> theme_module_name |> Module.concat(nil)

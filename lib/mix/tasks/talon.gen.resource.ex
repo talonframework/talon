@@ -161,10 +161,6 @@ defmodule Mix.Tasks.Talon.Gen.Resource do
     {bin_opts, opts -- bin_opts, parsed}
   end
 
-  defp lib_path do
-    Path.join("lib", to_string(Mix.Phoenix.otp_app()))
-  end
-
   defp paths do
     [".", :talon]
   end
