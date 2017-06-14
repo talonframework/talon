@@ -248,6 +248,11 @@ defmodule Mix.Tasks.Talon.NewTest do
         for file <- ~w(app nav_action_link nav_resource_link sidebar) do
           assert_file "web/templates/talon/admin_lte/layout/#{file}.html.slim"
         end
+
+        assert_file "web/templates/talon/admin_lte/dashboard/dashboard.html.slim", [
+          "Welcome to Talon",
+          "To add dashboard sections, checkout"
+        ]
       end
     end
   end
