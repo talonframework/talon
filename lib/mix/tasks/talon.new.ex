@@ -146,8 +146,7 @@ defmodule Mix.Tasks.Talon.New do
    config
   end
 
-  # TODO: use gen resouce controller (DJS)
-  def gen_controller(config) do
+  def gen_controller(config) do     # TODO: use gen_resource_controller (DJS)
     fname = "talon_resource_controller.ex"
     binding = Kernel.binding() ++ [base: config.base,
       boilerplate: config[:boilerplate], web_namespace: config.web_namespace]

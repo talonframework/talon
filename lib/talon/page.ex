@@ -40,7 +40,7 @@ defmodule Talon.Page do
       def resource_paths(%{talon: talon} = _talon) do
         talon.resources()
         |> Enum.map(fn talon_resource ->
-          schema = talon_resource.schema() # TODO: let view determine presentation name for a resource (DJS)
+          schema = talon_resource.schema() # TODO: let resource determine presentation name (DJS)
           {Talon.Utils.titleize(schema) |> Inflex.Pluralize.pluralize, Talon.Utils.talon_resource_path(schema, :index)}
         end)
       end

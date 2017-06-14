@@ -158,7 +158,7 @@ defmodule Talon.Resource do
         []
       end
 
-      # TODO: refactor to common module or context (DJS)
+      # TODO: refactor to common module or context/concern (DJS)
       @spec dashboard_paths(Map.t) :: [Tuple.t]
       def dashboard_paths(%{talon: talon} = _talon) do
         talon.dashboard_names()
@@ -176,7 +176,7 @@ defmodule Talon.Resource do
       def resource_paths(%{talon: talon} = _talon) do
         talon.resources()
         |> Enum.map(fn talon_resource ->
-          schema = talon_resource.schema() # TODO: let view determine presentation name for a resource (DJS)
+          schema = talon_resource.schema() # TODO: let resource determine presentation name (DJS)
           {Talon.Utils.titleize(schema) |> Inflex.Pluralize.pluralize, Talon.Utils.talon_resource_path(schema, :index)}
         end)
       end
