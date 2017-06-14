@@ -216,7 +216,7 @@ defmodule Talon.Resource do
       end
 
       @doc """
-      Returrn the Talon context.
+      Return the Talon context.
       """
       @spec context() :: atom
       def context, do: @__context__
