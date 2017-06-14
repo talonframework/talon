@@ -48,7 +48,7 @@ defmodule Mix.Tasks.Compile.Talon do
         for action <- [:index, :edit, :form, :new, :show] do
           unless compile_custom_template(action, resource_name, talon_resource, theme) do
             if Application.get_env :talon, :verbose_compile do
-              IO.puts "compiling global emplate for #{resource_name} #{action}"
+              IO.puts "compiling global template for #{resource_name} #{action}"
             end
             base_path = Path.join([Talon.web_path(), "templates", "talon", theme])
             templ = EEx.eval_file(Path.join([base_path, "generators", "#{action}.html.eex"]), assigns: [talon_resource: talon_resource])

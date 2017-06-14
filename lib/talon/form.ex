@@ -53,7 +53,7 @@ defmodule Talon.Form do
     text_input new_f, field, opts
   end
 
-  defp build_input({_a, f}, field, type, opts) do
+  defp build_input({_a, _f}, field, type, _opts) do
     IO.puts "build_input unknow #{inspect type} for #{inspect field}"
     "unknown type"
   end

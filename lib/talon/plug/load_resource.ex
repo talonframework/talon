@@ -16,7 +16,7 @@ defmodule Talon.Plug.LoadResource do
     unless schema do
       raise Phoenix.Router.NoRouteError, conn: conn, router: __MODULE__
     end
-    conn = conn |> assign :talon, Enum.into([schema: schema], talon)
+    conn = conn |> assign(:talon, Enum.into([schema: schema], talon))
     conn
     |> Phoenix.Controller.action_name
     |> handle_action(conn, repo, schema)

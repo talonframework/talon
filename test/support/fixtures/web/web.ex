@@ -1,6 +1,6 @@
 defmodule TestTalon.Web do
 
-  def view(opts \\ nil) do
+  def view(_opts \\ nil) do
     quote do
       use Phoenix.View, root: "test/support/fixtures/web/templates", namespace: TestTalon.Web
       # Import convenience functions from controllers
