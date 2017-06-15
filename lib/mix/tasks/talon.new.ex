@@ -318,7 +318,7 @@ defmodule Mix.Tasks.Talon.New do
       theme: opts[:theme] || @default_theme,
       verbose: bin_opts[:verbose],
       dry_run: bin_opts[:dry_run],
-      dashboard: bin_opts[:dashboard] || Application.get_env(:talon, :dashboard, true),
+      dashboard: true, # TODO: bin_opts[:dashboard] || Application.get_env(:talon, :dashboard, true), (DJS)
       package_path: get_package_path(),
       app: Mix.Project.config |> Keyword.fetch!(:app),
       project_structure: proj_struct,
