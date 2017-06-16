@@ -1,14 +1,13 @@
 aside.main-sidebar
   section.sidebar style="height: auto;"
     ul.sidebar-menu
-      li.header.text-uppercase Dashboard
-      / TODO: use talon_context to get page/dashboard_paths (DJS)
+      li.header.text-uppercase Pages
+      / TODO: use talon_context to get page_paths (DJS)
       - resource_or_page = @talon_resource || @talon_page
       = if resource_or_page do
-        = for dashboard_path <- resource_or_page.dashboard_paths(@conn.assigns.talon) do
-          = render "nav_resource_link.html", conn: @conn, resource_path: dashboard_path
+        = for page_path <- resource_or_page.page_paths(@conn.assigns.talon) do
+          = render "nav_resource_link.html", conn: @conn, resource_path: page_path
       li.header.text-uppercase Resources
-      / TODO: use talon_context to get resource_paths (DJS)
       = if resource_or_page do
         = for resource_path <- resource_or_page.resource_paths(@conn.assigns.talon) do
           = render "nav_resource_link.html", conn: @conn, resource_path: resource_path

@@ -2,7 +2,8 @@ use Mix.Config
 
 config :talon, resources: [
   ],
-  dashboard: nil,
+  pages: [
+  ],
   module: <%= base %>,
   messages_backend: <%= base %>.<%= web_namespace %>Gettext,
   theme: "<%= theme %>",

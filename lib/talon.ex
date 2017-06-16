@@ -54,12 +54,15 @@ defmodule Talon do
     quote location: :keep do
       @__resources__  Application.get_env(:talon, :resources, []) # TODO: make easier to inject/test (DJS)
 
-      @__dashboard__  Application.get_env(:talon, :dashboard, nil) # TODO: support more than one dashboard (DJS)
+      @__pages__ Application.get_env(:talon, :pages, [])
+
+      # @__dashboard__  Application.get_env(:talon, :dashboard, nil) # TODO: support more than one dashboard (DJS)
 
       @__resource_map__  for mod <- @__resources__, into: %{},
         do: {Module.split(mod) |> List.last() |> to_string |> Inflex.underscore |> Inflex.Pluralize.pluralize, mod}
 
-      @__page_map__ %{} # TODO: (DJS)
+      @__page_map__ for mod <- @__pages__, into: %{},
+        do: {mod |> Module.split |> List.last |> to_string |> Inflex.underscore, mod}
 
       @__view_path_names__ for {plural, _} <- @__resource_map__, into: %{}, do: {plural, Inflex.singularize(plural)}
 
@@ -75,22 +78,35 @@ defmodule Talon do
       @spec repo() :: atom
       def repo, do: @__repo__
 
+
       def resource_map, do: @__resource_map__
 
       def resources, do: @__resources__
 
       def resource_names, do: @__resource_map__ |> Map.keys
 
-      def dashboard_names, do: [__MODULE__. dashboard_name]
 
-      def dashboard_name do
-        case dashboard() do
-          nil -> "dashboard"
-          other -> other |> Module.split |> List.last() |> to_string |> Inflex.underscore
-        end
-      end
+      def page_map, do: @__page_map__
 
-      def dashboard(), do: @__dashboard__
+      def pages, do: @__pages__
+
+      def page_names, do: @__page_map__ |> Map.keys
+
+
+      # TODO: remove all dashboard stuff? (DJS)
+
+      # def dashboard_names, do: [__MODULE__. dashboard_name]
+
+      # def dashboard_name do
+      #   case dashboard() do
+      #     nil -> "dashboard"
+      #     other -> other |> Module.split |> List.last() |> to_string |> Inflex.underscore
+      #   end
+      # end
+
+      def dashboard(), do: List.first pages()
+
+      def dashboard_name(), do: List.first page_names()
 
       def schema(resource_name) do
         try do
@@ -150,7 +166,7 @@ defmodule Talon do
       end
 
       @doc """
-      Retrieve the name value form a model.
+      Retrieve the name value from a model.
 
       ## Examples
 
@@ -173,6 +189,10 @@ defmodule Talon do
         ]
     end
   end
+
+  # def module_to_name(mod) do
+  #   mod |> Module.split |> List.last |> to_string |> Inflex.underscore |> Inflex.Pluralize.pluralize
+  # end
 
   @doc """
   Return the app's base module.

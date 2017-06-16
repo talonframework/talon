@@ -19,16 +19,14 @@ defmodule Talon.Page do
       end
 
       @doc """
-      Returns a list of links for each of the Talon dashboards.
+      Returns a list of links for each of the Talon managed pages.
 
       Note: This function is overridable
       """
-      @spec dashboard_paths(Map.t) :: [Tuple.t]
-      def dashboard_paths(%{talon: talon} = _talon) do
-        talon.dashboard_names()
-        |> Enum.map(fn dashboard ->
-          {Talon.Utils.titleize(dashboard),  "/talon/#{dashboard}"}
-        end)
+      @spec page_paths(Map.t) :: [Tuple.t]
+      def page_paths(%{talon: talon} = _talon) do
+        talon.page_names()
+        |> Enum.map(&{Talon.Utils.titleize(&1),  "/talon/pages/#{&1}"})
       end
 
       @doc """
@@ -52,7 +50,7 @@ defmodule Talon.Page do
       def context, do: @__context__
 
       defoverridable [
-        context: 0, resource_paths: 1, dashboard_paths: 1, index_card_title: 0
+        context: 0, resource_paths: 1, page_paths: 1, index_card_title: 0
       ]
     end
   end
