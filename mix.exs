@@ -30,7 +30,6 @@ defmodule Talon.Mixfile do
       {:postgrex, ">= 0.0.0", only: :test},
       {:phoenix_slime, github: "slime-lang/phoenix_slime"},
       {:ecto_talon, github: "talonframework/ecto_talon"},
-      {:gettext, "~> 0.13"},
       {:mix_test_watch, "~> 0.3", only: :dev, runtime: false},
       # {:ecto_talon, path: "../ecto_talon", only: :test},
     ]

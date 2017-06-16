@@ -72,7 +72,6 @@ defmodule Mix.Tasks.Talon.Gen.Theme do
   use Mix.Task
 
   import Mix.Talon
-  import Talon.Gettext
 
   @only_options_options  ~w(assets layouts components generators brunch)
   @only_options for only <-@only_options_options, do: only <> "_only"
@@ -225,9 +224,9 @@ defmodule Mix.Tasks.Talon.Gen.Theme do
 
   def gen_dashboard_template(%{dashboard: true} = config) do
     binding = Kernel.binding() ++
-      [title_txt: gettext("Dashboard"),
-       welcome_txt: (gettext "Welcome to Talon. This is the default dashboard page."),
-       add_txt:  (gettext "To add dashboard sections, checkout 'lib/talon/dashboard.ex'")]
+      [title_txt: ~s[gettext("Dashboard")],
+       welcome_txt: ~s[gettext("Welcome to Talon. This is the default dashboard page.")],
+       add_txt: ~s[gettext("To add dashboard sections, checkout 'lib/talon/dashboard.ex'")]]
     theme = config.theme
     template_path = Path.join([config.web_path, "templates", "talon", theme, "dashboard"])
     unless config.dry_run do
