@@ -15,7 +15,7 @@ defmodule Talon.Page do
 
       @spec index_card_title() :: String.t
       def index_card_title do
-        Inflex.Pluralize.pluralize "#{Module.split(__MODULE__) |> List.last}"
+        "#{Module.split(__MODULE__) |> List.last}"
       end
 
       @doc """
