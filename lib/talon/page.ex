@@ -13,10 +13,9 @@ defmodule Talon.Page do
     quote do
       @__context__ unquote(context) || (Module.split(__MODULE__) |> hd |> Module.concat(nil))
 
+      # TODO: too specific to template. Move to view.
       @spec index_card_title() :: String.t
-      def index_card_title do
-        "#{Module.split(__MODULE__) |> List.last}"
-      end
+      def index_card_title, do: title()
 
       @doc """
       Returns a list of links for each of the Talon managed pages.
@@ -24,9 +23,8 @@ defmodule Talon.Page do
       Note: This function is overridable
       """
       @spec page_paths(Map.t) :: [Tuple.t]
-      def page_paths(%{talon: talon} = _talon) do
-        talon.page_names()
-        |> Enum.map(&{Talon.Utils.titleize(&1),  "/talon/pages/#{&1}"})
+      def page_paths(%{talon: talon} = _talon) do  # TODO: move to concern and use this approach for resource_paths (DJS)
+        talon.pages |> Enum.map(&{apply(&1, :title, []),  "/talon/pages/#{apply(&1, :name, [])}"})
       end
 
       @doc """
@@ -38,7 +36,8 @@ defmodule Talon.Page do
       def resource_paths(%{talon: talon} = _talon) do
         talon.resources()
         |> Enum.map(fn talon_resource ->
-          schema = talon_resource.schema() # TODO: let resource determine presentation name (DJS)
+          schema = talon_resource.schema()
+          # TODO: let resource determine presentation name (DJS)
           {Talon.Utils.titleize(schema) |> Inflex.Pluralize.pluralize, Talon.Utils.talon_resource_path(schema, :index)}
         end)
       end
@@ -49,8 +48,15 @@ defmodule Talon.Page do
       @spec context() :: atom
       def context, do: @__context__
 
+      @spec title() :: String.t
+      def title, do: name() |> Talon.Utils.titleize
+
+      # TODO: perhaps resource_name, module_name
+      @spec name() :: String.t
+      def name, do: __MODULE__ |> Module.split |> List.last() |> to_string |> Inflex.underscore
+
       defoverridable [
-        context: 0, resource_paths: 1, page_paths: 1, index_card_title: 0
+        context: 0, resource_paths: 1, page_paths: 1, index_card_title: 0, title: 0, name: 0
       ]
     end
   end
