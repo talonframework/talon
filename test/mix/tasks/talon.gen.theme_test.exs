@@ -45,7 +45,7 @@ defmodule Mix.Tasks.Talon.Gen.ThemeTest do
         assert_file "lib/phx_blogger/talon/templates/admin/admin-lte/layout/app.html.slim"
         assert_file "lib/phx_blogger/talon/views/admin/admin-lte/layout_view.ex", [
           "defmodule PhxBlogger.Admin.AdminLte.Web.LayoutView do",
-          ~s(use PhxBlogger.Talon.Web, which: :view, theme: "admin-lte", module: PhxBlogger.Admin.AdminLte.Web)
+          ~s(use PhxBlogger.Talon.Web, which: :view, theme: "admin/admin-lte", module: PhxBlogger.Admin.AdminLte.Web)
         ]
         assert_file "lib/phx_blogger/talon/templates/admin/admin-lte/generators/index.html.eex", fn file ->
           assert file =~ ~s(= PhxBlogger.Admin.AdminLte.Web.DatatableView.render_table)
@@ -180,7 +180,7 @@ defmodule Mix.Tasks.Talon.Gen.ThemeTest do
         assert_file "web/templates/talon/admin/admin-lte/layout/app.html.slim"
         assert_file "web/views/talon/admin/admin-lte/layout_view.ex", [
           "defmodule Blogger.Admin.AdminLte.LayoutView do",
-          ~s(use Blogger.Talon.Web, which: :view, theme: "admin-lte", module: Blogger.Admin.AdminLte)
+          ~s(use Blogger.Talon.Web, which: :view, theme: "admin/admin-lte", module: Blogger.Admin.AdminLte)
         ]
         assert_file "web/templates/talon/admin/admin-lte/generators/index.html.eex", fn file ->
           assert file =~ ~s(= Blogger.Admin.AdminLte.DatatableView.render_table)

@@ -134,44 +134,6 @@ defmodule Talon.Resource do
       @spec paginate() :: boolean
       def paginate, do: @__paginate__
 
-      # TODO: I think the view helpers belong in a diffent module. Putting them here for now.
-
-      @doc """
-      Return the action likes for a given controller action and resource.
-
-      Returns a list of action link tuples for give page and scema resource.
-
-      Note: This function is overridable
-      """
-      @spec nav_action_links(atom, Struct.t | Module.t) :: List.t
-      def nav_action_links(action, resource) when action in [:index, :edit] do
-        [Talon.Resource.nav_action_link(__MODULE__, :new, resource)]
-      end
-      def nav_action_links(:show, resource) do
-        [
-          Talon.Resource.nav_action_link(__MODULE__, :edit, resource),
-          Talon.Resource.nav_action_link(__MODULE__, :new, resource),
-          Talon.Resource.nav_action_link(__MODULE__, :delete, resource)
-        ]
-      end
-      def nav_action_links(_action, _resource) do
-        []
-      end
-
-      @doc """
-      Returns a list of links for each of the Talon managed resources.
-
-      Note: This function is overridable
-      """
-      @spec resource_paths(Map.t) :: [Tuple.t]
-      def resource_paths(%{talon: talon} = _talon) do
-        talon.resources()
-        |> Enum.map(fn talon_resource ->
-          schema = talon_resource.schema()
-          {Talon.Utils.titleize(schema) |> Inflex.Pluralize.pluralize, talon.resource_path(schema, :index)}
-        end)
-      end
-
       @doc """
       Preload your associations.
 
@@ -264,51 +226,23 @@ defmodule Talon.Resource do
         Config.themes(@__concern__)
       end
 
+      def display_name do
+        Talon.Utils.titleize(@__module__)
+      end
+
+      def display_name_plural do
+        Inflex.Pluralize.pluralize display_name()
+      end
+
       defoverridable [
-        resource_paths: 1, nav_action_links: 2, params_key: 0, display_schema_columns: 1,
+        params_key: 0, display_schema_columns: 1,
         index_card_title: 0, form_card_title: 1, tool_bar: 0, route_name: 0, repo: 0,
         adapter: 0, render_column_name: 2, get_schema_field: 3, preload: 3, concern: 0,
         paginate: 3, query: 3, search: 1, search: 3, schema_types: 0, name_field: 0,
-        themes: 0
+        themes: 0, display_name: 0, display_name_plural: 0
       ]
     end
 
-  end
-
-  @doc """
-  Return the action link tuple for an action link
-
-  Returns the action link for `:new`, `:edit`, and `:delete` actions.
-
-  ## Examples
-
-      iex> Talon.Resource.nav_action_link(TestTalon.Talon, :new, TestTalon.Simple)
-      {:new, "New Simple", "/talon/simples/new"}
-
-      iex> Talon.Resource.nav_action_link(TestTalon.Talon, :new, %TestTalon.Simple{id: 1})
-      {:new, "New Simple", "/talon/simples/new"}
-
-      iex> Talon.Resource.nav_action_link(TestTalon.Talon, :edit, %TestTalon.Simple{id: 1})
-      {:edit, "Edit Simple", "/talon/simples/1/edit"}
-
-      iex> Talon.Resource.nav_action_link(TestTalon.Talon, :delete, %TestTalon.Simple{id: 1})
-      {:delete, "Delete Simple", "/talon/simples/1"}
-  """
-  @spec nav_action_link(atom, atom, atom | struct) :: {atom, String.t, String.t}
-  def nav_action_link(concern, action, resource_or_module) do
-    {resource, module} =
-      case resource_or_module do
-        %{__struct__: module} -> {resource_or_module, module}
-        module -> {module.__struct__, module}
-      end
-    path =
-      case action do
-        :new -> concern.resource_path(module, :new)
-        :edit -> concern.resource_path(resource, :edit)
-        :delete -> concern.resource_path(resource, :delete)
-      end
-    title = String.capitalize(to_string(action)) <> " " <> Talon.Utils.titleize(resource)
-    {action, title, path}
   end
 
   @doc """

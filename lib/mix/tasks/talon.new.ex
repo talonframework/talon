@@ -101,9 +101,8 @@ defmodule Mix.Tasks.Talon.New do
     fname = "talon.exs"
     concern_config_path = Application.app_dir(:talon,
       "priv/templates/talon.new/config/concern_config.exs")
-    binding = Kernel.binding() ++ [base: config.base, theme: config.theme_name,
-      web_namespace: config.web_namespace, app: config.app, concern: config.concern,
-      app: config.app, path: concern_config_path
+    binding = Kernel.binding() ++ [config: config, theme: config.theme_name,
+      path: concern_config_path
     ]
     unless config.dry_run do
       copy_from paths(),
@@ -155,15 +154,21 @@ defmodule Mix.Tasks.Talon.New do
   end
 
   def gen_controller(config) do
-    fname = "talon_resource_controller.ex"
+    fname = "resource_controller.ex"
+    target_fname = Inflex.underscore(config.concern) <> "_" <> fname
+    web_module = web_module config.web_namespace
+    layout = Module.concat([config.base, config.concern, config.theme_module,
+      web_module, LayoutView])
+    layout = ~s/{#{layout}, "app.html"}/
     binding = Kernel.binding() ++ [base: config.base, concern: config.concern,
-      boilerplate: config[:boilerplate], web_namespace: config.web_namespace]
+      boilerplate: config[:boilerplate], web_namespace: config.web_namespace,
+      layout: layout, web_module: web_module]
     target_path = Path.join([config.root_path, "controllers", config.path_prefix])
     unless config.dry_run do
       File.mkdir_p! target_path
       copy_from paths(),
         "priv/templates/talon.new/web/controllers", target_path, binding, [
-          {:eex, fname, fname},
+          {:eex, fname, target_fname},
         ], config
     end
    config

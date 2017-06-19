@@ -87,7 +87,8 @@ defmodule Mix.Tasks.Talon.Gen.Resource do
         theme = config.target_name
         binding = config.binding ++ [base: config[:base], resource: config.resource,
           theme_module: theme_module_name(theme), theme_name: theme, view_opts: config.view_opts,
-          web_namespace: config.web_namespace, concern: config.concern]
+          web_namespace: config.web_namespace, concern: config.concern,
+          concern_path: config.concern_path]
         target_path = Path.join([config.root_path, "views", config.path_prefix,
             config.concern_path, theme])
         copy_from paths(),
@@ -149,8 +150,10 @@ defmodule Mix.Tasks.Talon.Gen.Resource do
         _ -> scoped_resource
       end
 
+    concern_path = concern_path(concern)
     view_opts =
-      %{target_name: target_name, base: base, concern: concern}
+      %{target_name: target_name, base: base, concern: concern,
+        concern_path: concern_path}
       |> view_opts(proj_struct)
 
     app = opts[:app_name] || Mix.Project.config |> Keyword.fetch!(:app)
@@ -171,7 +174,7 @@ defmodule Mix.Tasks.Talon.Gen.Resource do
       raw_args: raw_args,
       theme: opts[:theme] || @default_theme,
       concern: concern,
-      concern_path: concern_path(concern),
+      concern_path: concern_path,
       module: module,
       verbose: bin_opts[:verbose],
       resource: resource,

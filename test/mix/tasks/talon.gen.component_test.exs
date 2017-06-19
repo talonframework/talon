@@ -38,13 +38,13 @@ defmodule Mix.Tasks.Talon.Gen.ComponentsTest do
 
         assert_file "lib/phx_blogger/talon/views/admin/admin-lte/components/datatable_view.ex", fn file ->
           assert file =~ ~s(defmodule PhxBlogger.Admin.AdminLte.Web.DatatableView do)
-          assert file =~ ~s(use PhxBlogger.Talon.Web, which: :component_view, theme: "admin-lte", module: PhxBlogger.Admin.AdminLte.Web)
+          assert file =~ ~s(use PhxBlogger.Talon.Web, which: :component_view, theme: "admin/admin-lte", module: PhxBlogger.Admin.AdminLte.Web)
           assert file =~ ~s(use Talon.Components.Datatable, __MODULE__)
         end
 
         assert_file "lib/phx_blogger/talon/views/admin/admin-lte/components/paginate_view.ex", fn file ->
           assert file =~ ~s(defmodule PhxBlogger.Admin.AdminLte.Web.PaginateView do)
-          assert file =~ ~s(use PhxBlogger.Talon.Web, which: :component_view, theme: "admin-lte", module: PhxBlogger.Admin.AdminLte.Web)
+          assert file =~ ~s(use PhxBlogger.Talon.Web, which: :component_view, theme: "admin/admin-lte", module: PhxBlogger.Admin.AdminLte.Web)
         end
 
         assert_file "lib/phx_blogger/talon/templates/admin/admin-lte/components/datatable/datatable.html.slim", fn file ->
@@ -58,13 +58,13 @@ defmodule Mix.Tasks.Talon.Gen.ComponentsTest do
 
         assert_file "lib/phx_blogger/talon/views/main/my-theme/components/datatable_view.ex", fn file ->
           assert file =~ ~s(defmodule PhxBlogger.Main.MyTheme.Web.DatatableView do)
-          assert file =~ ~s(use PhxBlogger.Talon.Web, which: :component_view, theme: "my-theme", module: PhxBlogger.Main.MyTheme.Web)
+          assert file =~ ~s(use PhxBlogger.Talon.Web, which: :component_view, theme: "main/my-theme", module: PhxBlogger.Main.MyTheme.Web)
           assert file =~ ~s(use Talon.Components.Datatable, __MODULE__)
         end
 
         assert_file "lib/phx_blogger/talon/views/main/my-theme/components/paginate_view.ex", fn file ->
           assert file =~ ~s(defmodule PhxBlogger.Main.MyTheme.Web.PaginateView do)
-          assert file =~ ~s(use PhxBlogger.Talon.Web, which: :component_view, theme: "my-theme", module: PhxBlogger.Main.MyTheme.Web)
+          assert file =~ ~s(use PhxBlogger.Talon.Web, which: :component_view, theme: "main/my-theme", module: PhxBlogger.Main.MyTheme.Web)
         end
 
         assert_file "lib/phx_blogger/talon/templates/main/my-theme/components/datatable/datatable.html.slim", fn file ->
@@ -95,13 +95,13 @@ defmodule Mix.Tasks.Talon.Gen.ComponentsTest do
 
         assert_file "lib/phx_blogger/web/views/talon/admin/admin-lte/components/datatable_view.ex", fn file ->
           assert file =~ ~s(defmodule PhxBlogger.Admin.AdminLte.Web.DatatableView do)
-          assert file =~ ~s(use PhxBlogger.Talon.Web, which: :component_view, theme: "admin-lte", module: PhxBlogger.Admin.AdminLte.Web)
+          assert file =~ ~s(use PhxBlogger.Talon.Web, which: :component_view, theme: "admin/admin-lte", module: PhxBlogger.Admin.AdminLte.Web)
           assert file =~ ~s(use Talon.Components.Datatable, __MODULE__)
         end
 
         assert_file "lib/phx_blogger/web/views/talon/admin/admin-lte/components/paginate_view.ex", fn file ->
           assert file =~ ~s(defmodule PhxBlogger.Admin.AdminLte.Web.PaginateView do)
-          assert file =~ ~s(use PhxBlogger.Talon.Web, which: :component_view, theme: "admin-lte", module: PhxBlogger.Admin.AdminLte.Web)
+          assert file =~ ~s(use PhxBlogger.Talon.Web, which: :component_view, theme: "admin/admin-lte", module: PhxBlogger.Admin.AdminLte.Web)
         end
 
         assert_file "lib/phx_blogger/web/templates/talon/admin/admin-lte/components/datatable/datatable.html.slim", fn file ->

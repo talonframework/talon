@@ -135,9 +135,10 @@ defmodule Mix.Tasks.Talon.Gen.Components do
 
     base = bin_opts[:module] || binding[:base]
     proj_struct = to_atom(opts[:proj_struct] || detect_project_structure())
-
+    concern_path = concern_path(concern)
     view_opts =
-      %{target_name: target_name, base: base, concern: concern}
+      %{target_name: target_name, base: base, concern: concern,
+        concern_path: concern_path}
       |> view_opts(proj_struct)
 
     app = opts[:app_name] || Mix.Project.config |> Keyword.fetch!(:app)
@@ -155,7 +156,7 @@ defmodule Mix.Tasks.Talon.Gen.Components do
       project_structure: proj_struct,
       view_opts: view_opts,
       concern: concern,
-      concern_path: concern_path(concern),
+      concern_path: concern_path,
       web_namespace: web_namespace(proj_struct),
       boilerplate: bin_opts[:boilerplate] || Config.boilerplate() || true,
       base: base,

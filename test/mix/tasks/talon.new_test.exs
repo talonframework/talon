@@ -62,8 +62,8 @@ defmodule Mix.Tasks.Talon.NewTest do
           "import PhxBlogger.Web.Gettext",
         ]
 
-        assert_file "lib/phx_blogger/talon/controllers/talon_resource_controller.ex", [
-          "defmodule PhxBlogger.Web.TalonResourceController do",
+        assert_file "lib/phx_blogger/talon/controllers/admin_resource_controller.ex", [
+          "defmodule PhxBlogger.Web.AdminResourceController do",
           "use PhxBlogger.Web, :controller",
           "use Talon.Controller, repo: PhxBlogger.Repo, concern: PhxBlogger.Admin"
         ]
@@ -78,18 +78,19 @@ defmodule Mix.Tasks.Talon.NewTest do
 
         assert_file "lib/phx_blogger/talon/views/admin/admin-lte/layout_view.ex", [
           "defmodule PhxBlogger.Admin.AdminLte.Web.LayoutView do",
-          ~s/use PhxBlogger.Talon.Web, which: :view, theme: "admin-lte", module: PhxBlogger.Admin.AdminLte.Web/
+          ~s{use PhxBlogger.Talon.Web, which: :view, theme: "admin/admin-lte", module: PhxBlogger.Admin.AdminLte.Web}
         ]
 
         assert_file "lib/phx_blogger/talon/views/admin/admin-lte/components/datatable_view.ex", [
           "defmodule PhxBlogger.Admin.AdminLte.Web.DatatableView do",
-          ~s/use PhxBlogger.Talon.Web, which: :component_view, theme: "admin-lte", module: PhxBlogger.Admin.AdminLte.Web/,
+          ~s{use PhxBlogger.Talon.Web, which: :component_view, theme: "admin/admin-lte", module: PhxBlogger.Admin.AdminLte.Web},
+
           "use Talon.Components.Datatable, __MODULE__"
         ]
 
         assert_file "lib/phx_blogger/talon/views/admin/admin-lte/components/paginate_view.ex", [
           "defmodule PhxBlogger.Admin.AdminLte.Web.PaginateView do",
-          ~s/use PhxBlogger.Talon.Web, which: :component_view, theme: "admin-lte", module: PhxBlogger.Admin.AdminLte.Web/
+          ~s{use PhxBlogger.Talon.Web, which: :component_view, theme: "admin/admin-lte", module: PhxBlogger.Admin.AdminLte.Web}
         ]
 
         #########
@@ -164,8 +165,8 @@ defmodule Mix.Tasks.Talon.NewTest do
           "import Blogger.Gettext",
         ]
 
-        assert_file "lib/blogger/talon/controllers/talon_resource_controller.ex", [
-          "defmodule Blogger.TalonResourceController do",
+        assert_file "lib/blogger/talon/controllers/admin_resource_controller.ex", [
+          "defmodule Blogger.AdminResourceController do",
           "use Blogger.Web, :controller",
           "use Talon.Controller, repo: Blogger.Repo, concern: Blogger.Admin"
         ]
@@ -177,18 +178,18 @@ defmodule Mix.Tasks.Talon.NewTest do
 
         assert_file "lib/blogger/talon/views/admin/admin-lte/layout_view.ex", [
           "defmodule Blogger.Admin.AdminLte.LayoutView do",
-          ~s/use Blogger.Talon.Web, which: :view, theme: "admin-lte", module: Blogger.Admin.AdminLte/
+          ~s{use Blogger.Talon.Web, which: :view, theme: "admin/admin-lte", module: Blogger.Admin.AdminLte}
         ]
 
         assert_file "lib/blogger/talon/views/admin/admin-lte/components/datatable_view.ex", [
           "defmodule Blogger.Admin.AdminLte.DatatableView do",
-          ~s/use Blogger.Talon.Web, which: :component_view, theme: "admin-lte", module: Blogger.Admin.AdminLte/,
+          ~s{use Blogger.Talon.Web, which: :component_view, theme: "admin/admin-lte", module: Blogger.Admin.AdminLte},
           "use Talon.Components.Datatable, __MODULE__"
         ]
 
         assert_file "lib/blogger/talon/views/admin/admin-lte/components/paginate_view.ex", [
           "defmodule Blogger.Admin.AdminLte.PaginateView do",
-          ~s/use Blogger.Talon.Web, which: :component_view, theme: "admin-lte", module: Blogger.Admin.AdminLte/
+          ~s{use Blogger.Talon.Web, which: :component_view, theme: "admin/admin-lte", module: Blogger.Admin.AdminLte}
         ]
 
         #########

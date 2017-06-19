@@ -378,8 +378,10 @@ defmodule Mix.Tasks.Talon.Gen.Theme do
         true -> detect_project_structure()
       end
 
+    concern_path = concern_path(concern)
     view_opts =
-      %{target_name: target_name, base: base, concern: concern}
+      %{target_name: target_name, base: base, concern: concern,
+        concern_path: concern_path}
       |> view_opts(proj_struct)
 
     app = opts[:app_name] || Mix.Project.config |> Keyword.fetch!(:app)
@@ -393,7 +395,7 @@ defmodule Mix.Tasks.Talon.Gen.Theme do
         raw_args: raw_args,
         theme: theme,
         concern: concern,
-        concern_path: concern_path(concern),
+        concern_path: concern_path,
         app: app,
         root_path: root_path,
         path_prefix: opts[:path_prefix] || default_path_prefix(),

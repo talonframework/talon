@@ -207,17 +207,94 @@ defmodule Talon.Concern do
           route_path, primary_key(schema) | opts]
       end
       def resource_path(schema_mod, action, opts) when is_atom(schema_mod) do
+        # IO.inspect action, label: "action"
+        # IO.inspect opts, label: "opts"
         route_path = talon_resource(schema_mod).route_name()
         # route_path = Talon.Resource.talon_resource(schema_mod).route_name()
-        apply @__router_helpers__, @__resource_path_fn__, [@__endpoint__, action,
-          route_path | opts]
+        apply @__router_helpers__, @__resource_path_fn__, [@__endpoint__,
+          action, route_path | opts]
+      end
+      # def router_helpers, do: @__router_helpers__
+      # def resource_path_fn, do: @__resource_path_fn__
+      # def endpoint
+      def nav_action_links(conn) do
+        Talon.Concern.nav_action_links(__MODULE__,
+          Phoenix.Controller.action_name(conn), conn.assigns.resource)
       end
 
       defoverridable [
-          base: 0, repo: 0, resource_map: 0, schema: 1, schema_names: 0, talon_resource: 1,
-          resource_schema: 1, controller_action: 1, template_path_name: 1, schema_field_type: 3
-        ]
+        base: 0, repo: 0, resource_map: 0, schema: 1, schema_names: 0,
+        talon_resource: 1, resource_path: 3, resource_schema: 1,
+        controller_action: 1, template_path_name: 1, schema_field_type: 3,
+        nav_action_links: 1
+      ]
     end
+
+  end
+
+  @doc """
+  Return the action likes for a given controller action and resource.
+
+  Returns a list of action link tuples for give page and scema resource.
+
+  Note: This function is overridable
+  """
+  @spec nav_action_links(atom, atom, Struct.t | Module.t) :: List.t
+  def nav_action_links(concern, action, resource) when action in [:index, :edit] do
+    [nav_action_link(concern, :new, resource)]
+  end
+  def nav_action_links(concern, :show, resource) do
+    [
+      nav_action_link(concern, :edit, resource),
+      nav_action_link(concern, :new, resource),
+      nav_action_link(concern, :delete, resource)
+    ]
+  end
+  def nav_action_links(_concern, _action, _resource) do
+    []
+  end
+
+  @spec nav_action_links(Plug.Conn.t) :: List.t
+  def nav_action_links(conn) do
+    conn.assigns.talon.concern.nav_action_links(conn)
+  end
+
+  @doc """
+  Return the action link tuple for an action link
+
+  Returns the action link for `:new`, `:edit`, and `:delete` actions.
+
+  ## Examples
+
+      iex> Talon.Concern.nav_action_link(TestTalon.Talon, :new, TestTalon.Simple)
+      {:new, "New Simple", "/talon/simples/new"}
+
+      iex> Talon.Concern.nav_action_link(TestTalon.Talon, :new, %TestTalon.Simple{id: 1})
+      {:new, "New Simple", "/talon/simples/new"}
+
+      iex> Talon.Concern.nav_action_link(TestTalon.Talon, :edit, %TestTalon.Simple{id: 1})
+      {:edit, "Edit Simple", "/talon/simples/1/edit"}
+
+      iex> Talon.Concern.nav_action_link(TestTalon.Talon, :delete, %TestTalon.Simple{id: 1})
+      {:delete, "Delete Simple", "/talon/simples/1"}
+  """
+  @spec nav_action_link(atom, atom, atom | struct) :: {atom, String.t, String.t}
+  def nav_action_link(concern, action, resource_or_module) do
+    {resource, module} =
+      case resource_or_module do
+        %{__struct__: module} -> {resource_or_module, module}
+        module -> {module.__struct__, module}
+      end
+      # |> IO.inspect(label: "...{resource, module}")
+    path =
+      case action do
+        :new -> concern.resource_path(module, :new)
+        :edit -> concern.resource_path(resource, :edit)
+        :delete -> concern.resource_path(resource, :delete)
+      end
+      # |> IO.inspect(label: "...path")
+    title = String.capitalize(to_string(action)) <> " " <> Talon.Utils.titleize(resource)
+    {action, title, path}
   end
 
   @doc """
@@ -247,11 +324,32 @@ defmodule Talon.Concern do
     end
   end
 
-  def context(conn) do
+  def concern(conn) do
     conn.assigns.talon.talon
   end
-  def resource_path(conn, action, opts) do
-    context(conn).resource_path(conn.assigns.resource, action, opts)
+
+  @doc """
+  Returns a list of links for each of the Talon managed resources.
+
+  Note: This function is overridable
+  """
+  @spec resource_paths(Plug.Conn.t) :: [Tuple.t]
+  def resource_paths(conn) do
+    concern = concern(conn)
+    concern.resources()
+    |> Enum.map(fn talon_resource ->
+      schema = talon_resource.schema()
+      {Talon.Utils.titleize(schema) |> Inflex.Pluralize.pluralize, concern.resource_path(schema, :index)}
+    end)
+  end
+
+
+  def resource_path(conn, action_or_resource, opts_or_action, opts \\ [])
+  def resource_path(conn, action, opts, _) when is_atom(action) do
+    concern(conn).resource_path(conn.assigns.resource, action, opts)
+  end
+  def resource_path(conn, resource, action, opts) do
+    concern(conn).resource_path(resource, action, opts)
   end
 
 end

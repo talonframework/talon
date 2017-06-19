@@ -1,13 +1,14 @@
 use Mix.Config
 
-config :<%= app %>, :talon,
-  module: <%= base %>,
-  messages_backend: <%= base %>.<%= web_namespace %>Gettext,
-  <%= if web_namespace == "" do %>
+config :<%= config.app %>, :talon,
+  module: <%= config.base %>,
+  messages_backend: <%= config.base %>.<%= config.web_namespace %>Gettext,
+  themes: ["<%= theme %>"],
+  concerns: [<%= config.base %>.<%= config.concern %>],
+  <%= if config.web_namespace == "" do %>
   web_namespace: nil
   <% else %>
   web_namespace: Web
   <% end %>
 
-<%= EEx.eval_file path, app: app, base: base, concern: concern,
-  theme: theme %>
+<%= EEx.eval_file path, theme: theme, config: config %>

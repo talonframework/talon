@@ -6,14 +6,14 @@ defmodule Talon.Config do
   """
 
   @overridable_config [
-    theme: nil, endpoint: nil, router: nil, repo: nil,
-    schema_adapter: nil, paginate: nil
+    theme: nil, endpoint: nil, router: nil, repo: nil, schema_adapter: nil,
+    paginate: true
   ]
-  @overridable_keys Keyword.keys(@overridable_config)
+  # @overridable_keys Keyword.keys(@overridable_config)
 
   @top_level_config [
-    concerns: nil, module: nil, themes: [], paginate: true,
-    schema_adapter: nil, compiler_opts: [], boilerplate: true,
+    concerns: nil, module: nil, themes: [],
+    compiler_opts: [], boilerplate: true,
     web_namespace: nil
   ] ++ @overridable_config
 

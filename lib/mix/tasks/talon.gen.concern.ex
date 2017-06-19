@@ -46,6 +46,8 @@ defmodule Mix.Tasks.Talon.Gen.Concern do
     config
     |> gen_talon_concern
     |> gen_config
+    |> gen_controller
+    |> print_route_instructions
   end
 
   def gen_talon_concern(config) do
@@ -68,8 +70,7 @@ defmodule Mix.Tasks.Talon.Gen.Concern do
     concern_config_path = Application.app_dir(:talon,
       "priv/templates/talon.new/config/concern_config.exs")
     binding = Kernel.binding() ++ [
-      base: config.base, theme: config.theme_name,
-      app: config.app, concern: config.concern,
+      config: config, theme: config.theme_name,
     ]
     unless config.dry_run do
       path = "config/talon.exs"
@@ -77,6 +78,52 @@ defmodule Mix.Tasks.Talon.Gen.Concern do
       contents = File.read!(path)
       File.write path, contents <> concern_contents
     end
+    config
+  end
+
+  def gen_controller(config) do
+    fname = "resource_controller.ex"
+    target_fname = Inflex.underscore(config.concern) <> "_" <> fname
+    web_module = web_module config.web_namespace
+    layout = Module.concat([config.base, config.concern, config.theme_module,
+      web_module, LayoutView])
+    layout = ~s/{#{layout}, "app.html"}/
+    binding = Kernel.binding() ++ [base: config.base, concern: config.concern,
+      boilerplate: config[:boilerplate], web_namespace: config.web_namespace,
+      layout: layout, web_module: web_module]
+    target_path = Path.join([config.root_path, "controllers", config.path_prefix])
+    unless config.dry_run do
+      File.mkdir_p! target_path
+      copy_from paths(),
+        "priv/templates/talon.new/web/controllers", target_path, binding, [
+          {:eex, fname, target_fname},
+        ], config
+    end
+   config
+  end
+
+  defp print_route_instructions(config) do
+    namespace =
+      if config.project_structure == :phx do
+        "#{config.base}.Web"
+      else
+        config.base
+      end
+    full_concern = Module.concat config.base, config.concern
+
+    route_scope = Inflex.underscore(config.concern)
+
+    Mix.shell.info """
+
+    Add the concern routes to your web/router.ex:
+
+      # your concern routes
+      scope "/#{route_scope}", #{namespace} do
+        pipe_through :browser
+        talon_routes(#{to_s full_concern})
+      end
+    """
+    config
   end
 
   defp do_config({bin_opts, opts, parsed} = _args) do
@@ -102,14 +149,18 @@ defmodule Mix.Tasks.Talon.Gen.Concern do
     root_path = opts[:root_path] || Path.join(["lib", app_path_name, default_root_path()])
 
     theme_name = opts[:theme_name] || default_theme()
+    theme_module = Inflex.camelize theme_name
 
     %{
       verbose: bin_opts[:verbose],
       dry_run: bin_opts[:dry_run],
       binding: binding,
       root_path: root_path,
+      path_prefix: opts[:path_prefix] || default_path_prefix(),
       theme_name: theme_name,
+      theme_module: theme_module,
       project_structure: proj_struct,
+      web_namespace: web_namespace(proj_struct),
       concern: concern,
       concern_path: concern_path(concern),
       boilerplate: bin_opts[:boilerplate] || Config.boilerplate() || true,

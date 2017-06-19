@@ -3,9 +3,9 @@ aside.main-sidebar
     ul.sidebar-menu
       li.header.text-uppercase Resources
       = if @talon_resource do
-        = for resource_path <- @talon_resource.resource_paths(@conn.assigns.talon) do
+        = for resource_path <- Talon.Concern.resource_paths(@conn) do
           = render "nav_resource_link.html", conn: @conn, resource_path: resource_path
       li.header.text-uppercase Actions
       = if @talon_resource do
-        = for action_path <- @talon_resource.nav_action_links(Phoenix.Controller.action_name(@conn), @conn.assigns.resource) do
+        = for action_path <- Talon.Concern.nav_action_links(@conn) do
           = render "nav_action_link.html", conn: @conn, action_path: action_path

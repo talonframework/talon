@@ -9,8 +9,6 @@ defmodule Mix.Talon do
   Defaults to the "admin-lte" default theme if not configured.
   """
 
-  require Talon.Config, as: Config
-
   @default_theme "admin-lte"
   @default_concern "Admin"
   @default_root_path "talon"
@@ -18,7 +16,22 @@ defmodule Mix.Talon do
 
   @spec themes() :: String.t
   def themes do
-    Config.themes() || []
+    otp_app()
+    |> Application.get_env(:talon, [])
+    |> Keyword.get(:themes, [])
+  end
+
+  def concerns do
+    otp_app()
+    |> Application.get_env(:talon, [])
+    |> Keyword.get(:concerns, [])
+  end
+
+  @doc """
+  Returns the otp app from the Mix project configuration.
+  """
+  def otp_app do
+    Mix.Project.config |> Keyword.fetch!(:app)
   end
 
   @doc """
@@ -234,15 +247,15 @@ defmodule Mix.Talon do
     name = Module.concat([config.base, config.concern, theme_module_name(config.target_name)])
     prefix = if proj_struct == :phx, do: Web, else: nil
     module = Module.concat(name, prefix) |> inspect
-    ~s(, theme: "#{config.target_name}", module: #{module})
+    ~s(, theme: "#{config.concern_path}/#{config.target_name}", module: #{module})
   end
 
-  def view_opts(theme, proj_struct) do
-    name = theme_module_name(theme)
-    prefix = if proj_struct == :phx, do: Web, else: nil
-    module = Module.concat(name, prefix) |> inspect
-    ~s(, theme: "#{theme}", module: #{module})
-  end
+  # def view_opts(theme, proj_struct) do
+  #   name = theme_module_name(theme)
+  #   prefix = if proj_struct == :phx, do: Web, else: nil
+  #   module = Module.concat(name, prefix) |> inspect
+  #   ~s(, theme: "#{theme}", module: #{module})
+  # end
 
   @doc """
   Return the Web module name space for phx-1.3 projects
@@ -257,6 +270,9 @@ defmodule Mix.Talon do
   def web_namespace(:phx), do: "Web."
   def web_namespace(:phoenix), do: ""
 
+  def web_module("Web."), do: "Web"
+  def web_module(_), do: ""
+
   @spec brunch_path(:phx | :phoenix) :: String.t
   def brunch_path(:phx), do: Path.join(~w(assets brunch-config.js))
   def brunch_path(:phoenix), do: "brunch-config.js"
@@ -266,22 +282,39 @@ defmodule Mix.Talon do
   end
 
   def concern_path(%{concern: concern}) when is_atom(concern) do
-    concern
-    |> Module.split
-    |> List.last
-    |> Inflex.underscore
+    concern_path concern
   end
 
   def concern_path(%{concern: concern}) when is_binary(concern) do
+    concern_path concern
+  end
+
+  def concern_path(concern) when is_binary(concern) do
     concern
     |> String.split(".")
     |> List.last
     |> Inflex.underscore
   end
 
-  def concern_path(concern) do
-    # IO.inspect concern, label: "concern..."
-    Inflex.underscore concern
+  def concern_path(concern) when is_atom(concern) do
+    concern
+    |> Module.split
+    |> List.last
+    |> concern_path
+  end
+
+  def root_and_prefix_path(concern) do
+    concern_config =
+      otp_app()
+      |> Application.get_env(concern)
+    {Keyword.get(concern_config, :root_path), Keyword.get(concern_config, :path_prefix, "")}
+  end
+
+  def compiler_opts do
+    # IO.inspect otp_app(), label: "otp_app..."
+    otp_app()
+    |> Application.get_env(:talon, [])
+    |> Keyword.get(:compiler_opts, [])
   end
 
   def to_s(module) when is_binary(module), do: module
