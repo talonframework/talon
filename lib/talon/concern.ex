@@ -315,6 +315,10 @@ defmodule Talon.Concern do
     Config.web_namespace()
   end
 
+  def web_namespace(conn) do
+    conn.assigns.talon.web_namespace
+  end
+
   @spec web_path() :: String.t
   def web_path do
     case web_namespace() do

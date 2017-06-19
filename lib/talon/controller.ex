@@ -76,10 +76,9 @@ defmodule Talon.Controller do
 
       @spec search(Plug.Conn.t, Map.t) :: Plug.Conn.t
       def search(conn, params) do
-        theme_module = Talon.View.theme_module(conn)
         conn
         |> put_layout(false)
-        |> put_view(Module.concat([theme_module, Application.get_env(:talon, :web_namespace), DatatableView]))
+        |> put_view(Talon.View.view_module(conn, DatatableView))
         |> render("search.html", conn: conn)
       end
 

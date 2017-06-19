@@ -6,6 +6,48 @@ defmodule Talon.View do
   """
 
   alias Talon.Schema
+  require Talon.Config, as: Config
+
+  defmacro __using__(_) do
+    quote do
+      @doc """
+      Helper to return the current `talon_resource` module.
+
+      Extract the `talon_resource` module from the conn.assigns
+      """
+      @spec talon_resource(Plug.Conn.t) :: atom
+      def talon_resource(conn) do
+        conn.assigns.talon.talon_resource
+      end
+
+      def resource_paths(conn) do
+        concern = conn.assigns.talon.concern
+        concern.resources()
+        |> Enum.map(fn tr ->
+          {tr.display_name_plural(), concern.resource_path(tr.schema, :index)}
+        end)
+      end
+
+      def nav_action_links(conn) do
+        Talon.Concern.nav_action_links(conn)
+      end
+
+      defoverridable([
+        talon_resource: 1, resource_paths: 1, nav_action_links: 1
+      ])
+
+    end
+  end
+
+  def view_module(conn, view) do
+    theme_module = Talon.View.theme_module(conn)
+    Module.concat [
+      Talon.Concern.concern(conn),
+      Talon.View.theme_module(conn),
+      Talon.Concern.web_namespace(conn),
+      view
+    ]
+  end
 
   @doc """
   Return the humanized field name the field value.

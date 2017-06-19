@@ -43,6 +43,8 @@ defmodule <%= base %>.Talon.Web do
 
   def view(opts) do
     quote do
+      use Talon.View
+
       opts = unquote(opts)
       #use Phoenix.View, root: "<%= root_path %>/templates/talon/#{opts[:theme]}", namespace: opts[:module]
       use Phoenix.View, root: "<%= Path.join [root_path, "templates", path_prefix] %>/#{opts[:theme]}", namespace: opts[:module]
@@ -61,6 +63,8 @@ defmodule <%= base %>.Talon.Web do
 
   def component_view(opts) do
     quote do
+      use Talon.View
+
       opts = unquote(opts)
       # use Phoenix.View, root: "<%= root_path %>/templates/talon/#{opts[:theme]}/components", namespace: opts[:module]
       use Phoenix.View, root: "<%= Path.join [root_path, "templates", path_prefix] %>/#{opts[:theme]}/components", namespace: opts[:module]

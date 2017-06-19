@@ -55,6 +55,7 @@ defmodule Talon.Router do
         get "/switch_user/:id", controller, :switch_user
       end
       get "/:resource/search/:search_terms", resource_controller, :search
+      get "/:resource/search/", resource_controller, :search
       get "/:resource", resource_controller, :index
       # get "/:resource/search/:search_terms", TalonResourceController, :search
       get "/:resource/new", resource_controller, :new
