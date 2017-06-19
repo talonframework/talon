@@ -11,12 +11,12 @@ defmodule TestTalon.Router do
     plug :put_secure_browser_headers
   end
 
-  scope "/talon", TestTalon.Talon do
+  scope "/talon", TestTalon do
     pipe_through :browser
-    talon_routes(TestTalon.Talon)
+    talon_routes(TestTalon.Admin)
   end
 
-  scope "/front_end", TestTalon.FrontEnd do
+  scope "/front_end", TestTalon do
     pipe_through :browser
     talon_routes(TestTalon.FrontEnd)
   end

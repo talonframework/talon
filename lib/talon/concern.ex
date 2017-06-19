@@ -5,41 +5,41 @@ defmodule Talon.Concern do
   First, some termonolgy:
 
   * schema - The name of a give schema. .i.e. TestTalon.Simple
-  * talon_resource - the talon module for a given schema. .i.e. TestTalon.Talon.Simple
+  * talon_resource - the talon module for a given schema. .i.e. TestTalon.Admin.Simple
 
   ## resource_map
 
-      iex> TestTalon.Talon.resource_map()["simples"]
-      TestTalon.Talon.Simple
+      iex> TestTalon.Admin.resource_map()["simples"]
+      TestTalon.Admin.Simple
 
-      iex> TestTalon.Talon.resources() |> Enum.any?(& &1 == TestTalon.Talon.Simple)
+      iex> TestTalon.Admin.resources() |> Enum.any?(& &1 == TestTalon.Admin.Simple)
       true
 
-      iex> TestTalon.Talon.resource_names()|> Enum.any?(& &1 == "simples")
+      iex> TestTalon.Admin.resource_names()|> Enum.any?(& &1 == "simples")
       true
 
-      iex> TestTalon.Talon.schema("simples")
+      iex> TestTalon.Admin.schema("simples")
       TestTalon.Simple
 
-      iex> TestTalon.Talon.schema_names() |> Enum.any?(& &1 == "Simple")
+      iex> TestTalon.Admin.schema_names() |> Enum.any?(& &1 == "Simple")
       true
 
-      iex> TestTalon.Talon.talon_resource("simples")
-      TestTalon.Talon.Simple
+      iex> TestTalon.Admin.talon_resource("simples")
+      TestTalon.Admin.Simple
 
-      iex> TestTalon.Talon.talon_resource(TestTalon.Simple)
-      TestTalon.Talon.Simple
+      iex> TestTalon.Admin.talon_resource(TestTalon.Simple)
+      TestTalon.Admin.Simple
 
-      iex> TestTalon.Talon.talon_resource(%TestTalon.Simple{})
-      TestTalon.Talon.Simple
+      iex> TestTalon.Admin.talon_resource(%TestTalon.Simple{})
+      TestTalon.Admin.Simple
 
-      iex> TestTalon.Talon.controller_action("simples")
+      iex> TestTalon.Admin.controller_action("simples")
       {TestTalon.Simple, :simples, "admin-lte"}
 
-      iex> TestTalon.Talon.base()
+      iex> TestTalon.Admin.base()
       TestTalon
 
-      iex> TestTalon.Talon.template_path_name("simples")
+      iex> TestTalon.Admin.template_path_name("simples")
       "simple"
   """
 
@@ -83,6 +83,8 @@ defmodule Talon.Concern do
         |> Inflex.underscore) <>
         "_resource_path") |> String.to_atom
 
+      @__otp_app__ Mix.Talon.otp_app()
+
       @spec base() :: atom
       def base, do: @__base__
 
@@ -124,10 +126,16 @@ defmodule Talon.Concern do
         {String.to_atom(resource_name), talon_resource(resource_name)}
       end
 
+      def theme do
+        @__otp_app__
+        |> Application.get_env(__MODULE__)
+        |> Keyword.get(:theme, "admin-lte")
+      end
+
       def controller_action(resource_name) do
         {resource_name, talon_resource} = resource_schema(resource_name)
         schema = talon_resource.schema()
-        {schema, resource_name, Application.get_env(:talon, :theme)}
+        {schema, resource_name, theme()}
       end
 
       def template_path_name(resource_name) do
@@ -169,34 +177,34 @@ defmodule Talon.Concern do
 
       ## Examples:
 
-          iex> Talon.Utils.resource_path(TestTalon.Product)
+          iex> TestTalon.Admin.resource_path(TestTalon.Product)
           "/talon/products"
 
-          iex> Talon.Utils.resource_path(%TestTalon.Product{})
+          iex> TestTalon.Admin.resource_path(%TestTalon.Product{})
           "/talon/products/new"
 
-          iex> Talon.Utils.resource_path(%TestTalon.Product{id: 1})
+          iex> TestTalon.Admin.resource_path(%TestTalon.Product{id: 1})
           "/talon/products/1"
 
-          iex> Talon.Utils.resource_path(%TestTalon.Product{id: 1}, :edit)
+          iex> TestTalon.Admin.resource_path(%TestTalon.Product{id: 1}, :edit)
           "/talon/products/1/edit"
 
-          iex> Talon.Utils.resource_path(%TestTalon.Product{id: 1}, :update)
+          iex> TestTalon.Admin.resource_path(%TestTalon.Product{id: 1}, :update)
           "/talon/products/1"
 
-          iex> Talon.Utils.resource_path(%TestTalon.Product{id: 1}, :destroy)
+          iex> TestTalon.Admin.resource_path(%TestTalon.Product{id: 1}, :destroy)
           "/talon/products/1"
 
-          iex> Talon.Utils.resource_path(TestTalon.Product, :create)
+          iex> TestTalon.Admin.resource_path(TestTalon.Product, :create)
           "/talon/products"
 
-          iex> Talon.Utils.resource_path(TestTalon.Product, :batch_action)
+          iex> TestTalon.Admin.resource_path(TestTalon.Product, :batch_action)
           "/talon/products/batch_action"
 
-          iex> Talon.Utils.resource_path(TestTalon.Product, :csv)
+          iex> TestTalon.Admin.resource_path(TestTalon.Product, :csv)
           "/talon/products/csv"
 
-          iex> Talon.Utils.resource_path(%Plug.Conn{assigns: %{resource: %TestTalon.Product{}}}, :index, [[scope: "active"]])
+          iex> TestTalon.Admin.resource_path(%Plug.Conn{assigns: %{resource: %TestTalon.Product{}}}, :index, [[scope: "active"]])
           "/talon/products?scope=active"
       """
       def resource_path(schema, action, opts \\ [])
@@ -266,16 +274,16 @@ defmodule Talon.Concern do
 
   ## Examples
 
-      iex> Talon.Concern.nav_action_link(TestTalon.Talon, :new, TestTalon.Simple)
+      iex> Talon.Concern.nav_action_link(TestTalon.Admin, :new, TestTalon.Simple)
       {:new, "New Simple", "/talon/simples/new"}
 
-      iex> Talon.Concern.nav_action_link(TestTalon.Talon, :new, %TestTalon.Simple{id: 1})
+      iex> Talon.Concern.nav_action_link(TestTalon.Admin, :new, %TestTalon.Simple{id: 1})
       {:new, "New Simple", "/talon/simples/new"}
 
-      iex> Talon.Concern.nav_action_link(TestTalon.Talon, :edit, %TestTalon.Simple{id: 1})
+      iex> Talon.Concern.nav_action_link(TestTalon.Admin, :edit, %TestTalon.Simple{id: 1})
       {:edit, "Edit Simple", "/talon/simples/1/edit"}
 
-      iex> Talon.Concern.nav_action_link(TestTalon.Talon, :delete, %TestTalon.Simple{id: 1})
+      iex> Talon.Concern.nav_action_link(TestTalon.Admin, :delete, %TestTalon.Simple{id: 1})
       {:delete, "Delete Simple", "/talon/simples/1"}
   """
   @spec nav_action_link(atom, atom, atom | struct) :: {atom, String.t, String.t}
@@ -302,7 +310,7 @@ defmodule Talon.Concern do
 
   ## Examples
 
-      iex> Talon.app_module(TestTalon.Talon)
+      iex> Talon.Concern.app_module(TestTalon.Admin)
       TestTalon
   """
   @spec app_module(atom) :: atom

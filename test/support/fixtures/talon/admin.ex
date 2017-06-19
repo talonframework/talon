@@ -1,4 +1,4 @@
-defmodule TestTalon.Talon do
+defmodule TestTalon.Admin do
   use Talon.Concern, otp_app: :talon
 
 end

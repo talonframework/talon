@@ -2,8 +2,6 @@ defmodule TestTalon do
   use ExUnit.Case
   doctest Talon
 
-  alias TestTalon.FrontEnd
-
   setup do
     # Application.put_env :talon, TestTalon.Talon,
     #   resources: [
@@ -20,13 +18,13 @@ defmodule TestTalon do
   end
 
   test "backend" do
-    list = TestTalon.Talon.resource_names()
+    list = TestTalon.Admin.resource_names()
     assert "products" in list
     assert "simples" in list
   end
 
   test "front_end" do
-    list = FrontEnd.resource_names()
+    list = TestTalon.FrontEnd.resource_names()
     assert "noids" in list
   end
 end

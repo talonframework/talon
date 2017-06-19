@@ -5,9 +5,10 @@
 javascript:
 
   function search_path(value) {
-    var route = $('#datatable-body').data('route')
+    // var route = $('#datatable-body').data('route')
     // TODO: this needs to be based on the route scope. Should build this with router builders
-    return '/talon/' + route + '/search/' + value + '?format.js';
+    // return '/talon/' + route + '/search/' + value + '?format.js';
+    return "#{search_path @conn}/" + value + "?format.js";
   }
 
   window.onload = function(e) {

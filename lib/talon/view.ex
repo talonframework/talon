@@ -28,12 +28,21 @@ defmodule Talon.View do
         end)
       end
 
+      def resource_path(conn, resource, action, opts \\ []) do
+        Talon.Concern.resource_path conn, resource, action, opts
+      end
+
+      def search_path(conn) do
+        resource_path conn, :search, %{}
+      end
+
       def nav_action_links(conn) do
         Talon.Concern.nav_action_links(conn)
       end
 
       defoverridable([
-        talon_resource: 1, resource_paths: 1, nav_action_links: 1
+        talon_resource: 1, resource_paths: 1, nav_action_links: 1,
+        resource_path: 4
       ])
 
     end

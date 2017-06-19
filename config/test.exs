@@ -16,24 +16,20 @@ config :talon, TestTalon.Repo,
   hostname: "localhost",
   pool: Ecto.Adapters.SQL.Sandbox
 
-config :talon, TestTalon.Talon,
+config :talon, TestTalon.Admin,
   resources: [
-    TestTalon.Talon.Simple,
-    TestTalon.Talon.Product,
-    # TestTalon.Talon.Dashboard,
-    # TestTalon.Talon.Noid,
-    # TestTalon.Talon.User,
-    # TestTalon.Talon.Simple,
-    # TestTalon.Talon.ModelDisplayName,
-    # TestTalon.Talon.DefnDisplayName,
-    # TestTalon.Talon.RestrictedEdit,
+    TestTalon.Admin.Simple,
+    TestTalon.Admin.Product,
   ],
   schema_adapter: Talon.Schema.Adapters.Ecto,
   module: TestTalon,
   endpoint: TestTalon.Endpoint,
   repo: TestTalon.Repo,
   router: TestTalon.Router,
-  theme: "admin-lte"
+  root_path: "test/support/fixtures/talon",
+  path_prefix: "",
+  theme: "admin-lte",
+  schema_adapter: Talon.Schema.Adapters.Ecto
 
 config :talon, TestTalon.FrontEnd,
   resources: [
@@ -44,11 +40,14 @@ config :talon, TestTalon.FrontEnd,
   endpoint: TestTalon.Endpoint,
   repo: TestTalon.Repo,
   router: TestTalon.Router,
-  theme: "theme2"
+  theme: "theme2",
+  root_path: "test/support/fixtures/talon",
+  path_prefix: "",
+  schema_adapter: Talon.Schema.Adapters.Ecto
 
-config :talon,
-  concerns: [TestTalon.Talon, TestTalon.FrontEnd],
-  schema_adapter: Talon.Schema.Adapters.Ecto,
-  module: TestTalon
+config :talon, :talon,
+  module: TestTalon,
+  concerns: [TestTalon.Admin, TestTalon.FrontEnd],
+  themes: ["admin-lte", "theme2"]
 
 config :logger, level: :error
