@@ -11,16 +11,10 @@ defmodule Talon.PageController do
         render(conn, "#{page}.html")
       end
 
-      @spec dashboard(Plug.Conn.t, Map.t) :: Plug.Conn.t
-      def dashboard(conn, params) do
-        page(conn, Map.put(params, "page", "dashboard"))
-      end
-
       @spec set_context(Plug.Conn.t, Keyword.t) :: Plug.Conn.t
       defp set_context(conn, opts) do
         assign conn, :talon, Enum.into(opts, %{})
       end
-
     end
   end
 end
