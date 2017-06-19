@@ -24,7 +24,7 @@ defmodule Talon.Page do
       """
       @spec page_paths(Map.t) :: [Tuple.t]
       def page_paths(%{talon: talon} = _talon) do  # TODO: move to concern and use this approach for resource_paths (DJS)
-        talon.pages |> Enum.map(&{apply(&1, :title, []),  "/talon/pages/#{apply(&1, :name, [])}"})
+        talon.pages |> Enum.map(&{apply(&1, :title, []),  "/talon/pages/#{apply(&1, :name, [])}"})  # TODO: remove apply (DJS)
       end
 
       @doc """

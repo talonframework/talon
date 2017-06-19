@@ -242,14 +242,14 @@ defmodule Mix.Tasks.Talon.Gen.Theme do
   defp gen_dashboard_view(%{dashboard: true} = config) do
     binding = Kernel.binding() ++ [base: config.base, target_name: config.target_name,
       target_module: config.target_module, web_namespace: config.web_namespace,
-      view_opts: config.view_opts]
+      page: "Dashboard", view_opts: config.view_opts]
     theme = config.theme
     view_path = Path.join([config.web_path, "views", "talon", config.target_name])
     unless config.dry_run do
       File.mkdir_p! view_path
       copy_from paths(),
         "priv/templates/talon.gen.theme/#{theme}/views", view_path, binding, [
-          {:eex, "dashboard_view.ex", "dashboard_view.ex"}
+          {:eex, "page_view.ex", "dashboard_view.ex"}
         ], config
     end
     config

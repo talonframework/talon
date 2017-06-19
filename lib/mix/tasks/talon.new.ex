@@ -177,13 +177,12 @@ defmodule Mix.Tasks.Talon.New do
   end
 
   defp gen_dashboard_page(%{dashboard: true} = config) do
-    fname = "dashboard.ex"
-    binding = Kernel.binding() ++ [base: config.base, boilerplate: config[:boilerplate]]
+    binding = Kernel.binding() ++ [base: config.base, page: "Dashboard", boilerplate: config[:boilerplate]]
     source_path = "priv/templates/talon.new/talon"
     target_path = "lib/#{config.app}/talon"
     unless config.dry_run do
       File.mkdir_p! target_path
-      copy_from paths(), source_path, target_path, binding, [{:eex, fname, fname}], config
+      copy_from paths(), source_path, target_path, binding, [{:eex, "page.ex", "dashboard.ex"}], config
     end
    config
   end

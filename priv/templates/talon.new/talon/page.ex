@@ -1,6 +1,6 @@
-defmodule <%= base %>.Talon.Dashboard do
+defmodule <%= base %>.Talon.<%= page %> do
   @moduledoc """
-  Use this file to configure how Talon renders your dashboard.
+  Use this file to configure your Talon page.
 
   TBD
   """
