@@ -1,15 +1,15 @@
+/ TODO: put these in SidebarView
+- nav_action_links = @resource.nav_action_links(Phoenix.Controller.action_name(@conn), @conn.assigns[:resource])
+- page_paths = @resource.page_paths(@conn.assigns.talon)
+- resource_paths = @resource.resource_paths(@conn.assigns.talon)
+
 aside.main-sidebar
   section.sidebar style="height: auto;"
     ul.sidebar-menu
       li.header.text-uppercase Pages
-      = for path <- @talon_resource.page_paths(@conn.assigns.talon) do
-        = render "nav_resource_link.html", conn: @conn, resource_path: path
+      = render_many page_paths, __MODULE__, "nav_resource_link.html", as: :resource_path
       li.header.text-uppercase Resources
-      = for path <- @talon_resource.resource_paths(@conn.assigns.talon) do
-        = render "nav_resource_link.html", conn: @conn, resource_path: path
-      / TODO: put this in the view
-      - nav_action_links = @talon_resource.nav_action_links(Phoenix.Controller.action_name(@conn), @conn.assigns[:resource])
-      = if List.first(nav_action_links || []) do
+      = render_many resource_paths, __MODULE__, "nav_resource_link.html", as: :resource_path
+      = if List.first nav_action_links do
         li.header.text-uppercase Actions
-        = for action_path <- nav_action_links do
-          = render "nav_action_link.html", conn: @conn, action_path: action_path
+        = render_many nav_action_links, __MODULE__, "nav_action_link.html", as: :action_path

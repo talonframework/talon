@@ -27,7 +27,7 @@ html lang="en"
               li.dropdown.messages-menu
       / TODO: talon_resource should be available from LayoutView via use Talon.View
       - resource = Talon.View.talon_resource(@conn)
-      = render "sidebar.html", conn: @conn, talon_resource: resource
+      = render "sidebar.html", conn: @conn, resource: resource
       .content-wrapper style="min-height: 916px;"
         / TODO: Move this to a partial
         section.content-header#title_bar style="padding-left: 30px;"
