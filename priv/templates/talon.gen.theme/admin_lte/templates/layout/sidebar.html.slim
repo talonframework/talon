@@ -11,6 +11,6 @@ aside.main-sidebar
       = render_many page_paths, View, "nav_resource_link.html", as: :resource_path
       li.header.text-uppercase Resources
       = render_many resource_paths, View, "nav_resource_link.html", as: :resource_path
-      = if List.first nav_action_links do
+      = unless Enum.empty? nav_action_links do
         li.header.text-uppercase Actions
         = render_many nav_action_links, View, "nav_action_link.html", as: :action_path
