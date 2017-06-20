@@ -2,9 +2,9 @@ aside.main-sidebar
   section.sidebar style="height: auto;"
     ul.sidebar-menu
       li.header.text-uppercase Pages
-      = render_many page_paths(@conn), LayoutView, "nav_resource_link.html", as: :resource_path
+      = render_many page_paths(@conn), LayoutView, "nav_resource_link.html", as: :link
       li.header.text-uppercase Resources
-      = render_many resource_paths(@conn), LayoutView, "nav_resource_link.html", as: :resource_path
+      = render_many resource_paths(@conn), LayoutView, "nav_resource_link.html", as: :link
       = unless (links = nav_action_links(@conn)) |> Enum.empty? do
         li.header.text-uppercase Actions
-        = render_many links, LayoutView, "nav_action_link.html", as: :action_path
+        = render_many links, LayoutView, "nav_action_link.html", as: :link
