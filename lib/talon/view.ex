@@ -66,16 +66,6 @@ defmodule Talon.View do
   end
 
   @doc """
-  Helper to return the current `talon_page` module.
-
-  Extract the `talon_page` module from the conn.assigns
-  """
-  @spec talon_page(Plug.Conn.t) :: atom
-  def talon_page(conn) do
-    conn.assigns.talon[:talon_page]
-  end
-
-  @doc """
   Extract the params_key from the conn
   """
   @spec params_key(Plug.Conn.t) :: String.t

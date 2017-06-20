@@ -164,7 +164,7 @@ defmodule Talon.Resource do
       Note: This function is overridable
       """
       @spec page_paths(Map.t) :: [Tuple.t]
-      def page_paths(%{talon: talon} = _talon) do
+      def page_paths(%{talon: talon} = _talon) do  # TODO: move to concern (DJS)
         talon.page_names()
         |> Enum.map(&{Talon.Utils.titleize(&1),  "/talon/pages/#{&1}"})
       end
@@ -175,7 +175,7 @@ defmodule Talon.Resource do
       Note: This function is overridable
       """
       @spec resource_paths(Map.t) :: [Tuple.t]
-      def resource_paths(%{talon: talon} = _talon) do
+      def resource_paths(%{talon: talon} = _talon) do  # TODO: move to concern (DJS)
         talon.resources()
         |> Enum.map(fn talon_resource ->
           schema = talon_resource.schema() # TODO: let resource determine presentation name (DJS)
@@ -301,7 +301,7 @@ defmodule Talon.Resource do
       iex> Talon.Resource.nav_action_link(:delete, %TestTalon.Simple{id: 1})
       {:delete, "Delete Simple", "/talon/simples/1"}
   """
-  @spec nav_action_link(atom, atom | struct) :: {atom, String.t, String.t}
+  @spec nav_action_link(atom, atom | struct) :: {atom, String.t, String.t}  # TODO: move to view (DJS)
   def nav_action_link(action, resource_or_module) do
     {resource, module} =
       case resource_or_module do

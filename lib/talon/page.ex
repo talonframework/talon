@@ -42,6 +42,11 @@ defmodule Talon.Page do
         end)
       end
 
+      # TODO: move to view
+      def nav_action_links(_action, _resource) do
+        []
+      end
+
       @doc """
       Return the Talon context.
       """
