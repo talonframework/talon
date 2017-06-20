@@ -7,7 +7,7 @@ defmodule Talon.Plug.View do
   end
 
   def call(conn, opts) do
-    IO.inspect conn.assigns.talon, label: "talon..."
+    # IO.inspect conn.assigns.talon, label: "talon..."
     view =
       case opts[:view] do
         nil ->

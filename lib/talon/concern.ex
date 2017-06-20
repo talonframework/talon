@@ -152,7 +152,9 @@ defmodule Talon.Concern do
       end
 
       def primary_key(schema) do
-        Map.get schema, talon_resource(schema).adapter().primary_key(schema)
+        # IO.inspect {schema, talon_resource(schema).adapter().primary_key(schema)}, label: "stuff..."
+        Map.get(schema, talon_resource(schema).adapter().primary_key(schema))
+        # |> IO.inspect(label: "primary_key")
       end
 
       @doc """
@@ -208,23 +210,25 @@ defmodule Talon.Concern do
           "/talon/products?scope=active"
       """
       def resource_path(schema, action, opts \\ [])
-      def resource_path(%{} = schema, action, opts) do
-        # route_path = Talon.Resource.talon_resource(schema).route_name()
+      def resource_path(%{} = schema, action, opts) when action in ~w(show edit update delete)a do
         route_path = talon_resource(schema).route_name()
-        apply @__router_helpers__, @__resource_path_fn__, [@__endpoint__, action,
-          route_path, primary_key(schema) | opts]
+        args = [@__endpoint__, action, route_path, primary_key(schema) | opts]
+        apply @__router_helpers__, @__resource_path_fn__, args
       end
+
+      def resource_path(%{} = schema, action, opts) do
+        route_path = talon_resource(schema).route_name()
+        args = [@__endpoint__, action, route_path | opts]
+        apply @__router_helpers__, @__resource_path_fn__, args
+      end
+
       def resource_path(schema_mod, action, opts) when is_atom(schema_mod) do
-        # IO.inspect action, label: "action"
-        # IO.inspect opts, label: "opts"
         route_path = talon_resource(schema_mod).route_name()
-        # route_path = Talon.Resource.talon_resource(schema_mod).route_name()
-        apply @__router_helpers__, @__resource_path_fn__, [@__endpoint__,
-          action, route_path | opts]
+        args = [@__endpoint__, action, route_path | opts]
+        apply @__router_helpers__, @__resource_path_fn__, args
       end
-      # def router_helpers, do: @__router_helpers__
-      # def resource_path_fn, do: @__resource_path_fn__
-      # def endpoint
+
+
       def nav_action_links(conn) do
         Talon.Concern.nav_action_links(__MODULE__,
           Phoenix.Controller.action_name(conn), conn.assigns.resource)
