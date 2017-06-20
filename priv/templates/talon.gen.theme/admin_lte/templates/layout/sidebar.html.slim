@@ -2,14 +2,15 @@
 - nav_action_links = @resource.nav_action_links(Phoenix.Controller.action_name(@conn), @conn.assigns[:resource])
 - page_paths = @resource.page_paths(@conn.assigns.talon)
 - resource_paths = @resource.resource_paths(@conn.assigns.talon)
+- alias __MODULE__, as: View
 
 aside.main-sidebar
   section.sidebar style="height: auto;"
     ul.sidebar-menu
       li.header.text-uppercase Pages
-      = render_many page_paths, __MODULE__, "nav_resource_link.html", as: :resource_path
+      = render_many page_paths, View, "nav_resource_link.html", as: :resource_path
       li.header.text-uppercase Resources
-      = render_many resource_paths, __MODULE__, "nav_resource_link.html", as: :resource_path
+      = render_many resource_paths, View, "nav_resource_link.html", as: :resource_path
       = if List.first nav_action_links do
         li.header.text-uppercase Actions
-        = render_many nav_action_links, __MODULE__, "nav_action_link.html", as: :action_path
+        = render_many nav_action_links, View, "nav_action_link.html", as: :action_path
