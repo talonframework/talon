@@ -37,8 +37,8 @@ defmodule Mix.Tasks.Talon.Gen.Resource do
 
   # complete list of supported options
   @switches [
-    theme: :string, concern: :string, module: :string,
-    root_path: :string, path_prefix: :string
+    theme_name: :string, concern: :string, module: :string,
+    root_path: :string, path_prefix: :string, theme: :string
   ] ++ Enum.map(@boolean_options, &({&1, :boolean}))
 
 

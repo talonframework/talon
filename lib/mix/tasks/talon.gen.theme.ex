@@ -94,7 +94,8 @@ defmodule Mix.Tasks.Talon.Gen.Theme do
     root_path: :string,
     path_prefix: :string,
     assets_path: :string,
-    module: :string
+    module: :string,
+    target_theme: :string
   ] ++ Enum.map(@all_boolean_options, &({&1, :boolean}))
 
   # @default_theme "admin-lte"

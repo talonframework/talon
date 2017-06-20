@@ -328,7 +328,7 @@ defmodule Mix.Talon do
   def process_concern_theme(opts) do
     # IO.inspect opts, label: "opts...."
     concern = Keyword.get(opts, :concern, default_concern())
-    theme = Keyword.get(opts, :theme_name, default_theme())
+    theme = opts[:theme] || opts[:theme_name] || default_theme()
     {concern, theme}
   end
   # def process_concern_theme([theme]) do

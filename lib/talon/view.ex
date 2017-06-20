@@ -33,7 +33,7 @@ defmodule Talon.View do
       end
 
       def search_path(conn) do
-        resource_path conn, :search, %{}
+        resource_path(conn, :search, [""])
       end
 
       def nav_action_links(conn) do

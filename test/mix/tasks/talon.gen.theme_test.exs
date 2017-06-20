@@ -15,6 +15,10 @@ defmodule Mix.Tasks.Talon.Gen.ThemeTest do
     send self(), {:mix_shell_input, :yes?, false}
     send self(), {:mix_shell_input, :yes?, false}
     send self(), {:mix_shell_input, :yes?, false}
+    send self(), {:mix_shell_input, :yes?, false}
+    send self(), {:mix_shell_input, :yes?, false}
+    send self(), {:mix_shell_input, :yes?, false}
+    send self(), {:mix_shell_input, :yes?, false}
     {:ok, parsed: ~w(admin-lte admin-lte)}
   end
 
@@ -55,6 +59,44 @@ defmodule Mix.Tasks.Talon.Gen.ThemeTest do
         end
       end
 
+    end
+
+    test "second theme" do
+      Logger.disable(self())
+
+      Application.put_env(:phx_blogger, PhxBlogger.Web.Endpoint,
+        secret_key_base: String.duplicate("abcdefgh", 8),
+        code_reloader: true,
+        root: File.cwd!)
+
+      in_tmp "second_theme", fn ->
+        Mix.Task.clear
+        Mix.Tasks.Phx.New.run([@app_name, "--no-ecto"])
+      end
+
+      in_project :phx_blogger, Path.join(tmp_path(), "second_theme/phx_blogger"), fn _ ->
+        Mix.Task.clear
+        GenNew.run [""] #{ }~w(--phx)
+        Mix.Task.clear
+        # mk_web_path()
+        # mk_assets_path()
+        GenTheme.run ["--phx", "--target-theme=front-end", "--concern=Front"]
+
+        assert_file assets_path("static/images/talon/front-end/orderable.png")
+        assert_file "assets/css/talon/front-end/talon.css"
+        assert_file "assets/vendor/talon/front-end/bootstrap/css/bootstrap.min.css"
+        assert_file "lib/phx_blogger/talon/templates/front/front-end/layout/app.html.slim"
+        assert_file "lib/phx_blogger/talon/views/front/front-end/layout_view.ex", [
+          "defmodule PhxBlogger.Front.FrontEnd.Web.LayoutView do",
+          ~s(use PhxBlogger.Talon.Web, which: :view, theme: "front/front-end", module: PhxBlogger.Front.FrontEnd.Web)
+        ]
+        assert_file "lib/phx_blogger/talon/templates/front/front-end/generators/index.html.eex", fn file ->
+          assert file =~ ~s(= PhxBlogger.Front.FrontEnd.Web.DatatableView.render_table)
+        end
+        assert_file "lib/phx_blogger/talon/templates/front/front-end/components/datatable/datatable.html.slim", fn file ->
+          assert file =~ ~s(= PhxBlogger.Front.FrontEnd.Web.PaginateView.paginate)
+        end
+      end
     end
 
     @name "all_default_opts"
