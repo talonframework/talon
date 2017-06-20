@@ -158,6 +158,11 @@ defmodule Talon.Resource do
         []
       end
 
+      # TODO: Consider renaming page_paths/presource_paths as page/resource_links.
+
+      # TODO: return the resource type (:page/:backed) as well. With that, we could collapse to just resource_links.
+      #   Could return the resource module as well for easy handling of additional callbacks, if needed
+
       @doc """
       Returns a list of links for each of the Talon managed pages.
 
