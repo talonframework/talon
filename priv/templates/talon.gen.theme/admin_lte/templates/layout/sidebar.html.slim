@@ -7,6 +7,9 @@ aside.main-sidebar
       li.header.text-uppercase Resources
       = for path <- @talon_resource.resource_paths(@conn.assigns.talon) do
         = render "nav_resource_link.html", conn: @conn, resource_path: path
-      li.header.text-uppercase Actions
-      = for action_path <- @talon_resource.nav_action_links(Phoenix.Controller.action_name(@conn), @conn.assigns[:resource]) do
-        = render "nav_action_link.html", conn: @conn, action_path: action_path
+      / TODO: put this in the view
+      - nav_action_links = @talon_resource.nav_action_links(Phoenix.Controller.action_name(@conn), @conn.assigns[:resource])
+      = if List.first(nav_action_links || []) do
+        li.header.text-uppercase Actions
+        = for action_path <- nav_action_links do
+          = render "nav_action_link.html", conn: @conn, action_path: action_path
