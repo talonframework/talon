@@ -25,13 +25,11 @@ html lang="en"
           .navbar-custom-menu
             ul.nav.navbar-nav
               li.dropdown.messages-menu
-      / TODO: talon_resource should be available from LayoutView via use Talon.View
-      - resource = Talon.View.talon_resource(@conn)
-      = render "sidebar.html", conn: @conn, resource: resource
+      = render "sidebar.html", conn: @conn
       .content-wrapper style="min-height: 916px;"
         / TODO: Move this to a partial
         section.content-header#title_bar style="padding-left: 30px;"
-          h1#page_title = resource.index_card_title()
+          h1#page_title = index_card_title(@conn)
           ol.breadcrumb
             li
               a href="/talon"
