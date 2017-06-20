@@ -6,7 +6,6 @@ defmodule Talon.View do
   """
 
   alias Talon.Schema
-  require Talon.Config, as: Config
 
   defmacro __using__(_) do
     quote do
@@ -49,7 +48,6 @@ defmodule Talon.View do
   end
 
   def view_module(conn, view) do
-    theme_module = Talon.View.theme_module(conn)
     Module.concat [
       Talon.Concern.concern(conn),
       Talon.View.theme_module(conn),

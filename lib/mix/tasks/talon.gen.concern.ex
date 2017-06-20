@@ -20,7 +20,7 @@ defmodule Mix.Tasks.Talon.Gen.Concern do
   # complete list of supported options
   @switches [
     root_path: :string, proj_struct: :string, path_prefix: :string,
-    theme_name: :string
+    target_theme: :string, theme_name: :string, theme: :string
   ] ++ Enum.map(@boolean_options, &({&1, :boolean}))
 
 
@@ -87,7 +87,7 @@ defmodule Mix.Tasks.Talon.Gen.Concern do
     web_module = web_module config.web_namespace
     layout = Module.concat([config.base, config.concern, config.theme_module,
       web_module, LayoutView])
-    layout = ~s/{#{layout}, "app.html"}/
+    layout = ~s/{#{inspect layout}, "app.html"}/
     binding = Kernel.binding() ++ [base: config.base, concern: config.concern,
       boilerplate: config[:boilerplate], web_namespace: config.web_namespace,
       layout: layout, web_module: web_module]
@@ -148,7 +148,7 @@ defmodule Mix.Tasks.Talon.Gen.Concern do
     app_path_name = app |> to_string |> Inflex.underscore
     root_path = opts[:root_path] || Path.join(["lib", app_path_name, default_root_path()])
 
-    theme_name = opts[:theme_name] || default_theme()
+    theme_name = opts[:target_theme] || opts[:theme_name] || opts[:theme] || default_theme()
     theme_module = Inflex.camelize theme_name
 
     %{
