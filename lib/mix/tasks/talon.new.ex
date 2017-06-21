@@ -142,7 +142,6 @@ defmodule Mix.Tasks.Talon.New do
       boilerplate: config.boilerplate, concern: to_s(config.concern)]
     target_path = Path.join config.root_path, concern_path
     unless config.dry_run do
-      # File.mkdir_p! target_path
       copy_from paths(),
         "priv/templates/talon.new/web", target_path, binding, [
           {:eex, "talon_concern.ex", fname},
@@ -181,7 +180,6 @@ defmodule Mix.Tasks.Talon.New do
         path_prefix: config.path_prefix]
     target_path = Path.join config.root_path, config.path_prefix
     unless config.dry_run do
-      # File.mkdir_p! target_path
       copy_from paths(),
         "priv/templates/talon.new/web", target_path, binding, [
           {:eex, fname, "web.ex"},
@@ -196,7 +194,6 @@ defmodule Mix.Tasks.Talon.New do
       [base: config.base, web_namespace: config.web_namespace]
     target_path = Path.join config.root_path, config.path_prefix
     unless config.dry_run do
-      # File.mkdir_p! target_path
       copy_from paths(),
         "priv/templates/talon.new/web", target_path, binding, [
           {:eex, fname, "messages.ex"},
@@ -300,10 +297,6 @@ defmodule Mix.Tasks.Talon.New do
 
     proj_struct = to_atom(opts[:proj_struct] || detect_project_structure())
 
-    # view_opts =
-    #   %{target_name: target_name, base: base, concern: concern}
-    #   |> view_opts(proj_struct)
-
     app = opts[:app_name] || Mix.Project.config |> Keyword.fetch!(:app)
     app_path_name = app |> to_string |> Inflex.underscore
     root_path = opts[:root_path] || Path.join(["lib", app_path_name, default_root_path()])
@@ -322,7 +315,6 @@ defmodule Mix.Tasks.Talon.New do
         verbose: bin_opts[:verbose],
         dry_run: bin_opts[:dry_run],
         package_path: get_package_path(),
-        # view_opts: view_opts,
         app: app,
         app_path_name: app_path_name,
         project_structure: proj_struct,
@@ -331,7 +323,6 @@ defmodule Mix.Tasks.Talon.New do
         boilerplate: bin_opts[:boilerplate] || Application.get_env(:talon, :boilerplate, true),
         base: bin_opts[:module] || binding[:base],
       })
-    # |> IO.inspect(label: "new config")
   end
 
   defp to_atom(atom) when is_atom(atom), do: atom
@@ -364,10 +355,6 @@ defmodule Mix.Tasks.Talon.New do
     bin_opts = Enum.filter(opts, fn {k,_v} -> k in @all_boolean_options end)
     {bin_opts, opts -- bin_opts, parsed}
   end
-
-  # defp lib_path do
-  #   Path.join("lib", to_string(Mix.Phoenix.otp_app()))
-  # end
 
   defp paths do
     [".", :talon]
