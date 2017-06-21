@@ -5,11 +5,12 @@ defmodule Mix.Tasks.Talon.Gen.Components do
       mix talon.gen.components theme
 
   This is a supporting mix task that is used by the talon.gen.theme task.
-  It is the foundation for an optional component installer. However, we
-  don't have any optional components at this time.
+  It is the foundation for an optional component installer.
 
   ## Options
 
+  * --root-path=lib/my_app/talon -- set talon's root path
+  * --path-prefix="" -- set talon's path prefix
   * --dry-run -- print what will be done, but don't create any files
   * --verbose -- Print extra information
   """

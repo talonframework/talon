@@ -5,7 +5,7 @@ defmodule Mix.Tasks.Talon.Gen.Resource do
   Creates the resource files needed to manage a schema with Talon.
 
       mix talon.gen.resource User
-      mix talon.gen.resource FrontEnd Blogs.Blog
+      mix talon.gen.resource Blogs.Blog --concern=FrontEnd --target-theme=front-end
 
   Two arguments can be passed to the task. The first is an optional
   Talon concern. The second argument is a schema to be managed with
@@ -21,7 +21,8 @@ defmodule Mix.Tasks.Talon.Gen.Resource do
 
   ## Options
 
-  * --theme=custom_theme -- create the layout file for a custom theme
+  * --target-theme=custom_theme -- create the layout file for a custom theme
+  * --concern=Admin -- set the concern module
   * --all-themes -- create the layout for all configured themes
   * --no-boilerplate -- don't include the boilerplate comments
   * --dry-run -- print what will be done, but don't create any files
@@ -38,7 +39,8 @@ defmodule Mix.Tasks.Talon.Gen.Resource do
   # complete list of supported options
   @switches [
     theme_name: :string, concern: :string, module: :string,
-    root_path: :string, path_prefix: :string, theme: :string
+    root_path: :string, path_prefix: :string, theme: :string,
+    target_theme: :string
   ] ++ Enum.map(@boolean_options, &({&1, :boolean}))
 
 

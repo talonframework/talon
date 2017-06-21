@@ -64,9 +64,6 @@ defmodule Talon.Concern do
 
       @__view_path_names__ for {plural, _} <- @__resource_map__, into: %{}, do: {plural, Inflex.singularize(plural)}
 
-      # @__resource_to_talon__ for resource <- @__resources__, do: {resource.schema(), resource}
-
-      # @__base__ Module.split(__MODULE__) |> hd |> Module.concat(nil)
       @__base__ Config.module()
 
       @__repo__ unquote(repo) || Config.repo(__MODULE__)
@@ -327,6 +324,7 @@ defmodule Talon.Concern do
     Config.web_namespace()
   end
 
+  @spec web_namespace(Plug.Conn.t) :: String.t | nil
   def web_namespace(conn) do
     conn.assigns.talon.web_namespace
   end
@@ -340,6 +338,7 @@ defmodule Talon.Concern do
     end
   end
 
+  @spec concern(Plug.Conn.t) :: Module.t
   def concern(conn) do
     conn.assigns.talon.talon
   end
@@ -359,7 +358,7 @@ defmodule Talon.Concern do
     end)
   end
 
-
+  @spec resource_path(Plug.Conn.t, atom | Module.t | Struct.t, List.t | atom, List.t) :: String.t
   def resource_path(conn, action_or_resource, opts_or_action, opts \\ [])
   def resource_path(conn, action, opts, _) when is_atom(action) do
     concern(conn).resource_path(conn.assigns.resource, action, opts)

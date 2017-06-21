@@ -59,10 +59,8 @@ defmodule Mix.Tasks.Compile.Talon do
             if Mix.Talon.compiler_opts()[:verbose_compile] do
               IO.puts "compiling global template for #{resource_name} #{action}"
             end
-            # base_path = Path.join([Talon.Concern.web_path(), "templates", "talon",
-            #   concern_path, theme])
-            # IO.inspect base_path, label: "base_path 2"
-            templ = EEx.eval_file(Path.join([base_path, "generators", "#{action}.html.eex"]), assigns: [talon_resource: talon_resource])
+            templ = EEx.eval_file(Path.join([base_path, "generators", "#{action}.html.eex"]),
+              assigns: [talon_resource: talon_resource])
             File.mkdir_p(Path.join(base_path, resource_name))
             Path.join([base_path, resource_name, "#{action}.html.slim"])
             |> File.write(templ)

@@ -2,7 +2,7 @@ defmodule Mix.Tasks.Talon.Gen.Theme do
   @moduledoc """
   Install a new Talon theme into your project.
 
-      mix talon.gen.theme theme target_namees
+      mix talon.gen.theme --theme=admin-lte --target-theme=my-theme
 
   The target theme will contain:
 
@@ -26,12 +26,12 @@ defmodule Mix.Tasks.Talon.Gen.Theme do
   if a second theme is included in the Talon package
 
       # assuming talon comes with the admin_topnav theme
-      mix talon.gen.theme admin_topnav admin_topnav
+      mix talon.gen.theme --theme=admin_topnav
 
   Lastly, it can be used to create a theme template to assist in building
   your own custom theme.
 
-      mix talon.gen.theme admin-lte my_theme
+      mix talon.gen.theme --target-theme=my_theme
 
   ## Project Structure Support
 
@@ -49,6 +49,7 @@ defmodule Mix.Tasks.Talon.Gen.Theme do
   * --concern=(Admin) -- set the concern module name
   * --root-path=(lib/my_app/talon) - the path where talon files are stored
   * --path_prefix=("") -- the path prefix for `controllers`, `templates`, `views`
+  * --target-theme=theme-name
 
   ### Boolean Options
 
@@ -69,7 +70,7 @@ defmodule Mix.Tasks.Talon.Gen.Theme do
   To disable a default boolean option, use the `--no-option` syntax. For example,
   to disable brunch:
 
-      mix talon.gen.theme admin-lte my_theme --no-brunch
+      mix talon.gen.theme --target-theme=my_theme --no-brunch
   """
   use Mix.Task
 

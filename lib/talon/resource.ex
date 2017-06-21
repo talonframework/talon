@@ -263,7 +263,6 @@ defmodule Talon.Resource do
       :title
   """
   @spec name_field(Struct.t | Module.t) :: atom
-
   def name_field(schema) when is_map(schema) do
     name_field schema.__struct__
   end

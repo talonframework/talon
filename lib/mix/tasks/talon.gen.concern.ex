@@ -6,6 +6,10 @@ defmodule Mix.Tasks.Talon.Gen.Concern do
 
   ## Options
 
+  * --root-path=lib/my_app/talon -- set talon's root path
+  * --path-prefix="" -- set talon's path prefix
+  * --target-theme=admin-lte -- the target theme name
+  * --theme-name=admin-lte - the theme name
   * --dry-run -- print what will be done, but don't create any files
   * --verbose -- Print extra information
   """

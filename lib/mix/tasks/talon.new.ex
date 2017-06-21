@@ -4,8 +4,6 @@ defmodule Mix.Tasks.Talon.New do
 
       mix talon.install
 
-
-
   ## Project Structure Support
 
   Both legacy projects created with `mix phoenix.new` and the new project
