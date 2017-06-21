@@ -1,0 +1,13 @@
+aside.main-sidebar
+  section.sidebar style="height: auto;"
+    ul.sidebar-menu
+      li.header= dgettext "talon", "Resources"
+      / TODO: Dont' think we need this if check anymore. Remove
+      = if @talon_resource do
+        = for resource_path <- resource_paths(@conn) do
+          = render "nav_resource_link.html", conn: @conn, resource_path: resource_path
+      li.header= dgettext "talon", "Actions"
+      / TODO: Dont' think we need this if check anymore. Remove
+      = if @talon_resource do
+        = for action_path <- nav_action_links(@conn) do
+          = render "nav_action_link.html", conn: @conn, action_path: action_path

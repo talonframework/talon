@@ -10,11 +10,11 @@ use Mix.Config
 
 # You can configure for your application as:
 #
-#     config :talon, key: :value
+#     config :my_app, key: :value
 #
 # And access this configuration in your application as:
 #
-#     Application.get_env(:talon, :key)
+#     Application.get_env(:my_app, :talon, :key)
 #
 # Or configure a 3rd-party app:
 #

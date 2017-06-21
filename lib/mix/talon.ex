@@ -6,13 +6,34 @@ defmodule Mix.Talon do
   @doc """
   Get the configured themes.
 
-  Defaults to the "admin_lte" default them if not configured.
+  Defaults to the "admin-lte" default theme if not configured.
   """
 
+  @default_theme "admin-lte"
+  @default_concern "Admin"
+  @default_root_path "talon"
+  @default_path_prefix ""
 
   @spec themes() :: String.t
   def themes do
-    Application.get_env :talon, :themes, ["admin_lte"]
+    otp_app()
+    |> Application.get_env(:talon, [])
+    |> Keyword.get(:themes, [])
+  end
+
+  @spec concerns() :: List.t
+  def concerns do
+    otp_app()
+    |> Application.get_env(:talon, [])
+    |> Keyword.get(:concerns, [])
+  end
+
+  @doc """
+  Returns the otp app from the Mix project configuration.
+  """
+  @spec otp_app() :: atom
+  def otp_app do
+    Mix.Project.config |> Keyword.fetch!(:app)
   end
 
   @doc """
@@ -115,11 +136,7 @@ defmodule Mix.Talon do
     end
   end
 
-  # def source_path(apps, source_dir) do
-  #   roots = Enum.map(apps, &to_app_source(&1, source_dir))
-  #   # source =
-  # end
-
+  @spec to_app_source(String.t | atom, String.t) :: String.t
   defp to_app_source(path, source_dir) when is_binary(path),
     do: Path.join(path, source_dir)
   defp to_app_source(app, source_dir) when is_atom(app),
@@ -173,9 +190,11 @@ defmodule Mix.Talon do
     |> Map.put(:vendor_parent, vendor_parent(proj_struct))
   end
 
+  @spec images_path(atom) :: String.t
   defp images_path(:phx), do: Path.join(~w(assets static images))
   defp images_path(_), do: Path.join(~w(web static assets images))
 
+  @spec vendor_parent(atom) :: String.t
   defp vendor_parent(:phx), do: "assets"
   defp vendor_parent(_), do: Path.join(~w(web static))
 
@@ -218,17 +237,17 @@ defmodule Mix.Talon do
 
   ## Examples
 
-      iex> Talon.Mix.view_opts("admin_lte", :phx)
-      ~s(, theme: "admin_lte", module: AdminLte.Web)
-      iex> Talon.Mix.view_opts("admin_lte", :phoenix)
-      ~s(, theme: "admin_lte", module: AdminLte)
+      iex> Talon.Mix.view_opts("admin-lte", :phx)
+      ~s(, theme: "admin-lte", module: AdminLte.Web)
+      iex> Talon.Mix.view_opts("admin-lte", :phoenix)
+      ~s(, theme: "admin-lte", module: AdminLte)
   """
-  @spec view_opts(String.t, atom) :: String.t
-  def view_opts(theme, proj_struct) do
-    name = theme_module_name(theme)
-    module =
-      if proj_struct == :phx, do: Module.concat(name, Web) |> inspect, else: name
-    ~s(, theme: "#{theme}", module: #{module})
+  @spec view_opts(String.t | Struct.t, atom) :: String.t
+  def view_opts(%{} = config, proj_struct) do
+    name = Module.concat([config.base, config.concern, theme_module_name(config.target_name)])
+    prefix = if proj_struct == :phx, do: Web, else: nil
+    module = Module.concat(name, prefix) |> inspect
+    ~s(, theme: "#{config.concern_path}/#{config.target_name}", module: #{module})
   end
 
   @doc """
@@ -244,13 +263,89 @@ defmodule Mix.Talon do
   def web_namespace(:phx), do: "Web."
   def web_namespace(:phoenix), do: ""
 
+  @spec web_module(String.t | nil) :: String.t
+  def web_module("Web."), do: "Web"
+  def web_module(_), do: ""
+
   @spec brunch_path(:phx | :phoenix) :: String.t
   def brunch_path(:phx), do: Path.join(~w(assets brunch-config.js))
   def brunch_path(:phoenix), do: "brunch-config.js"
 
+  @doc """
+  Get the path to common templates.
+  """
+  @spec common_absolute_path(atom) :: String.t
   def common_absolute_path(app) do
     to_app_source app, Path.join(["priv", "templates", "common"])
   end
+
+  @doc """
+  Get the path name of a concern.
+  """
+  @spec concern_path(Map.t | String.t) :: String.t
+  def concern_path(%{concern: concern}) when is_atom(concern) do
+    concern_path concern
+  end
+
+  def concern_path(%{concern: concern}) when is_binary(concern) do
+    concern_path concern
+  end
+
+  def concern_path(concern) when is_binary(concern) do
+    concern
+    |> String.split(".")
+    |> List.last
+    |> Inflex.underscore
+  end
+
+  def concern_path(concern) when is_atom(concern) do
+    concern
+    |> Module.split
+    |> List.last
+    |> concern_path
+  end
+
+  @doc """
+  Get root_path and path_prefix for a concern.
+  """
+  @spec root_and_prefix_path(Module.t) :: tuple
+  def root_and_prefix_path(concern) do
+    concern_config =
+      otp_app()
+      |> Application.get_env(concern)
+    {Keyword.get(concern_config, :root_path), Keyword.get(concern_config, :path_prefix, "")}
+  end
+
+
+  @doc """
+  Get configured compiler options.
+  """
+  @spec compiler_opts() :: List.t
+  def compiler_opts do
+    otp_app()
+    |> Application.get_env(:talon, [])
+    |> Keyword.get(:compiler_opts, [])
+  end
+
+  @doc """
+  Convert module name to string.
+  """
+  @spec to_s(String.t | Module.t) :: String.t
+  def to_s(module) when is_binary(module), do: module
+  def to_s(module), do: inspect(module)
+
+  def default_concern, do: @default_concern
+  def default_root_path, do: @default_root_path
+  def default_path_prefix, do: @default_path_prefix
+  def default_theme, do: @default_theme
+
+  def process_concern_theme(opts) do
+    # IO.inspect opts, label: "opts...."
+    concern = Keyword.get(opts, :concern, default_concern())
+    theme = opts[:theme] || opts[:theme_name] || default_theme()
+    {concern, theme}
+  end
+
 end
 
 

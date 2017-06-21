@@ -1,10 +1,11 @@
-defmodule <%= base %>.Talon.<%= scoped_resource %> do
+<% import Mix.Talon, only: [to_s: 1] %>
+defmodule <%= to_s base %>.<%= to_s concern %>.<%= to_s scoped_resource %> do
   @moduledoc """
-  Use this file to configure how Talon renders your resource.
+  Use this file to configure how Talon renders your resource
 
   TBD
   """
-  use Talon.Resource, schema: <%= "#{base}.#{scoped_resource}" %>, context: <%= "#{base}.Talon" %>
+  use Talon.Resource, schema: <%= "#{to_s base}.#{to_s scoped_resource}" %>, concern: <%= "#{to_s base}.#{to_s concern}" %>
   <%= if boilerplate do %>
   # The above is all that is required to use Talon with defaults
   # If you would like to customize some of the features, wee the

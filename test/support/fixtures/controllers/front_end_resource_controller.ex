@@ -1,6 +1,6 @@
-defmodule TestTalon.TalonResourceController do
+defmodule TestTalon.FrontEndResourceController do
   use TestTalon.Web, :controller
-  use Talon.Controller, repo: TestTalon.Repo, concern: TestTalon.Talon
+  use Talon.Controller, repo: TestTalon.Repo, concern: TestTalon.FrontEnd
 
   plug Talon.Plug.LoadConcern
   plug Talon.Plug.LoadResource

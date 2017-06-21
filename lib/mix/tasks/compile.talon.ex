@@ -14,6 +14,10 @@ defmodule Mix.Tasks.Compile.Talon do
   @recursive true
 
   def run(_args) do
+    {:ok, _} = Application.ensure_all_started(:talon)
+    if Mix.Talon.compiler_opts()[:verbose_compile] do
+      IO.puts "Compiling Talon generators"
+    end
     case touch() do
       [] -> :noop
       _ -> :ok
@@ -22,36 +26,41 @@ defmodule Mix.Tasks.Compile.Talon do
 
   def touch() do
     Mix.Talon.themes()
-    |> compile_templates
+    |> Enum.reduce(:ok, fn theme, acc ->
+      Enum.reduce Mix.Talon.concerns(), acc, fn concern, _acc ->
+        compile_templates concern, theme
+      end
+    end)
     |> case do
       [] -> :noop
       _ -> :ok
     end
   end
 
-  defp templates_path(theme) do
-    Path.join([Mix.Talon.web_path(), "templates", "talon", theme])
+  defp templates_path(concern, theme) do
+    concern_path = Mix.Talon.concern_path(concern)
+    {root_path, path_prefix} = Mix.Talon.root_and_prefix_path(concern)
+    Path.join([root_path, "templates", path_prefix, concern_path, theme])
   end
 
-  defp compile_templates(theme) do
+  defp compile_templates(concern, theme) do
     try do
-      base = Application.get_env :talon, :module
-      base_path = templates_path(theme)
+      base = Mix.Phoenix.base()
+      base_path = templates_path(concern, theme)
       unless base, do: Mix.raise(":module configuration required")
 
-      mod = Module.concat base, Talon
-      Code.ensure_compiled mod
-      # TODO: need to replace Talon namespace here
-      for {resource_name, talon_resource} <- mod.resource_map() do
-        resource_name = mod.template_path_name resource_name
+      Code.ensure_compiled concern
+
+      for {resource_name, talon_resource} <- concern.resource_map() do
+        resource_name = concern.template_path_name resource_name
 
         for action <- [:index, :edit, :form, :new, :show] do
-          unless compile_custom_template(action, resource_name, talon_resource, theme) do
-            if Application.get_env :talon, :verbose_compile do
-              IO.puts "compiling global emplate for #{resource_name} #{action}"
+          unless compile_custom_template(action, resource_name, talon_resource, concern, theme) do
+            if Mix.Talon.compiler_opts()[:verbose_compile] do
+              IO.puts "compiling global template for #{resource_name} #{action}"
             end
-            base_path = Path.join([Talon.web_path(), "templates", "talon", theme])
-            templ = EEx.eval_file(Path.join([base_path, "generators", "#{action}.html.eex"]), assigns: [talon_resource: talon_resource])
+            templ = EEx.eval_file(Path.join([base_path, "generators", "#{action}.html.eex"]),
+              assigns: [talon_resource: talon_resource])
             File.mkdir_p(Path.join(base_path, resource_name))
             Path.join([base_path, resource_name, "#{action}.html.slim"])
             |> File.write(templ)
@@ -64,13 +73,13 @@ defmodule Mix.Tasks.Compile.Talon do
     end
   end
 
-  defp compile_custom_template(action, resource_name, talon_resource, theme) do
+  defp compile_custom_template(action, resource_name, talon_resource, concern, theme) do
     try do
-      base_path = templates_path(theme)
+      base_path = templates_path(concern, theme)
       path = Path.join([base_path, resource_name, "generators"])
       template = Path.join path, "#{action}.html.eex"
       if File.exists? template do
-        if Application.get_env :talon, :verbose_compile do
+        if Mix.Talon.compiler_opts()[:verbose_compile] do
           IO.puts "compiling override template for #{resource_name} #{action}"
         end
         templ = EEx.eval_file(template, assigns: [talon_resource: talon_resource])

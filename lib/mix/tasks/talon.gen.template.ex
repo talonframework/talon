@@ -37,7 +37,7 @@ defmodule Mix.Tasks.Talon.Gen.Template do
 
   import Mix.Talon
 
-  @default_theme "admin_lte"
+  @default_theme "admin-lte"
   @valid_actions ~w(form index show new edit)
 
   # list all supported boolean options
