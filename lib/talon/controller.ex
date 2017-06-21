@@ -59,7 +59,7 @@ defmodule Talon.Controller do
         params_key = Talon.View.params_key(conn)
         repo = Talon.View.repo(conn)
         changeset = conn.assigns.talon.schema.changeset(conn.assigns.resource, params[params_key])
-        case repo.insert(changeset) do
+        case repo.update(changeset) do
           {:ok, resource} ->
             redirect conn, to: Talon.Concern.resource_path(conn, resource, :show)
           {:error, changeset} ->

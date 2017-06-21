@@ -100,7 +100,8 @@ defmodule Talon.View do
       end
     {Talon.Utils.titleize(to_string field), format_data(value)}
   end
-  defp get_resource_field(_, _, resource, _, name) do
+
+  defp get_resource_field(_, _, _resource, _, name) do
     {Talon.Utils.titleize(to_string name), "unknown type"}
   end
 
