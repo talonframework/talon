@@ -66,6 +66,8 @@ defmodule Talon.View do
   * Use the Schema's `display_name/1` if defined
   * Use the schema's `:name` field if it exists
   * Otherwise, return "No Display Name"
+
+  TODO: Need to use overridable decorators to resolve value types
   """
   @spec get_resource_field(Struct.t, atom) :: {String.t, any}
   def get_resource_field(resource, name) do
@@ -78,7 +80,7 @@ defmodule Talon.View do
   end
 
   defp get_resource_field(nil, _, resource, _, name) do
-    {Talon.Utils.titleize(to_string name), Map.get(resource, name)}
+    {Talon.Utils.titleize(to_string name), format_data(Map.get(resource, name))}
   end
 
   defp get_resource_field(%{field: field, related: related}, _, resource, _, _name) do
@@ -96,7 +98,10 @@ defmodule Talon.View do
       else
         "Not Loaded"
       end
-    {Talon.Utils.titleize(to_string field), value}
+    {Talon.Utils.titleize(to_string field), format_data(value)}
+  end
+  defp get_resource_field(_, _, resource, _, name) do
+    {Talon.Utils.titleize(to_string name), "unknown type"}
   end
 
   @doc """
@@ -147,4 +152,10 @@ defmodule Talon.View do
   def association_loaded?(%Ecto.Association.NotLoaded{}), do: false
   def association_loaded?(%{}), do: true
   def association_loaded?(_), do: false
+
+  # TODO: this is only temporary. Need to use orverridable decorator concept here
+  def format_data(data) when is_binary(data), do: data
+  def format_data(data) when is_number(data), do: data
+  def format_data(data), do: inspect(data)
+
 end

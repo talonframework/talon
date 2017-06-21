@@ -271,9 +271,10 @@ defmodule Talon.Resource do
     if types[:name] == :string do
       :name
     else
-      Enum.find(types, &(elem(&1, 1) == :string))
-      |> case do
-        nil -> hd(types) |> elem(0)
+      types = Enum.find(types, &(elem(&1, 1) == :string))
+      case types do
+        nil ->
+          schema.__schema__(:primary_key)
         {field, _} -> field
       end
     end
