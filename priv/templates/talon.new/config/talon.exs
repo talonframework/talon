@@ -2,7 +2,6 @@ use Mix.Config
 
 config :<%= config.app %>, :talon,
   module: <%= config.base %>,
-  messages_backend: <%= config.base %>.<%= config.web_namespace %>Gettext,
   themes: ["<%= theme %>"],
   concerns: [<%= config.base %>.<%= config.concern %>],
   <%= if config.web_namespace == "" do %>

@@ -3,6 +3,6 @@
     .col-md-12
       = if @changeset.action do
         .alert.alert-danger
-          p Oops, something went wrong! Please check the errors below.
+          p= dgettext "talon", "Oops, something went wrong! Please check the errors below."
       .box.box-info
         = render "form.html", changeset: @changeset, resource: @resource, action: Talon.Concern.resource_path(@conn, @resource, :update), talon: @conn.assigns[:talon] || %{}

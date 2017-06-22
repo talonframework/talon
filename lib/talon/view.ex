@@ -89,7 +89,7 @@ defmodule Talon.View do
       if association_loaded? assoc_resource do
         concern.display_name(assoc_resource)
       else
-        "Not Loaded"
+        concern.messages_backend().not_loaded()
       end
     {Talon.Utils.titleize(to_string field), format_data(value)}
   end

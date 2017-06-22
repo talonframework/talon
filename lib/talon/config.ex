@@ -7,7 +7,7 @@ defmodule Talon.Config do
 
   @overridable_config [
     theme: nil, endpoint: nil, router: nil, repo: nil, schema_adapter: nil,
-    paginate: true
+    paginate: true, messages_backend: nil
   ]
   # @overridable_keys Keyword.keys(@overridable_config)
 

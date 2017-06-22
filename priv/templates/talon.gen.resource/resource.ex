@@ -5,6 +5,7 @@ defmodule <%= to_s base %>.<%= to_s concern %>.<%= to_s scoped_resource %> do
 
   TBD
   """
+  use <%= base %>.Talon.Web, which: :resource
   use Talon.Resource, schema: <%= "#{to_s base}.#{to_s scoped_resource}" %>, concern: <%= "#{to_s base}.#{to_s concern}" %>
   <%= if boilerplate do %>
   # The above is all that is required to use Talon with defaults
