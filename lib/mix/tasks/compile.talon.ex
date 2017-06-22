@@ -43,10 +43,18 @@ defmodule Mix.Tasks.Compile.Talon do
     Path.join([root_path, "templates", path_prefix, concern_path, theme])
   end
 
+  defp views_path(concern, theme) do
+    concern_path = Mix.Talon.concern_path(concern)
+    {root_path, path_prefix} = Mix.Talon.root_and_prefix_path(concern)
+    Path.join([root_path, "views", path_prefix, concern_path, theme])
+  end
+
   defp compile_templates(concern, theme) do
     try do
       base = Mix.Phoenix.base()
       base_path = templates_path(concern, theme)
+      views_path = views_path(concern, theme)
+
       unless base, do: Mix.raise(":module configuration required")
 
       Code.ensure_compiled concern
@@ -66,7 +74,7 @@ defmodule Mix.Tasks.Compile.Talon do
             |> File.write(templ)
           end
         end
-        File.touch! Path.join(base_path, "#{resource_name}_view.ex")
+        File.touch! Path.join(views_path, "#{resource_name}_view.ex")
       end
     rescue
       _ -> []
