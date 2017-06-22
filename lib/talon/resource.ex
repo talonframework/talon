@@ -97,7 +97,7 @@ defmodule Talon.Resource do
       """
       @spec get_schema_field(:index | :show | :form, Struct.t, String.t) :: atom
       def get_schema_field(_action, resource, name) do
-        Talon.View.get_resource_field(resource, name)
+        Talon.View.get_resource_field(@__concern__, resource, name)
       end
 
       @spec index_card_title() :: String.t

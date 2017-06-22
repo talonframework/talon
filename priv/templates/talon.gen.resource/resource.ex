@@ -43,5 +43,12 @@ defmodule <%= to_s base %>.<%= to_s concern %>.<%= to_s scoped_resource %> do
   #   # handle redering for the remaining fields
   #   super(page, field)
   # end
+  #
+  # @doc """
+  # Define how to display an association's name
+  # """
+  # def display_name(resource) do
+  #  resource.field_name
+  # end
   <% end %>
 end
