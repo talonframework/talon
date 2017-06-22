@@ -50,7 +50,7 @@ defmodule TestTalon.Talon.Web do
     # end
   end
 
-  def view(opts) do
+  def view(_opts) do
     # quote do
     #   use Talon.View
 
@@ -70,7 +70,7 @@ defmodule TestTalon.Talon.Web do
     # end
   end
 
-  def component_view(opts) do
+  def component_view(_opts) do
     # quote do
     #   use Talon.View
 

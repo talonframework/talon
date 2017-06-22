@@ -8,4 +8,5 @@ config :<%= config.app %>, <%= config.base %>.<%= config.concern %>,
   router: <%= config.base %>.Web.Router,
   endpoint: <%= config.base %>.Web.Endpoint,
   schema_adapter: Talon.Schema.Adapters.Ecto,
-  messages_backend: <% config.base %>.Talon.Messages
+  messages_backend: <%= config.base %>.Talon.Messages
+
