@@ -29,7 +29,7 @@ config :talon, TestTalon.Admin,
   root_path: "test/support/fixtures/talon",
   path_prefix: "",
   theme: "admin-lte",
-  schema_adapter: Talon.Schema.Adapters.Ecto
+  messages_backend: TestTalon.Talon.Messages
 
 config :talon, TestTalon.FrontEnd,
   resources: [
@@ -43,7 +43,7 @@ config :talon, TestTalon.FrontEnd,
   theme: "theme2",
   root_path: "test/support/fixtures/talon",
   path_prefix: "",
-  schema_adapter: Talon.Schema.Adapters.Ecto
+  messages_backend: TestTalon.Talon.Messages
 
 config :talon, :talon,
   module: TestTalon,

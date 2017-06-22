@@ -15,9 +15,11 @@ defmodule Talon.Resource do
       require Talon.Config, as: Config
 
       opts = unquote(opts)
-      @__concern__ opts[:concern]
 
-      @__module__ opts[:schema]
+      @__concern__   opts[:concern]
+      @__domain__    opts[:domain] || "talon"
+      @__module__    opts[:schema]
+
       unless @__module__ do
         raise ":schema is required"
       end
@@ -31,8 +33,6 @@ defmodule Talon.Resource do
       @__paginate__ opts[:paginate] || Config.paginate(__MODULE__) || true
       @__params_key__  Module.split(@__module__) |> List.last |> to_string |> Inflex.underscore
       @__route_name__ @__params_key__ |> Inflex.Pluralize.pluralize
-
-      require Ecto.Query
 
       @doc """
       Return the schema columns for rending on all pages.
@@ -103,7 +103,8 @@ defmodule Talon.Resource do
       @spec index_card_title() :: String.t
       def index_card_title do
         # TODO: find a resuable approach here
-        Inflex.Pluralize.pluralize "#{Module.split(@__module__) |> List.last}"
+        title = Inflex.Pluralize.pluralize("#{Module.split(@__module__) |> List.last}")
+        dgettext @__domain__, "%{title}", title: title
       end
 
       @spec form_card_title(String.t) :: String.t
@@ -111,12 +112,15 @@ defmodule Talon.Resource do
         name =
           resource
           |> Map.get(Talon.Resource.name_field(resource.__struct__))
-        "#{Module.split(@__module__) |> List.last} #{name}"
+
+        dgettext @__domain__, "%{mod} %{name}",
+          mod: Module.split(@__module__) |> List.last,
+          name: name
       end
 
       @spec tool_bar() :: String.t
       def tool_bar do
-        "Listing of #{index_card_title()}"
+        dgettext(@__domain__, "Listing of ") <> index_card_title()
       end
 
       @spec route_name() :: String.t
@@ -227,11 +231,11 @@ defmodule Talon.Resource do
       end
 
       def display_name do
-        Talon.Utils.titleize(@__module__)
+        dgettext @__domain__, "%{name}", name: Talon.Utils.titleize(@__module__)
       end
 
       def display_name_plural do
-        Inflex.Pluralize.pluralize display_name()
+        dgettext @__domain__, "%{name}", name: Inflex.Pluralize.pluralize(display_name())
       end
 
       defoverridable [
