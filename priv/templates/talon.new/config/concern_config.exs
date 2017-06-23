@@ -1,6 +1,8 @@
 config :<%= config.app %>, <%= config.base %>.<%= config.concern %>,
   resources: [
   ],
+  pages: [
+  ],
   theme: "<%= theme %>",
   root_path: "<%= config.root_path %>",
   path_prefix: "<%= config.path_prefix %>",

@@ -1,5 +1,4 @@
 defmodule Talon.Plug.Theme do
-
   import Plug.Conn
 
   @behaviour Plug
@@ -12,5 +11,4 @@ defmodule Talon.Plug.Theme do
     talon = conn.assigns[:talon]
     assign conn, :talon, Map.put(talon, :theme, opts[:theme] || talon.concern.theme())
   end
-
 end

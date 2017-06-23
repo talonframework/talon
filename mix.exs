@@ -8,16 +8,16 @@ defmodule Talon.Mixfile do
      elixirc_paths: elixirc_paths(Mix.env),
      build_embedded: Mix.env == :prod,
      start_permanent: Mix.env == :prod,
-     # compilers: compilers(Mix.env),
+     compilers: compilers(Mix.env),
      deps: deps()]
   end
 
-  # defp compilers(:test), do: [:talon, :phoenix, :gettext] ++ Mix.compilers
-  # defp compilers(_), do: []
+  defp compilers(:test), do: [:phoenix] ++ Mix.compilers
+  defp compilers(_), do: nil
 
   def application do
-    [extra_applications: [:logger],
-     mod: {Talon.Application, [:inflex]}]
+    [mod: {Talon.Application, [:inflex]},
+     extra_applications: [:logger]]
   end
 
   defp elixirc_paths(:test), do: ["lib", "test/support"]
@@ -33,9 +33,9 @@ defmodule Talon.Mixfile do
       {:postgrex, ">= 0.0.0", only: :test},
       {:phoenix_slime, github: "slime-lang/phoenix_slime"},
       {:ecto_talon, github: "talonframework/ecto_talon"},
+      {:mix_test_watch, "~> 0.3", only: :dev, runtime: false},
       {:gettext, "~> 0.11", only: :test},
       # {:ecto_talon, path: "../ecto_talon", only: :test},
     ]
   end
 end
-

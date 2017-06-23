@@ -1,6 +1,13 @@
-- {name, path} = @resource_path
+elixir:
+  {name, path} = @link
+
+  # TODO: use view helpers (DJS)
+
+  is_dashboard = String.downcase(name) == "dashboard" # TODO: cheating... need to ask the resource module (DJS)
+  i_class = if is_dashboard, do: "fa fa-dashboard", else: "nav-label label label-info"
+  i_content = if is_dashboard, do: "", else: String.first name
+
 li
   = link to: path do
-    i.nav-label.label.label-info
-      = String.first name
+    i class="#{i_class}" "#{i_content}"
     span = name

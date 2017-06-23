@@ -32,7 +32,7 @@ defmodule Talon.Utils do
   # end
 
   # TODO: This needs to be done differently. In needs to be scoped to the
-  #       applicable talon context
+  #       applicable talon concern
 
   def router do
     module = Application.get_env(:talon, :module)

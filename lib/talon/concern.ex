@@ -59,6 +59,11 @@ defmodule Talon.Concern do
 
       @__resources__  Config.resources(__MODULE__)
 
+      @__pages__ Config.pages(__MODULE__)
+
+      @__page_map__ for mod <- @__pages__, into: %{},
+        do: {mod |> Module.split |> List.last |> to_string |> Inflex.underscore, mod}
+
       @__resource_map__  for mod <- @__resources__, into: %{},
         do: {Module.split(mod) |> List.last() |> to_string |> Inflex.underscore |> Inflex.Pluralize.pluralize, mod}
 
@@ -96,6 +101,16 @@ defmodule Talon.Concern do
 
       def resource_names, do: @__resource_map__ |> Map.keys
 
+      def page_map, do: @__page_map__
+
+      def pages, do: @__pages__
+
+      def page_names, do: @__page_map__ |> Map.keys
+
+      def dashboard(), do: List.first pages()
+
+      def dashboard_name(), do: List.first page_names()
+
       def schema(resource_name) do
         try do
           talon_resource(resource_name).schema()
@@ -120,6 +135,11 @@ defmodule Talon.Concern do
       def talon_resource(resource) when is_map(resource) do
         talon_resource(resource.__struct__)
       end
+
+      def talon_page(page_name) when is_binary(page_name) do
+        @__page_map__[page_name]
+      end
+      def talon_page(_), do: dashboard()
 
       def resource_schema(resource_name) when is_binary(resource_name) do
         {String.to_atom(resource_name), talon_resource(resource_name)}
@@ -162,7 +182,7 @@ defmodule Talon.Concern do
       ## Examples
 
           %TestTalon.Talon.Noid{description: "test", company: "Acme"} |>
-          Talon.Context.display_name()
+          Talon.Concern.display_name()
           Acme
       """
       def display_name(schema) do
@@ -227,10 +247,43 @@ defmodule Talon.Concern do
         apply @__router_helpers__, @__resource_path_fn__, args
       end
 
+      @spec concern(Plug.Conn.t) :: Module.t
+      def concern(conn) do
+        conn.assigns.talon.concern
+      end
 
-      def nav_action_links(conn) do
+      @doc """
+      Returns a list of links for each of the Talon managed resources.
+
+      Note: This function is overridable
+      """
+      @spec resource_paths(Plug.Conn.t) :: [Tuple.t]
+      def resource_paths(conn) do
+        concern = concern(conn)
+        concern.resources()
+        |> Enum.map(fn talon_resource ->
+          schema = talon_resource.schema()
+          {Talon.Utils.titleize(schema) |> Inflex.Pluralize.pluralize, concern.resource_path(schema, :index)}
+        end)
+      end
+
+      @doc """
+      Returns a list of links for each of the Talon managed pages.
+
+      Note: This function is overridable
+      """
+      @spec page_paths(Plug.Conn.t) :: [Tuple.t]
+      def page_paths(conn) do  # TODO: use this approach for resource_paths? (DJS)
+        concern = concern(conn)
+        concern_name = concern |> Module.split |> List.last |> to_string |> Inflex.underscore
+        concern.pages |> Enum.map(&{apply(&1, :title, []),
+          "/#{concern_name}/pages/#{apply(&1, :name, [])}"})  # TODO: remove apply? (DJS)
+                                                              # TODO: use Router.Helpers here (SMP)
+      end
+
+      def nav_action_links(conn) do # TODO: move to view (DJS)
         Talon.Concern.nav_action_links(__MODULE__,
-          Phoenix.Controller.action_name(conn), conn.assigns.resource)
+          Phoenix.Controller.action_name(conn), conn.assigns[:resource])
       end
 
       def messages_backend, do: @__messages_backend__
@@ -310,6 +363,22 @@ defmodule Talon.Concern do
     {action, title, path}
   end
 
+
+  @spec concern(Plug.Conn.t) :: Module.t
+  def concern(conn) do
+    conn.assigns.talon.talon
+  end
+
+
+  @spec resource_path(Plug.Conn.t, atom | Module.t | Struct.t, List.t | atom, List.t) :: String.t
+  def resource_path(conn, action_or_resource, opts_or_action, opts \\ [])
+  def resource_path(conn, action, opts, _) when is_atom(action) do
+    concern(conn).resource_path(conn.assigns.resource, action, opts)
+  end
+  def resource_path(conn, resource, action, opts) do
+    concern(conn).resource_path(resource, action, opts)
+  end
+
   @doc """
   Return the app's base module.
 
@@ -340,35 +409,6 @@ defmodule Talon.Concern do
       _ ->
         Path.join(["lib", Inflex.underscore(Config.module()), "web"])
     end
-  end
-
-  @spec concern(Plug.Conn.t) :: Module.t
-  def concern(conn) do
-    conn.assigns.talon.talon
-  end
-
-  @doc """
-  Returns a list of links for each of the Talon managed resources.
-
-  Note: This function is overridable
-  """
-  @spec resource_paths(Plug.Conn.t) :: [Tuple.t]
-  def resource_paths(conn) do
-    concern = concern(conn)
-    concern.resources()
-    |> Enum.map(fn talon_resource ->
-      schema = talon_resource.schema()
-      {Talon.Utils.titleize(schema) |> Inflex.Pluralize.pluralize, concern.resource_path(schema, :index)}
-    end)
-  end
-
-  @spec resource_path(Plug.Conn.t, atom | Module.t | Struct.t, List.t | atom, List.t) :: String.t
-  def resource_path(conn, action_or_resource, opts_or_action, opts \\ [])
-  def resource_path(conn, action, opts, _) when is_atom(action) do
-    concern(conn).resource_path(conn.assigns.resource, action, opts)
-  end
-  def resource_path(conn, resource, action, opts) do
-    concern(conn).resource_path(resource, action, opts)
   end
 
 end

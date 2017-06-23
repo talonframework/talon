@@ -1,13 +1,10 @@
 aside.main-sidebar
   section.sidebar style="height: auto;"
     ul.sidebar-menu
-      li.header= dgettext "talon", "Resources"
-      / TODO: Dont' think we need this if check anymore. Remove
-      = if @talon_resource do
-        = for resource_path <- resource_paths(@conn) do
-          = render "nav_resource_link.html", conn: @conn, resource_path: resource_path
-      li.header= dgettext "talon", "Actions"
-      / TODO: Dont' think we need this if check anymore. Remove
-      = if @talon_resource do
-        = for action_path <- nav_action_links(@conn) do
-          = render "nav_action_link.html", conn: @conn, action_path: action_path
+      li.header.text-uppercase = dgettext "talon", "Pages"
+      = render_many page_paths(@conn), LayoutView, "nav_resource_link.html", as: :link
+      li.header.text-uppercase = dgettext "talon", "Resources"
+      = render_many resource_paths(@conn), LayoutView, "nav_resource_link.html", as: :link
+      = unless (links = nav_action_links(@conn)) |> Enum.empty? do
+        li.header.text-uppercase = dgettext "talon", "Actions"
+        = render_many links, LayoutView, "nav_action_link.html", as: :link

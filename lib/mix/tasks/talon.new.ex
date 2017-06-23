@@ -83,6 +83,8 @@ defmodule Mix.Tasks.Talon.New do
     |> verify_project!
     |> gen_talon_concern
     |> gen_controller
+    |> gen_page_controller
+    |> gen_dashboard_page
     |> gen_web
     |> gen_messages
     |> gen_theme
@@ -170,6 +172,41 @@ defmodule Mix.Tasks.Talon.New do
     end
    config
   end
+
+  def gen_page_controller(config) do
+    fname = "page_controller.ex"
+    target_fname = Inflex.underscore(config.concern) <> "_" <> fname
+    web_module = web_module config.web_namespace
+    layout = Module.concat([config.base, config.concern, config.theme_module,
+      web_module, LayoutView])
+    layout = ~s/{#{layout}, "app.html"}/  # TODO: DJS handle layout
+    binding = Kernel.binding() ++ [base: config.base, concern: config.concern,
+      boilerplate: config[:boilerplate], web_namespace: config.web_namespace,
+      layout: layout, web_module: web_module]
+    target_path = Path.join([config.root_path, "controllers", config.path_prefix])
+    unless config.dry_run do
+      File.mkdir_p! target_path
+      copy_from paths(),
+        "priv/templates/talon.new/web/controllers", target_path, binding, [
+          {:eex, fname, target_fname},
+        ], config
+    end
+   config
+  end
+
+  defp gen_dashboard_page(%{dashboard: true} = config) do
+    concern_path = Inflex.underscore(config.concern)
+    binding = Kernel.binding() ++ [base: config.base, page: "Dashboard",
+      boilerplate: config[:boilerplate], concern: to_s(config.concern)]
+    source_path = "priv/templates/talon.new/talon"
+    target_path = Path.join config.root_path, concern_path
+    unless config.dry_run do
+      File.mkdir_p! target_path
+      copy_from paths(), source_path, target_path, binding, [{:eex, "page.ex", "dashboard.ex"}], config
+    end
+   config
+  end
+  defp gen_dashboard_page(config), do: config
 
   def gen_web(config) do
     fname = "talon_web.ex"
@@ -314,6 +351,7 @@ defmodule Mix.Tasks.Talon.New do
         concern: concern,
         verbose: bin_opts[:verbose],
         dry_run: bin_opts[:dry_run],
+        dashboard: true, # TODO: bin_opts[:dashboard] || Application.get_env(:talon, :dashboard, true), (DJS)
         package_path: get_package_path(),
         app: app,
         app_path_name: app_path_name,

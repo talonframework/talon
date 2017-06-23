@@ -46,6 +46,16 @@ defmodule Mix.Tasks.Talon.Gen.ThemeTest do
         assert_file assets_path("static/images/talon/admin-lte/orderable.png")
         assert_file "assets/css/talon/admin-lte/talon.css"
         assert_file "assets/vendor/talon/admin-lte/bootstrap/css/bootstrap.min.css"
+
+        assert_file "lib/phx_blogger/talon/views/admin/admin-lte/dashboard_view.ex", [
+          "defmodule PhxBlogger.Admin.AdminLte.Web.DashboardView do",
+          ~s{use PhxBlogger.Talon.Web, which: :view, theme: "admin/admin-lte", module: PhxBlogger.Admin.AdminLte.Web}
+        ]
+        assert_file "lib/phx_blogger/talon/templates/admin/admin-lte/dashboard/dashboard.html.slim", [
+          "Welcome to Talon",
+          "To add dashboard sections, checkout 'lib/talon/admin/dashboard.ex'"
+        ]
+
         assert_file "lib/phx_blogger/talon/templates/admin/admin-lte/layout/app.html.slim"
         assert_file "lib/phx_blogger/talon/views/admin/admin-lte/layout_view.ex", [
           "defmodule PhxBlogger.Admin.AdminLte.Web.LayoutView do",
@@ -230,6 +240,15 @@ defmodule Mix.Tasks.Talon.Gen.ThemeTest do
         assert_file "web/templates/talon/admin/admin-lte/components/datatable/datatable.html.slim", fn file ->
           assert file =~ ~s(= Blogger.Admin.AdminLte.PaginateView.paginate)
         end
+
+        assert_file "web/views/talon/admin/admin-lte/dashboard_view.ex", [
+          "defmodule Blogger.Admin.AdminLte.DashboardView do",
+          ~s(use Blogger.Talon.Web, which: :view, theme: "admin/admin-lte", module: Blogger.Admin.AdminLte)
+        ]
+
+        assert_file "web/templates/talon/admin/admin-lte/dashboard/dashboard.html.slim", [
+          "To add dashboard sections, checkout 'lib/talon/admin/dashboard.ex'"
+        ]
       end
     end
   end

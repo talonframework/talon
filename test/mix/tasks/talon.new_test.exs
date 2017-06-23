@@ -67,6 +67,22 @@ defmodule Mix.Tasks.Talon.NewTest do
           "use Talon.Controller, repo: PhxBlogger.Repo, concern: PhxBlogger.Admin"
         ]
 
+        assert_file "lib/phx_blogger/talon/controllers/admin_page_controller.ex", [
+          "defmodule PhxBlogger.Web.TalonPageController do",
+          "use PhxBlogger.Web, :controller",
+          "use Talon.PageController, concern: PhxBlogger.Admin",
+          "plug Talon.Plug.LoadConcern",
+          "plug Talon.Plug.Theme",
+          "plug Talon.Plug.Layout",
+          "plug Talon.Plug.View"
+        ]
+
+        assert_file "lib/phx_blogger/talon/admin/dashboard.ex", [
+          "defmodule PhxBlogger.Admin.Dashboard",
+          "use Talon.Page, concern: PhxBlogger.Admin"
+          # TODO: test for boilerplate
+        ]
+
         assert_file "lib/phx_blogger/talon/messages.ex", [
           "defmodule PhxBlogger.Talon.Messages do",
           "import PhxBlogger.Web.Gettext"
@@ -92,6 +108,11 @@ defmodule Mix.Tasks.Talon.NewTest do
           ~s{use PhxBlogger.Talon.Web, which: :component_view, theme: "admin/admin-lte", module: PhxBlogger.Admin.AdminLte.Web}
         ]
 
+        assert_file "lib/phx_blogger/talon/views/admin/admin-lte/dashboard_view.ex", [
+          "defmodule PhxBlogger.Admin.AdminLte.Web.DashboardView do",
+          ~s{use PhxBlogger.Talon.Web, which: :view, theme: "admin/admin-lte", module: PhxBlogger.Admin.AdminLte.Web}
+        ]
+
         #########
         # templates
         base_path = Path.join(~w(lib phx_blogger talon templates admin admin-lte))
@@ -113,6 +134,11 @@ defmodule Mix.Tasks.Talon.NewTest do
         for file <- ~w(app nav_action_link nav_resource_link sidebar) do
           assert_file Path.join([base_path, "layout", "#{file}.html.slim"])
         end
+
+        assert_file "lib/phx_blogger/talon/templates/admin/admin-lte/dashboard/dashboard.html.slim", [
+          "Welcome to Talon",
+          "To add dashboard sections, checkout"
+        ]
       end
     end
   end
@@ -190,6 +216,22 @@ defmodule Mix.Tasks.Talon.NewTest do
           ~s{use Blogger.Talon.Web, which: :component_view, theme: "admin/admin-lte", module: Blogger.Admin.AdminLte}
         ]
 
+        assert_file "lib/blogger/talon/controllers/admin_page_controller.ex", [
+          "defmodule Blogger.TalonPageController do",
+          "use Blogger.Web, :controller",
+          "use Talon.PageController, concern: Blogger.Admin",
+          "plug Talon.Plug.LoadConcern",
+          "plug Talon.Plug.Theme",
+          "plug Talon.Plug.Layout",
+          "plug Talon.Plug.View"
+        ]
+
+        assert_file "lib/blogger/talon/admin/dashboard.ex", [
+          "defmodule Blogger.Admin.Dashboard",
+          "use Talon.Page, concern: Blogger.Admin"
+          # TODO: test for boilerplate
+        ]
+
         #########
         # templates
 
@@ -207,6 +249,11 @@ defmodule Mix.Tasks.Talon.NewTest do
         for file <- ~w(app nav_action_link nav_resource_link sidebar) do
           assert_file "lib/blogger/talon/templates/admin/admin-lte/layout/#{file}.html.slim"
         end
+
+        assert_file "lib/blogger/talon/templates/admin/admin-lte/dashboard/dashboard.html.slim", [
+          "Welcome to Talon",
+          "To add dashboard sections, checkout"
+        ]
       end
     end
   end

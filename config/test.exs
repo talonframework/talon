@@ -21,6 +21,9 @@ config :talon, TestTalon.Admin,
     TestTalon.Admin.Simple,
     TestTalon.Admin.Product,
   ],
+  pages: [
+    TestTalon.Talon.Dashboard
+  ],
   schema_adapter: Talon.Schema.Adapters.Ecto,
   module: TestTalon,
   endpoint: TestTalon.Endpoint,
@@ -34,6 +37,9 @@ config :talon, TestTalon.Admin,
 config :talon, TestTalon.FrontEnd,
   resources: [
     TestTalon.FrontEnd.Noid
+  ],
+  pages: [
+    TestTalon.Talon.Dashboard
   ],
   schema_adapter: Talon.Schema.Adapters.Ecto,
   module: TestTalon,

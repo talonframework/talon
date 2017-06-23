@@ -84,7 +84,7 @@ defmodule Mix.Tasks.Talon.Gen.Theme do
                    ~w(brunch_instructions_only)
 
   # List of the options that default to yet
-  @enabled_boolean_options ~w(brunch assets layouts generators components)
+  @enabled_boolean_options ~w(brunch assets layouts generators components dashboard)
 
   # All the boolean options
   @all_boolean_options @boolean_options ++ @enabled_boolean_options ++ @only_options
@@ -151,6 +151,8 @@ defmodule Mix.Tasks.Talon.Gen.Theme do
     |> assets_paths
     |> gen_layout_view
     |> gen_layout_templates
+    |> gen_dashboard_template
+    |> gen_dashboard_view
     |> gen_generators
     |> gen_images
     |> gen_vendor
@@ -230,6 +232,44 @@ defmodule Mix.Tasks.Talon.Gen.Theme do
     config
   end
   defp gen_generators(config), do: config
+
+  def gen_dashboard_template(%{dashboard: true} = config) do
+    concern = config.concern |> Inflex.underscore
+    binding = Kernel.binding() ++
+      [welcome_txt: ~s[dgettext("talon", "Welcome to Talon. This is the default dashboard page.")],
+       add_txt: ~s[dgettext("talon", "To add dashboard sections, checkout 'lib/talon/#{concern}/dashboard.ex'")]]
+    # TOOD: The above path to the dashboard path needs to use the root_path and path_prefix config (SMP)
+    theme = config.theme
+    template_path = Path.join([config.root_path, "templates", config.path_prefix,
+      config.concern_path, config.target_name, "dashboard"])
+    unless config.dry_run do
+      File.mkdir_p! template_path
+      copy_from paths(),
+        "priv/templates/talon.gen.theme/#{theme}/templates/dashboard", template_path, binding, [
+          {:eex, "dashboard.html.slim", "dashboard.html.slim"}
+        ], config
+    end
+    config
+  end
+  def gen_dashboard(config), do: config
+
+  defp gen_dashboard_view(%{dashboard: true} = config) do
+    binding = Kernel.binding() ++ [base: config.base, target_name: config.target_name,
+      target_module: config.target_module, web_namespace: config.web_namespace,
+      view_opts: config.view_opts, concern: config.concern, page: "Dashboard"]
+
+    theme = config.theme
+    view_path = Path.join([config.root_path, "views", config.path_prefix, config.concern_path, config.target_name])
+    unless config.dry_run do
+      File.mkdir_p! view_path
+      copy_from paths(),
+        "priv/templates/talon.gen.theme/#{theme}/views", view_path, binding, [
+          {:eex, "page_view.ex", "dashboard_view.ex"}
+        ], config
+    end
+    config
+  end
+  defp gen_dashboard_view(config), do: config
 
   # this is private, but left as `def` for testing
   @doc false

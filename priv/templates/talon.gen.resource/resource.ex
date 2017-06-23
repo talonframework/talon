@@ -1,7 +1,7 @@
 <% import Mix.Talon, only: [to_s: 1] %>
 defmodule <%= to_s base %>.<%= to_s concern %>.<%= to_s scoped_resource %> do
   @moduledoc """
-  Use this file to configure how Talon renders your resource
+  Use this file to configure how Talon renders your resource.
 
   TBD
   """
@@ -36,7 +36,7 @@ defmodule <%= to_s base %>.<%= to_s concern %>.<%= to_s scoped_resource %> do
   # end
 
   # @doc """
-  # Override the default columm nam redering.
+  # Override the default columm name rendering.
   # """
   # def render_column_name(_page, :zip_code), do: "Zip"
   # def render_column_name(_page, :street_num), do: "Num"

@@ -2,7 +2,6 @@ defmodule TestTalon.Router do
   use Phoenix.Router
   use Talon.Router
 
-
   pipeline :browser do
     plug :accepts, ["html"]
     plug :fetch_session

@@ -9,6 +9,12 @@ defmodule Talon.View do
 
   defmacro __using__(_) do
     quote do
+
+      @spec concern(Plug.Conn.t) :: atom
+      def concern(conn) do
+        conn.assigns.talon.concern
+      end
+
       @doc """
       Helper to return the current `talon_resource` module.
 
@@ -19,7 +25,11 @@ defmodule Talon.View do
         conn.assigns.talon.talon_resource
       end
 
-      def resource_paths(conn) do
+      # TODO: Consider renaming page_paths/presource_paths as page/resource_links. (DJS)
+      # TODO: return the resource type (:page/:backed) as well. With that, we could offer a single resource_links.
+      #       Could return the resource module as well for easy handling of additional callbacks, if needed. (DJS)
+
+      def resource_paths(conn) do  # TODO: don't repeat logic done in Concern, see page_paths (DJS)
         concern = conn.assigns.talon.concern
         concern.resources()
         |> Enum.map(fn tr ->
@@ -28,7 +38,11 @@ defmodule Talon.View do
       end
 
       def resource_path(conn, resource, action, opts \\ []) do
-        Talon.Concern.resource_path conn, resource, action, opts
+        Talon.Concern.resource_path conn, resource, action, opts # TODO: why use Talon.Concern here? (DJS)
+      end
+
+      def page_paths(conn) do
+        concern(conn).page_paths(conn)
       end
 
       def search_path(conn) do
@@ -36,7 +50,11 @@ defmodule Talon.View do
       end
 
       def nav_action_links(conn) do
-        Talon.Concern.nav_action_links(conn)
+        Talon.Concern.nav_action_links(conn) # TODO: why use Talon.Concern here? (DJS)
+      end
+
+      def index_card_title(conn) do
+        talon_resource(conn).index_card_title()
       end
 
       defoverridable([
@@ -105,7 +123,7 @@ defmodule Talon.View do
   """
   @spec talon_resource(Plug.Conn.t) :: atom
   def talon_resource(conn) do
-    conn.assigns.talon.talon_resource
+    conn.assigns.talon[:talon_resource]
   end
 
   @doc """

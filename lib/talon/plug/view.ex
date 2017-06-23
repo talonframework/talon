@@ -7,14 +7,14 @@ defmodule Talon.Plug.View do
   end
 
   def call(conn, opts) do
-    # IO.inspect conn.assigns.talon, label: "talon..."
     view =
       case opts[:view] do
         nil ->
           talon = conn.assigns[:talon]
           theme = Inflex.camelize talon.theme
-          schema = talon.schema |> Module.split |> List.last
-          Module.concat [talon.concern, theme, conn.assigns.talon.web_namespace, schema <> "View"]
+          prefix = talon[:talon_resource] |> Module.split |> List.last
+
+          Module.concat [talon.concern, theme, conn.assigns.talon.web_namespace, prefix <> "View"]
         view ->
           view
       end

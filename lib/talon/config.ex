@@ -98,10 +98,15 @@ defmodule Talon.Config do
     end
   end
 
-
   defmacro resources(context) do
     quote do
       Talon.Config.get_env(unquote(context), :resources)
+    end
+  end
+
+  defmacro pages(context) do
+    quote do
+      Talon.Config.get_env(unquote(context), :pages)
     end
   end
 
