@@ -278,9 +278,6 @@ defmodule Talon.Concern do
         concern_name = concern |> Module.split |> List.last |> to_string |> Inflex.underscore
         concern.pages |> Enum.map(&{apply(&1, :title, []),  "/#{concern_name}/pages/#{apply(&1, :name, [])}"})  # TODO: remove apply? (DJS)
       end
-      def page_paths(_) do
-        []
-      end
 
       def nav_action_links(conn) do # TODO: move to view (DJS)
         Talon.Concern.nav_action_links(__MODULE__,
