@@ -8,10 +8,10 @@ defmodule Talon.Page do
 
   defmacro __using__(opts) do
 
-    context = opts[:context]
+    concern = opts[:concern]
 
     quote do
-      @__context__ unquote(context) || (Module.split(__MODULE__) |> hd |> Module.concat(nil))
+      @__concern__ unquote(concern) || (Module.split(__MODULE__) |> hd |> Module.concat(nil))
 
       # TODO: too specific to template. Move to view. (DJS)
       @spec index_card_title() :: String.t

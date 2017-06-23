@@ -236,8 +236,9 @@ defmodule Mix.Tasks.Talon.Gen.Theme do
   def gen_dashboard_template(%{dashboard: true} = config) do
     concern = config.concern |> Inflex.underscore
     binding = Kernel.binding() ++
-      [welcome_txt: ~s[dgettext("Talon", "Welcome to Talon. This is the default dashboard page.")],
-       add_txt: ~s[dgettext("Talon", "To add dashboard sections, checkout 'lib/talon/#{concern}/dashboard.ex'")]]
+      [welcome_txt: ~s[dgettext("talon", "Welcome to Talon. This is the default dashboard page.")],
+       add_txt: ~s[dgettext("talon", "To add dashboard sections, checkout 'lib/talon/#{concern}/dashboard.ex'")]]
+    # TOOD: The above path to the dashboard path needs to use the root_path and path_prefix config (SMP)
     theme = config.theme
     template_path = Path.join([config.root_path, "templates", config.path_prefix,
       config.concern_path, config.target_name, "dashboard"])

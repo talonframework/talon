@@ -276,7 +276,9 @@ defmodule Talon.Concern do
       def page_paths(conn) do  # TODO: use this approach for resource_paths? (DJS)
         concern = concern(conn)
         concern_name = concern |> Module.split |> List.last |> to_string |> Inflex.underscore
-        concern.pages |> Enum.map(&{apply(&1, :title, []),  "/#{concern_name}/pages/#{apply(&1, :name, [])}"})  # TODO: remove apply? (DJS)
+        concern.pages |> Enum.map(&{apply(&1, :title, []),
+          "/#{concern_name}/pages/#{apply(&1, :name, [])}"})  # TODO: remove apply? (DJS)
+                                                              # TODO: use Router.Helpers here (SMP)
       end
 
       def nav_action_links(conn) do # TODO: move to view (DJS)
