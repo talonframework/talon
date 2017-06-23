@@ -35,17 +35,17 @@ defmodule Talon.Router do
 
   Adds the routes required for Talon
   """
-  defmacro talon_routes(context) do
+  defmacro talon_routes(concern) do
 
     quote do
-      context =
-        unquote(context)
+      concern =
+        unquote(concern)
         |> Module.split()
         |> List.last
         |> Module.concat(nil)
 
-      resource_controller = Talon.Utils.module_join(context, ResourceController)
-      controller = Talon.Utils.module_join(context, Controller)
+      resource_controller = Talon.Utils.module_join(concern, ResourceController)
+      controller = Talon.Utils.module_join(concern, Controller)
 
       get "/", TalonPageController, :page
       get "/pages/:page", TalonPageController, :page

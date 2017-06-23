@@ -1,6 +1,6 @@
 defmodule Talon.Plug.LoadConcern do
   @moduledoc """
-  Creates a new conn.assigns.talon and loads the context into it
+  Creates a new conn.assigns.talon and loads the concern into it
   """
   import Plug.Conn
 

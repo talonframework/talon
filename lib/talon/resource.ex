@@ -29,7 +29,7 @@ defmodule Talon.Resource do
         raise "schema_adapter required"
       end
 
-      @__repo__ unquote(repo) || @__concern__.repo()# ||  Module.concat(@__context__, Repo)
+      @__repo__ unquote(repo) || @__concern__.repo()# ||  Module.concat(@__concern__, Repo)
       @__paginate__ opts[:paginate] || Config.paginate(__MODULE__) || true
       @__params_key__  Module.split(@__module__) |> List.last |> to_string |> Inflex.underscore
       @__route_name__ @__params_key__ |> Inflex.Pluralize.pluralize

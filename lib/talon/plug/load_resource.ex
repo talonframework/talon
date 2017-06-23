@@ -11,8 +11,8 @@ defmodule Talon.Plug.LoadResource do
   def call(conn, opts) do
     talon = conn.assigns[:talon]
     repo = opts[:repo] || talon[:repo]
-    context = opts[:talon] || talon[:talon] || raise("talon option required")
-    schema = context.schema(conn.params["resource"])
+    concern = opts[:talon] || talon[:talon] || raise("talon option required")
+    schema = concern.schema(conn.params["resource"])
     unless schema do
       raise Phoenix.Router.NoRouteError, conn: conn, router: __MODULE__
     end

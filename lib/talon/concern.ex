@@ -182,7 +182,7 @@ defmodule Talon.Concern do
       ## Examples
 
           %TestTalon.Talon.Noid{description: "test", company: "Acme"} |>
-          Talon.Context.display_name()
+          Talon.Concern.display_name()
           Acme
       """
       def display_name(schema) do

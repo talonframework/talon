@@ -79,7 +79,7 @@ defmodule Mix.Tasks.Talon.NewTest do
 
         assert_file "lib/phx_blogger/talon/admin/dashboard.ex", [
           "defmodule PhxBlogger.Admin.Dashboard",
-          "use Talon.Page, context: PhxBlogger.Talon"
+          "use Talon.Page, concern: PhxBlogger.Admin"
           # TODO: test for boilerplate
         ]
 
@@ -228,7 +228,7 @@ defmodule Mix.Tasks.Talon.NewTest do
 
         assert_file "lib/blogger/talon/admin/dashboard.ex", [
           "defmodule Blogger.Admin.Dashboard",
-          "use Talon.Page, context: Blogger.Talon"
+          "use Talon.Page, concern: Blogger.Admin"
           # TODO: test for boilerplate
         ]
 
