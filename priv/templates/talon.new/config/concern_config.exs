@@ -9,4 +9,6 @@ config :<%= config.app %>, <%= config.base %>.<%= config.concern %>,
   repo: <%= config.base %>.Repo,
   router: <%= config.base %>.Web.Router,
   endpoint: <%= config.base %>.Web.Endpoint,
-  schema_adapter: Talon.Schema.Adapters.Ecto
+  schema_adapter: Talon.Schema.Adapters.Ecto,
+  messages_backend: <%= config.base %>.Talon.Messages
+

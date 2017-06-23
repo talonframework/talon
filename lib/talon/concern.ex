@@ -87,6 +87,8 @@ defmodule Talon.Concern do
 
       @__otp_app__ Mix.Talon.otp_app()
 
+      @__messages_backend__ Config.messages_backend(__MODULE__)
+
       @spec base() :: atom
       def base, do: @__base__
 
@@ -285,11 +287,13 @@ defmodule Talon.Concern do
           Phoenix.Controller.action_name(conn), conn.assigns[:resource])
       end
 
+      def messages_backend, do: @__messages_backend__
+
       defoverridable [
         base: 0, repo: 0, resource_map: 0, schema: 1, schema_names: 0,
         talon_resource: 1, resource_path: 3, resource_schema: 1,
         controller_action: 1, template_path_name: 1, schema_field_type: 3,
-        nav_action_links: 1
+        nav_action_links: 1, messages_backend: 0
       ]
     end
 

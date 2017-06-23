@@ -12,7 +12,8 @@ defmodule Talon.Messages do
   # @callback cant_be_blank() :: binary
   # @callback verify_user_token([{atom, any}]) :: binary
 
-  @callback are_you_sure_you_want_to_delete_this?() ::binary
+  @callback are_you_sure_you_want_to_delete_this?() :: binary
+  @callback not_loaded() :: binary
 
   @doc """
   Returns the Messages module from the users app's configuration

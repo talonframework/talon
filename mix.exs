@@ -34,6 +34,7 @@ defmodule Talon.Mixfile do
       {:phoenix_slime, github: "slime-lang/phoenix_slime"},
       {:ecto_talon, github: "talonframework/ecto_talon"},
       {:mix_test_watch, "~> 0.3", only: :dev, runtime: false},
+      {:gettext, "~> 0.11", only: :test},
       # {:ecto_talon, path: "../ecto_talon", only: :test},
     ]
   end

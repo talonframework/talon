@@ -1,7 +1,7 @@
 defmodule <%= base %>.<%= concern %>.<%= theme_module %>.<%= web_namespace %>PaginateView do
   use <%= base %>.Talon.Web, which: :component_view<%= view_opts %>
 
-  import Talon.Components.Paginate
+  use Talon.Components.Paginate
   import Talon.Utils, only: [to_integer: 1]
 
   def paginate(%{params: params} = conn) do

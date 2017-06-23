@@ -28,6 +28,14 @@ defmodule <%= base %>.Talon.Web do
     end
   end
 
+  def resource(_) do
+    quote do
+      import Ecto.Query
+      import <%= base %>.<%= web_namespace %>Gettext
+      require <%= base %>.<%= web_namespace %>Gettext
+    end
+  end
+
   def controller(_) do
     quote do
       use Phoenix.Controller
