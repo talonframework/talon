@@ -12,11 +12,9 @@ defmodule Talon.Plug.View do
         nil ->
           talon = conn.assigns[:talon]
           theme = Inflex.camelize talon.theme
-          prefix =
-            (talon[:talon_resource] || talon[:talon_page])
-            |> Module.split |> List.last
+          prefix = talon[:talon_resource] |> Module.split |> List.last
 
-          Module.concat [theme, Talon.web_namespace(), prefix <> "View"]
+          Module.concat [talon.concern, theme, conn.assigns.talon.web_namespace, prefix <> "View"]
         view ->
           view
       end

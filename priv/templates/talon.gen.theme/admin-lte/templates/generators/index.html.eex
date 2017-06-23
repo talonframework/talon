@@ -1,13 +1,11 @@
 .container-fluid
   .row
-    .col-md-12#datatable-view
-      = <%= target_module %>.<%= web_namespace %>DatatableView.render_table(@conn, @resources)
+    .col-md-12#datatable-view(data-path="#{search_path @conn}")
+      = <%= base %>.<%= concern %>.<%= target_module %>.<%= web_namespace %>DatatableView.render_table(@conn, @resources)
 javascript:
 
   function search_path(value) {
-    var route = $('#datatable-body').data('route')
-    // TODO: this needs to be based on the route scope. Should build this with router builders
-    return '/talon/' + route + '/search/' + value + '?format.js';
+    return $('#datatable-view').data('path') + '/' + value + '?format.js';
   }
 
   window.onload = function(e) {

@@ -4,7 +4,7 @@ defmodule Talon.Controller do # TODO: rename to ResourceController (DJS)
     quote do
       opts = unquote(opts)
       repo = opts[:repo] || raise("repo option required")
-      talon = opts[:context] || raise("context option required")
+      talon = opts[:concern] || raise("concern option required")
       plug :set_repo, repo: repo, talon: talon
 
       # TODO: Add docs for each of these and indicate they are overridable
@@ -48,7 +48,7 @@ defmodule Talon.Controller do # TODO: rename to ResourceController (DJS)
         #       are exposiing.
         case repo.insert(changeset) do
           {:ok, resource} ->
-            redirect conn, to: Talon.Utils.talon_resource_path(resource, :show)
+            redirect conn, to: Talon.Concern.resource_path(conn, resource, :show)
           {:error, changeset} ->
             render conn, "new.html", changeset: changeset
         end
@@ -61,7 +61,7 @@ defmodule Talon.Controller do # TODO: rename to ResourceController (DJS)
         changeset = conn.assigns.talon.schema.changeset(conn.assigns.resource, params[params_key])
         case repo.insert(changeset) do
           {:ok, resource} ->
-            redirect conn, to: Talon.Utils.talon_resource_path(resource, :show)
+            redirect conn, to: Talon.Concern.resource_path(conn, resource, :show)
           {:error, changeset} ->
             render conn, "edit.html", changeset: changeset
         end
@@ -71,15 +71,14 @@ defmodule Talon.Controller do # TODO: rename to ResourceController (DJS)
       def delete(conn, params) do
         repo = Talon.View.repo(conn)
         repo.delete! conn.assigns.resource
-        redirect conn, to: Talon.Utils.talon_resource_path(conn.assigns.resource.__struct__, :index)
+        redirect conn, to: Talon.Concern.resource_path(conn, conn.assigns.resource, :index)
       end
 
       @spec search(Plug.Conn.t, Map.t) :: Plug.Conn.t
       def search(conn, params) do
-        theme_module = Talon.View.theme_module(conn)
         conn
         |> put_layout(false)
-        |> put_view(Module.concat([theme_module, Application.get_env(:talon, :web_namespace), DatatableView]))
+        |> put_view(Talon.View.view_module(conn, DatatableView))
         |> render("search.html", conn: conn)
       end
 

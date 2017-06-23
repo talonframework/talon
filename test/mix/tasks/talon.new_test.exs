@@ -3,6 +3,7 @@ Code.require_file "../../mix_helpers.exs", __DIR__
 defmodule Mix.Tasks.Talon.NewTest do
   use ExUnit.Case
   import MixHelper
+  # import Talon.TestHelpers
   # import ExUnit.CaptureIO
 
   alias Mix.Tasks.Talon.New, as: GenNew
@@ -12,7 +13,7 @@ defmodule Mix.Tasks.Talon.NewTest do
   setup do
     send self(), {:mix_shell_input, :yes?, false}
     send self(), {:mix_shell_input, :yes?, false}
-    {:ok, parsed: ~w(admin_lte admin_lte)}
+    {:ok, parsed: ~w(admin-lte admin-lte)}
   end
 
   @app_name "phx_blogger"
@@ -43,49 +44,47 @@ defmodule Mix.Tasks.Talon.NewTest do
         assert_file "mix.exs",
           "compilers: [:talon, :phoenix, :gettext] ++ Mix.compilers,"
 
-        assert_file "lib/phx_blogger/talon/talon.ex", fn file ->
-          assert file =~ "defmodule PhxBlogger.Talon do"
-          assert file =~ "use Talon, otp_app: :phx_blogger"
+        assert_file "lib/phx_blogger/talon/admin/admin.ex", fn file ->
+          assert file =~ "defmodule PhxBlogger.Admin do"
+          assert file =~ "use Talon.Concern, otp_app: :phx_blogger"
         end
 
         assert_file "config/talon.exs", [
-          "config :talon,",
+          "config :phx_blogger,",
           "module: PhxBlogger,",
-          "messages_backend: PhxBlogger.Web.Gettext,",
-          ~s/theme: "admin_lte",/,
-          "web_namespace: Web,",
-          "schema_adapter: Talon.Schema.Adapters.Ecto"
+          "messages_backend: PhxBlogger.Web.Gettext",
+          "web_namespace: Web"
         ]
 
-        assert_file "lib/phx_blogger/web/talon_web.ex", [
+        assert_file "lib/phx_blogger/talon/web.ex", [
           "import PhxBlogger.Web.Router.Helpers",
           "import PhxBlogger.Web.ErrorHelpers",
           "import PhxBlogger.Web.Gettext",
         ]
 
-        assert_file "lib/phx_blogger/web/controllers/talon/talon_resource_controller.ex", [
-          "defmodule PhxBlogger.Web.TalonResourceController do",
+        assert_file "lib/phx_blogger/talon/controllers/admin_resource_controller.ex", [
+          "defmodule PhxBlogger.Web.AdminResourceController do",
           "use PhxBlogger.Web, :controller",
-          "use Talon.Controller, repo: PhxBlogger.Repo, context: PhxBlogger.Talon"
+          "use Talon.Controller, repo: PhxBlogger.Repo, concern: PhxBlogger.Admin"
         ]
 
-        assert_file "lib/phx_blogger/web/controllers/talon/talon_page_controller.ex", [
+        assert_file "lib/phx_blogger/talon/controllers/admin_page_controller.ex", [
           "defmodule PhxBlogger.Web.TalonPageController do",
           "use PhxBlogger.Web, :controller",
-          "use Talon.PageController, context: PhxBlogger.Talon",
-          "plug Talon.Plug.TalonResource",
+          "use Talon.PageController, concern: PhxBlogger.Admin",
+          "plug Talon.Plug.LoadConcern",
           "plug Talon.Plug.Theme",
           "plug Talon.Plug.Layout",
           "plug Talon.Plug.View"
         ]
 
-        assert_file "lib/phx_blogger/talon/dashboard.ex", [
-          "defmodule PhxBlogger.Talon.Dashboard",
+        assert_file "lib/phx_blogger/talon/admin/dashboard.ex", [
+          "defmodule PhxBlogger.Admin.Dashboard",
           "use Talon.Page, context: PhxBlogger.Talon"
           # TODO: test for boilerplate
         ]
 
-        assert_file "lib/phx_blogger/web/talon_messages.ex", [
+        assert_file "lib/phx_blogger/talon/messages.ex", [
           "defmodule PhxBlogger.Web.Talon.Messages do",
           "import PhxBlogger.Web.Gettext"
         ]
@@ -93,47 +92,51 @@ defmodule Mix.Tasks.Talon.NewTest do
         #########
         # Views
 
-        assert_file "lib/phx_blogger/web/views/talon/admin_lte/layout_view.ex", [
-          "defmodule AdminLte.Web.LayoutView do",
-          ~s/use Talon.Web, which: :view, theme: "admin_lte", module: AdminLte.Web/
+        assert_file "lib/phx_blogger/talon/views/admin/admin-lte/layout_view.ex", [
+          "defmodule PhxBlogger.Admin.AdminLte.Web.LayoutView do",
+          ~s{use PhxBlogger.Talon.Web, which: :view, theme: "admin/admin-lte", module: PhxBlogger.Admin.AdminLte.Web}
         ]
 
-        assert_file "lib/phx_blogger/web/views/talon/admin_lte/components/datatable_view.ex", [
-          "defmodule AdminLte.Web.DatatableView do",
-          ~s/use Talon.Web, which: :component_view, theme: "admin_lte", module: AdminLte.Web/,
+        assert_file "lib/phx_blogger/talon/views/admin/admin-lte/components/datatable_view.ex", [
+          "defmodule PhxBlogger.Admin.AdminLte.Web.DatatableView do",
+          ~s{use PhxBlogger.Talon.Web, which: :component_view, theme: "admin/admin-lte", module: PhxBlogger.Admin.AdminLte.Web},
+
           "use Talon.Components.Datatable, __MODULE__"
         ]
 
-        assert_file "lib/phx_blogger/web/views/talon/admin_lte/components/paginate_view.ex", [
-          "defmodule AdminLte.Web.PaginateView do",
-          ~s/use Talon.Web, which: :component_view, theme: "admin_lte", module: AdminLte.Web/
+        assert_file "lib/phx_blogger/talon/views/admin/admin-lte/components/paginate_view.ex", [
+          "defmodule PhxBlogger.Admin.AdminLte.Web.PaginateView do",
+          ~s{use PhxBlogger.Talon.Web, which: :component_view, theme: "admin/admin-lte", module: PhxBlogger.Admin.AdminLte.Web}
         ]
 
-        assert_file "lib/phx_blogger/web/views/talon/admin_lte/dashboard_view.ex", [
-          "defmodule AdminLte.Web.DashboardView do",
-          ~s/use Talon.Web, which: :view, theme: "admin_lte", module: AdminLte.Web/
+        assert_file "lib/phx_blogger/talon/views/admin/admin-lte/dashboard_view.ex", [
+          "defmodule PhxBlogger.Admin.AdminLte.Web.DashboardView do",
+          ~s{use PhxBlogger.Talon.Web, which: :view, theme: "admin/admin-lte", module: PhxBlogger.Admin.AdminLte.Web}
         ]
 
         #########
         # templates
+        base_path = Path.join(~w(lib phx_blogger talon templates admin admin-lte))
+        path = Path.join(base_path, "generators")
+        datatable_path = Path.join([base_path, "components", "datatable"])
 
-        assert_file "lib/phx_blogger/web/templates/talon/admin_lte/generators/edit.html.eex"
-        assert_file "lib/phx_blogger/web/templates/talon/admin_lte/generators/form.html.eex"
-        assert_file "lib/phx_blogger/web/templates/talon/admin_lte/generators/index.html.eex", [
-          "= AdminLte.Web.DatatableView.render_table(@conn, @resources)"
+        assert_file Path.join(path, "edit.html.eex")
+        assert_file Path.join(path, "form.html.eex")
+        assert_file Path.join(path, "index.html.eex"), [
+          "= PhxBlogger.Admin.AdminLte.Web.DatatableView.render_table(@conn, @resources)"
         ]
-        assert_file "lib/phx_blogger/web/templates/talon/admin_lte/generators/new.html.eex"
-        assert_file "lib/phx_blogger/web/templates/talon/admin_lte/generators/show.html.eex"
+        assert_file Path.join(path, "new.html.eex")
+        assert_file Path.join(path, "show.html.eex")
 
-        assert_file "lib/phx_blogger/web/templates/talon/admin_lte/components/datatable/datatable.html.slim", [
-          "= AdminLte.Web.PaginateView.paginate(@conn)"
+        assert_file Path.join(datatable_path, "datatable.html.slim"), [
+          "= PhxBlogger.Admin.AdminLte.Web.PaginateView.paginate(@conn)"
         ]
-        assert_file "lib/phx_blogger/web/templates/talon/admin_lte/components/datatable/table_body.html.slim"
+        assert_file Path.join(datatable_path, "table_body.html.slim")
         for file <- ~w(app nav_action_link nav_resource_link sidebar) do
-          assert_file "lib/phx_blogger/web/templates/talon/admin_lte/layout/#{file}.html.slim"
+          assert_file Path.join([base_path, "layout", "#{file}.html.slim"])
         end
 
-        assert_file "lib/phx_blogger/web/templates/talon/admin_lte/dashboard/dashboard.html.slim", [
+        assert_file "lib/phx_blogger/talon/templates/admin/admin-lte/dashboard/dashboard.html.slim", [
           "Welcome to Talon",
           "To add dashboard sections, checkout"
         ]
@@ -169,64 +172,64 @@ defmodule Mix.Tasks.Talon.NewTest do
         assert_file "mix.exs",
           "compilers: [:talon, :phoenix, :gettext] ++ Mix.compilers,"
 
-        assert_file "lib/blogger/talon/talon.ex", fn file ->
-          assert file =~ "defmodule Blogger.Talon do"
-          assert file =~ "use Talon, otp_app: :blogger"
+        assert_file "lib/blogger/talon/admin/admin.ex", fn file ->
+          assert file =~ "defmodule Blogger.Admin do"
+          assert file =~ "use Talon.Concern, otp_app: :blogger"
         end
 
         assert_file "config/talon.exs", [
-          "config :talon,",
+          "config :blogger,",
           "module: Blogger,",
           "messages_backend: Blogger.Gettext,",
-          ~s/theme: "admin_lte",/,
+          ~s/theme: "admin-lte",/,
           "schema_adapter: Talon.Schema.Adapters.Ecto"
         ]
 
-        assert_file "web/talon_web.ex", [
+        assert_file "lib/blogger/talon/web.ex", [
           "import Blogger.Router.Helpers",
           "import Blogger.ErrorHelpers",
           "import Blogger.Gettext",
         ]
 
-        assert_file "web/controllers/talon/talon_resource_controller.ex", [
-          "defmodule Blogger.TalonResourceController do",
+        assert_file "lib/blogger/talon/controllers/admin_resource_controller.ex", [
+          "defmodule Blogger.AdminResourceController do",
           "use Blogger.Web, :controller",
-          "use Talon.Controller, repo: Blogger.Repo, context: Blogger.Talon"
+          "use Talon.Controller, repo: Blogger.Repo, concern: Blogger.Admin"
         ]
 
-        assert_file "web/talon_messages.ex", [
+        assert_file "lib/blogger/talon/messages.ex", [
           "defmodule Blogger.Talon.Messages do",
           "import Blogger.Gettext"
         ]
 
-        assert_file "web/views/talon/admin_lte/layout_view.ex", [
-          "defmodule AdminLte.LayoutView do",
-          ~s/use Talon.Web, which: :view, theme: "admin_lte", module: AdminLte/
+        assert_file "lib/blogger/talon/views/admin/admin-lte/layout_view.ex", [
+          "defmodule Blogger.Admin.AdminLte.LayoutView do",
+          ~s{use Blogger.Talon.Web, which: :view, theme: "admin/admin-lte", module: Blogger.Admin.AdminLte}
         ]
 
-        assert_file "web/views/talon/admin_lte/components/datatable_view.ex", [
-          "defmodule AdminLte.DatatableView do",
-          ~s/use Talon.Web, which: :component_view, theme: "admin_lte", module: AdminLte/,
+        assert_file "lib/blogger/talon/views/admin/admin-lte/components/datatable_view.ex", [
+          "defmodule Blogger.Admin.AdminLte.DatatableView do",
+          ~s{use Blogger.Talon.Web, which: :component_view, theme: "admin/admin-lte", module: Blogger.Admin.AdminLte},
           "use Talon.Components.Datatable, __MODULE__"
         ]
 
-        assert_file "web/views/talon/admin_lte/components/paginate_view.ex", [
-          "defmodule AdminLte.PaginateView do",
-          ~s/use Talon.Web, which: :component_view, theme: "admin_lte", module: AdminLte/
+        assert_file "lib/blogger/talon/views/admin/admin-lte/components/paginate_view.ex", [
+          "defmodule Blogger.Admin.AdminLte.PaginateView do",
+          ~s{use Blogger.Talon.Web, which: :component_view, theme: "admin/admin-lte", module: Blogger.Admin.AdminLte}
         ]
 
-        assert_file "web/controllers/talon/talon_page_controller.ex", [
+        assert_file "lib/blogger/talon/controllers/admin_page_controller.ex", [
           "defmodule Blogger.TalonPageController do",
           "use Blogger.Web, :controller",
-          "use Talon.PageController, context: Blogger.Talon",
-          "plug Talon.Plug.TalonResource",
+          "use Talon.PageController, concern: Blogger.Admin",
+          "plug Talon.Plug.LoadConcern",
           "plug Talon.Plug.Theme",
           "plug Talon.Plug.Layout",
           "plug Talon.Plug.View"
         ]
 
-        assert_file "lib/blogger/talon/dashboard.ex", [
-          "defmodule Blogger.Talon.Dashboard",
+        assert_file "lib/blogger/talon/admin/dashboard.ex", [
+          "defmodule Blogger.Admin.Dashboard",
           "use Talon.Page, context: Blogger.Talon"
           # TODO: test for boilerplate
         ]
@@ -234,22 +237,22 @@ defmodule Mix.Tasks.Talon.NewTest do
         #########
         # templates
 
-        assert_file "web/templates/talon/admin_lte/generators/edit.html.eex"
-        assert_file "web/templates/talon/admin_lte/generators/form.html.eex"
-        assert_file "web/templates/talon/admin_lte/generators/index.html.eex", [
-          "= AdminLte.DatatableView.render_table(@conn, @resources)"
+        assert_file "lib/blogger/talon/templates/admin/admin-lte/generators/edit.html.eex"
+        assert_file "lib/blogger/talon/templates/admin/admin-lte/generators/form.html.eex"
+        assert_file "lib/blogger/talon/templates/admin/admin-lte/generators/index.html.eex", [
+          "= Blogger.Admin.AdminLte.DatatableView.render_table(@conn, @resources)"
         ]
-        assert_file "web/templates/talon/admin_lte/generators/new.html.eex"
-        assert_file "web/templates/talon/admin_lte/generators/show.html.eex"
-        assert_file "web/templates/talon/admin_lte/components/datatable/datatable.html.slim", [
-          "= AdminLte.PaginateView.paginate(@conn)"
+        assert_file "lib/blogger/talon/templates/admin/admin-lte/generators/new.html.eex"
+        assert_file "lib/blogger/talon/templates/admin/admin-lte/generators/show.html.eex"
+        assert_file "lib/blogger/talon/templates/admin/admin-lte/components/datatable/datatable.html.slim", [
+          "= Blogger.Admin.AdminLte.PaginateView.paginate(@conn)"
         ]
-        assert_file "web/templates/talon/admin_lte/components/datatable/table_body.html.slim"
+        assert_file "lib/blogger/talon/templates/admin/admin-lte/components/datatable/table_body.html.slim"
         for file <- ~w(app nav_action_link nav_resource_link sidebar) do
-          assert_file "web/templates/talon/admin_lte/layout/#{file}.html.slim"
+          assert_file "lib/blogger/talon/templates/admin/admin-lte/layout/#{file}.html.slim"
         end
 
-        assert_file "web/templates/talon/admin_lte/dashboard/dashboard.html.slim", [
+        assert_file "lib/blogger/talon/templates/admin/admin-lte/dashboard/dashboard.html.slim", [
           "Welcome to Talon",
           "To add dashboard sections, checkout"
         ]

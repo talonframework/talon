@@ -36,6 +36,7 @@ defmodule Talon.Search do
     |> Enum.filter(& &1 in string_fields)
   end
 
+  @spec build_query(tuple, Struct.t | Module.t, String.t) :: Ecto.Query.t
   def build_query({:halt, query}, _, _), do: query
   def build_query({:cont, fields}, schema, search_terms) do
     dynamic =

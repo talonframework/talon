@@ -5,15 +5,24 @@ defmodule Mix.Tasks.Talon.Gen.Resource do
   Creates the resource files needed to manage a schema with Talon.
 
       mix talon.gen.resource User
+      mix talon.gen.resource Blogs.Blog --concern=FrontEnd --target-theme=front-end
+
+  Two arguments can be passed to the task. The first is an optional
+  Talon concern. The second argument is a schema to be managed with
+  Talon.
+
+  If the concern argument is omitted, the fist concern from the
+  `concerns` configuration list will be used.
 
   Creates the following files:
 
-  * web/layout/talon/admin_lte/user_view.ex
+  * web/layout/talon/admin-lte/user_view.ex
   * lib/my_app/talon/user.ex
 
   ## Options
 
-  * --theme=custom_theme -- create the layout file for a custom theme
+  * --target-theme=custom_theme -- create the layout file for a custom theme
+  * --concern=Admin -- set the concern module
   * --all-themes -- create the layout for all configured themes
   * --no-boilerplate -- don't include the boilerplate comments
   * --dry-run -- print what will be done, but don't create any files
@@ -21,16 +30,17 @@ defmodule Mix.Tasks.Talon.Gen.Resource do
   use Mix.Task
 
   import Mix.Talon
-  # import Mix.Generator
 
-  @default_theme "admin_lte"
+  @default_theme "admin-lte"
 
   # list all supported boolean options
   @boolean_options ~w(all_themes verbose boilerplate dry_run)a
 
   # complete list of supported options
   @switches [
-    theme: :string
+    theme_name: :string, concern: :string, module: :string,
+    root_path: :string, path_prefix: :string, theme: :string,
+    target_theme: :string
   ] ++ Enum.map(@boolean_options, &({&1, :boolean}))
 
 
@@ -45,7 +55,7 @@ defmodule Mix.Tasks.Talon.Gen.Resource do
     # verify_args!(parsed, unknown)
     opts
     |> parse_options(parsed)
-    |> do_config
+    |> do_config(args)
     |> do_run
   end
 
@@ -59,30 +69,35 @@ defmodule Mix.Tasks.Talon.Gen.Resource do
 
   def create_resource_file(config) do
     binding = config.binding ++ [base: config[:base], boilerplate: config.boilerplate,
-      resource: config.resource, scoped_resource: config.scoped_resource]
-    name = String.downcase config.resource
+      resource: config.resource, scoped_resource: config.scoped_resource, module: config.module,
+      concern: config.concern, app: config.app]
+    name = Inflex.underscore config.resource
+    target_path = Path.join([config.root_path, config.path_prefix, config.concern_path])
     unless config.dry_run do
       copy_from paths(),
-        "priv/templates/talon.gen.resource", "", binding, [
-          {:eex, "resource.ex", Path.join(config.lib_path, "talon/#{name}.ex")}
+        "priv/templates/talon.gen.resource", target_path, binding, [
+          {:eex, "resource.ex", "#{name}.ex"}
         ], config
     end
     config
   end
 
   def create_view(config) do
-    name = String.downcase config.resource
+    name = Inflex.underscore config.resource
     unless config.dry_run do
-      Enum.each config.themes, fn theme ->
-        view_opts = view_opts(theme, config.project_structure)
+      # Enum.each config.themes, fn theme ->
+        theme = config.target_name
         binding = config.binding ++ [base: config[:base], resource: config.resource,
-          theme_module: theme_module_name(theme), theme_name: theme, view_opts: view_opts,
-          web_namespace: config.web_namespace]
+          theme_module: theme_module_name(theme), theme_name: theme, view_opts: config.view_opts,
+          web_namespace: config.web_namespace, concern: config.concern,
+          concern_path: config.concern_path]
+        target_path = Path.join([config.root_path, "views", config.path_prefix,
+            config.concern_path, theme])
         copy_from paths(),
-          "priv/templates/talon.gen.resource", "", binding, [
-            {:eex, "view.ex", Path.join([config.web_path, "views", "talon",theme, "#{name}_view.ex"])}
+          "priv/templates/talon.gen.resource", target_path, binding, [
+            {:eex, "view.ex", "#{name}_view.ex"}
           ], config
-      end
+      # end
     end
     config
   end
@@ -90,26 +105,38 @@ defmodule Mix.Tasks.Talon.Gen.Resource do
   def print_instructions(config) do
     Mix.shell.info """
       Remember to update your config/talon.exs file with the resource module
-        config :talon, :modules, [
-          ...
-          #{config.base}.Talon.#{config.scoped_resource}
-        ]
+        config :#{config.app}, #{config.base}.#{config.concern},
+          :resources, [
+            ...
+            #{config.base}.#{inspect config.module}
+          ]
       """
     config
   end
 
+  def normalize_module(module, _binding) do
+    module
+  end
 
-  defp do_config({bin_opts, _opts, parsed} = args) do
+  defp do_config({bin_opts, opts, parsed}, raw_args) do
+    {concern, theme_name} = process_concern_theme(opts)
+
+    target_name = Keyword.get(opts, :target_theme, theme_name)
+    target_module = Inflex.camelize(target_name)
+
+
     binding =
       Mix.Project.config
       |> Keyword.fetch!(:app)
       |> Atom.to_string
       |> Mix.Phoenix.inflect
 
+    base = opts[:module] || binding[:base]
+
     scoped_resource =
       case parsed do
         [resource] ->
-          resource
+          normalize_module(resource, binding)
         other ->
           Mix.raise "Invalid arguments #{inspect other}"
       end
@@ -125,33 +152,62 @@ defmodule Mix.Tasks.Talon.Gen.Resource do
         _ -> scoped_resource
       end
 
+    concern_path = concern_path(concern)
+    view_opts =
+      %{target_name: target_name, base: base, concern: concern,
+        concern_path: concern_path}
+      |> view_opts(proj_struct)
+
+    app = opts[:app_name] || Mix.Project.config |> Keyword.fetch!(:app)
+    app_path_name = app |> to_string |> Inflex.underscore
+    root_path = opts[:root_path] || Path.join(["lib", app_path_name, default_root_path()])
+    # concerns = Config.concerns() || [concern]
+    # unless concerns, do: Mix.raise("You must add :talon, :concerns to your config/talon.exs file")
+
+    # IO.inspect {opts[:concern], hd(concerns)}, label: "...."
+    # concern = Module.concat(opts[:concern] || hd(concerns), nil)
+
+    # TODO: not sure if this is right
+    module = opts[:module] || Module.concat(concern, scoped_resource)
+
     %{
-      themes: get_themes(args),
+      # themes: get_themes(args),
+      app: app,
+      raw_args: raw_args,
+      theme: opts[:theme] || @default_theme,
+      concern: concern,
+      concern_path: concern_path,
+      module: module,
       verbose: bin_opts[:verbose],
       resource: resource,
       scoped_resource: scoped_resource,
-      web_path: web_path(),
+      root_path: root_path,
+      path_prefix: opts[:path_prefix] || default_path_prefix(),
       dry_run: bin_opts[:dry_run],
+      target_name: target_name,
+      target_module: target_module,
+      view_opts: view_opts,
       binding: binding,
       lib_path: lib_path(),
       web_namespace: web_namespace(proj_struct),
       project_structure: proj_struct,
       boilerplate: bin_opts[:boilerplate] || Application.get_env(:talon, :boilerplate, true),
-      base: bin_opts[:module] || binding[:base],
+      base: base,
     }
+    # |> IO.inspect(label: "contfig")
   end
 
-  defp get_themes({opts, bin_opts, _parsed}) do
-    cond do
-      bin_opts[:all_themes] -> all_themes()
-      opts[:theme] -> [opts[:theme]]
-      all = all_themes() -> Enum.take(all, 1)
-    end
-  end
+  # defp get_themes({opts, bin_opts, _parsed}) do
+  #   cond do
+  #     bin_opts[:all_themes] -> all_themes()
+  #     opts[:theme] -> [opts[:theme]]
+  #     all = all_themes() -> Enum.take(all, 1)
+  #   end
+  # end
 
-  defp all_themes do
-    Application.get_env :talon, :themes, [@default_theme]
-  end
+  # defp all_themes do
+  #   Application.get_env :talon, :themes, [@default_theme]
+  # end
 
   defp parse_options([], parsed) do
     {[], [], parsed}

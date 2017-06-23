@@ -1,4 +1,4 @@
-defmodule <%= base %>.Talon.<%= page %> do
+defmodule <%= base %>.<%= concern %>.<%= page %> do
   @moduledoc """
   Use this file to configure your Talon page.
 

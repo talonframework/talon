@@ -22,9 +22,9 @@
                 <%% end %>
 
                   td.text-right.index-actions
-                    button.btn.btn-xs.btn-primary.action-show type="button" data-url="#{Talon.Utils.talon_resource_path(resource, :show)}"
+                    button.btn.btn-xs.btn-primary.action-show type="button" data-url="#{Talon.Concern.resource_path(@conn, resource, :show)}"
                       i.fa.fa-info-circle
-                    button.btn.btn-xs.btn-warning.action-edit type="button" data-url="#{Talon.Utils.talon_resource_path(resource, :edit)}"
+                    button.btn.btn-xs.btn-warning.action-edit type="button" data-url="#{Talon.Conn.resource_path(@conn, resource, :edit)}"
                       i.fa.fa-pencil-square-o
                     button.btn.btn-xs.btn-danger.action-delete type="button"
                       i.fa.fa-times

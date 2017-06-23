@@ -12,6 +12,11 @@ defmodule TestTalon.Router do
 
   scope "/talon", TestTalon do
     pipe_through :browser
-    talon_routes()
+    talon_routes(TestTalon.Admin)
+  end
+
+  scope "/front_end", TestTalon do
+    pipe_through :browser
+    talon_routes(TestTalon.FrontEnd)
   end
 end

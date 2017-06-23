@@ -2,8 +2,10 @@ defmodule Talon.Utils do
   @moduledoc """
   A collection of utility functions.
   """
-  require Logger
+  use Talon.Config
   alias Talon.Messages
+
+  require Logger
 
   # @module Application.get_env(:talon, :module)
 
@@ -189,63 +191,6 @@ defmodule Talon.Utils do
   end
 
   @doc """
-  URL helper to build talon paths for CRUD
-
-  Examples:
-
-      iex> Talon.Utils.talon_resource_path(TestTalon.Product)
-      "/talon/products"
-
-      iex> Talon.Utils.talon_resource_path(%TestTalon.Product{})
-      "/talon/products/new"
-
-      iex> Talon.Utils.talon_resource_path(%TestTalon.Product{id: 1})
-      "/talon/products/1"
-
-      iex> Talon.Utils.talon_resource_path(%TestTalon.Product{id: 1}, :edit)
-      "/talon/products/1/edit"
-
-      iex> Talon.Utils.talon_resource_path(%TestTalon.Product{id: 1}, :update)
-      "/talon/products/1"
-
-      iex> Talon.Utils.talon_resource_path(%TestTalon.Product{id: 1}, :destroy)
-      "/talon/products/1"
-
-      iex> Talon.Utils.talon_resource_path(TestTalon.Product, :create)
-      "/talon/products"
-
-      iex> Talon.Utils.talon_resource_path(TestTalon.Product, :batch_action)
-      "/talon/products/batch_action"
-
-      iex> Talon.Utils.talon_resource_path(TestTalon.Product, :csv)
-      "/talon/products/csv"
-
-      iex> Talon.Utils.talon_resource_path(%Plug.Conn{assigns: %{resource: %TestTalon.Product{}}}, :index, [[scope: "active"]])
-      "/talon/products?scope=active"
-  """
-  def talon_resource_path(resource_or_model, method \\ nil, args \\ [])
-  def talon_resource_path(%Plug.Conn{} = conn, method, args) when method in [:show, :edit, :update, :delete] do
-    talon_resource_path(conn.assigns.resource, method, args)
-  end
-  def talon_resource_path(%Plug.Conn{} = conn, method, args) do
-    talon_resource_path(conn.assigns.resource.__struct__, method, args)
-  end
-  def talon_resource_path(resource_model, method, args) when is_atom(resource_model) do
-    resource_name = resource_model |> Talon.Helpers.model_name |> Inflex.pluralize
-    apply(router_helpers(), :talon_resource_path, [endpoint(), method || :index, resource_name | args])
-  end
-  def talon_resource_path(resource, method, args) when is_map(resource) do
-    resource_model = resource.__struct__
-    id = Talon.Schema.get_id(resource)
-    case id do
-      nil ->
-        talon_resource_path(resource_model, method || :new, args)
-      _ ->
-        talon_resource_path(resource_model, method || :show, [id | args])
-    end
-  end
-
-  @doc """
   URL helper to build assistant talon paths
 
   Examples:
@@ -428,5 +373,9 @@ defmodule Talon.Utils do
   @doc false
   def use_authentication do
     false
+  end
+
+  def module_join(pre, post) do
+    Module.concat nil, inspect(pre) <> inspect(post)
   end
 end

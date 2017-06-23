@@ -5,11 +5,12 @@ defmodule Mix.Tasks.Talon.Gen.Components do
       mix talon.gen.components theme
 
   This is a supporting mix task that is used by the talon.gen.theme task.
-  It is the foundation for an optional component installer. However, we
-  don't have any optional components at this time.
+  It is the foundation for an optional component installer.
 
   ## Options
 
+  * --root-path=lib/my_app/talon -- set talon's root path
+  * --path-prefix="" -- set talon's path prefix
   * --dry-run -- print what will be done, but don't create any files
   * --verbose -- Print extra information
   """
@@ -17,12 +18,14 @@ defmodule Mix.Tasks.Talon.Gen.Components do
 
   import Mix.Talon
 
+  require Talon.Config, as: Config
+
   # list all supported boolean options
   @boolean_options ~w(verbose dry_run)a
 
   # complete list of supported options
   @switches [
-    web_path: :string, proj_struct: :string
+    root_path: :string, proj_struct: :string, path_prefix: :string
   ] ++ Enum.map(@boolean_options, &({&1, :boolean}))
 
   @component_path "priv/templates/talon.gen.components/components/*"
@@ -75,14 +78,17 @@ defmodule Mix.Tasks.Talon.Gen.Components do
 
   defp gen_component_views(config, {_component, component_path} = comp_info) do
     source_path = Path.join([component_path, "views"])
-    target_path = Path.join([config.web_path, "views", "talon", config.theme_name, "components"])
+    target_path = Path.join([config.root_path, "views", config.path_prefix,
+      config.concern_path, config.theme_name, "components"])
+
 
     gen_files(config, comp_info, source_path, target_path)
   end
 
   defp gen_component_templates(config, {component, component_path} = comp_info) do
     source_path = Path.join([component_path, "templates"])
-    target_path = Path.join([config.web_path, "templates", "talon", config.theme_name, "components", component])
+    target_path = Path.join([config.root_path, "templates", config.path_prefix,
+      config.concern_path, config.theme_name, "components", component])
 
     gen_files(config, comp_info, source_path, target_path)
   end
@@ -96,7 +102,7 @@ defmodule Mix.Tasks.Talon.Gen.Components do
 
     binding = Kernel.binding() ++ [base: config.base, theme_name: config.theme_name,
       theme_module: config.theme_module, web_namespace: config.web_namespace,
-      view_opts: config.view_opts]
+      view_opts: config.view_opts, concern_path: config.concern_path, concern: config.concern]
 
     infos =
       file_names
@@ -115,20 +121,12 @@ defmodule Mix.Tasks.Talon.Gen.Components do
     config
   end
 
-  defp do_config({bin_opts, opts, parsed} = _args) do
-    themes = get_available_themes()
+  defp do_config({bin_opts, opts, _parsed} = _args) do
+    # themes = get_available_themes()
+    {concern, theme_name} = process_concern_theme(opts)
 
-    theme_name =
-      case parsed do
-        [theme] ->
-          unless theme in themes,
-            do: Mix.raise("Invalid theme name. Choices are #{inspect themes}")
-          theme
-        other ->
-          Mix.raise "Invalid arguments #{inspect other}"
-      end
-
-    theme_module = Inflex.camelize(theme_name)
+    target_name = Keyword.get(opts, :target_theme, theme_name)
+    target_module = Inflex.camelize(target_name)
 
     binding =
       Mix.Project.config
@@ -136,33 +134,38 @@ defmodule Mix.Tasks.Talon.Gen.Components do
       |> Atom.to_string
       |> Mix.Phoenix.inflect
 
+    base = bin_opts[:module] || binding[:base]
     proj_struct = to_atom(opts[:proj_struct] || detect_project_structure())
-    view_opts = view_opts(theme_name, proj_struct)
+    concern_path = concern_path(concern)
+    view_opts =
+      %{target_name: target_name, base: base, concern: concern,
+        concern_path: concern_path}
+      |> view_opts(proj_struct)
+
+    app = opts[:app_name] || Mix.Project.config |> Keyword.fetch!(:app)
+    app_path_name = app |> to_string |> Inflex.underscore
+    root_path = opts[:root_path] || Path.join(["lib", app_path_name, default_root_path()])
 
     %{
-      theme_name: theme_name,
-      theme_module: theme_module,
+      theme_name: target_name,
+      theme_module: target_module,
       verbose: bin_opts[:verbose],
       dry_run: bin_opts[:dry_run],
       binding: binding,
+      root_path: root_path,
+      path_prefix: opts[:path_prefix] || default_path_prefix(),
       project_structure: proj_struct,
       view_opts: view_opts,
-      web_path: opts[:web_path] || web_path(verify: true),
+      concern: concern,
+      concern_path: concern_path,
       web_namespace: web_namespace(proj_struct),
-      boilerplate: bin_opts[:boilerplate] || Application.get_env(:talon, :boilerplate, true),
-      base: bin_opts[:module] || binding[:base],
+      boilerplate: bin_opts[:boilerplate] || Config.boilerplate() || true,
+      base: base,
     }
   end
 
   defp to_atom(atom) when is_atom(atom), do: atom
   defp to_atom(string), do: String.to_atom(string)
-
-  defp get_available_themes do
-    :talon
-    |> Application.app_dir("priv/templates/talon.gen.theme/*")
-    |> Path.wildcard()
-    |> Enum.map(& Path.split(&1) |> List.last)
-  end
 
   defp parse_options([], parsed) do
     {[], [], parsed}

@@ -1,4 +1,4 @@
-defmodule Talon.Web do
+defmodule <%= base %>.Talon.Web do
   @moduledoc """
   A module defining __using__ hooks for controllers,
   views and so on.
@@ -43,8 +43,11 @@ defmodule Talon.Web do
 
   def view(opts) do
     quote do
+      use Talon.View
+
       opts = unquote(opts)
-      use Phoenix.View, root: "<%= web_path %>/templates/talon/#{opts[:theme]}", namespace: opts[:module]
+      #use Phoenix.View, root: "<%= root_path %>/templates/talon/#{opts[:theme]}", namespace: opts[:module]
+      use Phoenix.View, root: "<%= Path.join [root_path, "templates", path_prefix] %>/#{opts[:theme]}", namespace: opts[:module]
 
       # Import convenience functions from controllers
       import Phoenix.Controller, only: [get_csrf_token: 0, get_flash: 2, view_module: 1]
@@ -60,8 +63,11 @@ defmodule Talon.Web do
 
   def component_view(opts) do
     quote do
+      use Talon.View
+
       opts = unquote(opts)
-      use Phoenix.View, root: "<%= web_path %>/templates/talon/#{opts[:theme]}/components", namespace: opts[:module]
+      # use Phoenix.View, root: "<%= root_path %>/templates/talon/#{opts[:theme]}/components", namespace: opts[:module]
+      use Phoenix.View, root: "<%= Path.join [root_path, "templates", path_prefix] %>/#{opts[:theme]}/components", namespace: opts[:module]
 
       # Import convenience functions from controllers
       import Phoenix.Controller, only: [get_csrf_token: 0, get_flash: 2, view_module: 1]

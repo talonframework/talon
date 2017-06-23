@@ -12,10 +12,10 @@
 //     javascripts: {
 //       joinTo: {
 //         'js/app.js': /^(<%= root_match %>js)|(node_modules)/,
-//         'js/talon/admin_lte/jquery-2.2.3.min.js': '<%= root_path %>vendor/talon/admin-lte/plugins/jQuery/jquery-2.2.3.min.js',
-//         'js/talon/admin_lte/bootstrap.min.js': '<%= root_path %>vendor/talon/admin-lte/bootstrap/js/bootstrap.min.js',
-//         'js/talon/admin_lte/app.min.js': '<%= root_path %>vendor/talon/admin-lte/dist/js/app.min.js',
-//         'js/talon/admin_lte/sweetalert.min.js': '<%= root_path %>vendor/talon/admin-lte/plugins/sweetalert/dist/sweetalert.min.js'
+//         'js/talon/<%= theme %>/jquery-2.2.3.min.js': '<%= root_path %>vendor/talon/<%= theme %>/plugins/jQuery/jquery-2.2.3.min.js',
+//         'js/talon/<%= theme %>/bootstrap.min.js': '<%= root_path %>vendor/talon/<%= theme %>/bootstrap/js/bootstrap.min.js',
+//         'js/talon/<%= theme %>/app.min.js': '<%= root_path %>vendor/talon/<%= theme %>/dist/js/app.min.js',
+//         'js/talon/<%= theme %>/sweetalert.min.js': '<%= root_path %>vendor/talon/<%= theme %>/plugins/sweetalert/dist/sweetalert.min.js'
 //       }
 //     },
 //
@@ -30,12 +30,12 @@
 //     stylesheets: {
 //       joinTo: {
 //         'css/app.css': /^(<%= root_match %>css)/,
-//         'css/talon/admin_lte/talon.css': [
-//           '<%= root_path %>css/talon/admin-lte/talon.css',
-//           '<%= root_path %>vendor/talon/admin-lte/dist/css/skins/all-skins.css',
-//           '<%= root_path %>vendor/talon/admin-lte/bootstrap/css/bootstrap.min.css',
-//           '<%= root_path %>vendor/talon/admin-lte/dist/css/AdminLTE.min.css',
-//           '<%= root_path %>vendor/talon/admin-lte/plugins/sweetalert/dist/sweetalert.css'
+//         'css/talon/<%= theme %>/talon.css': [
+//           '<%= root_path %>css/talon/<%= theme %>/talon.css',
+//           '<%= root_path %>vendor/talon/<%= theme %>/dist/css/skins/all-skins.css',
+//           '<%= root_path %>vendor/talon/<%= theme %>/bootstrap/css/bootstrap.min.css',
+//           '<%= root_path %>vendor/talon/<%= theme %>/dist/css/AdminLTE.min.css',
+//           '<%= root_path %>vendor/talon/<%= theme %>/plugins/sweetalert/dist/sweetalert.css'
 //         ]
 //       }<%= styles_snippet %>
 //     },
@@ -49,6 +49,6 @@
 // With
 //
 //     autoRequire: {
-//       "js/app.js": ["js/app", "js/talon/admin-lte/talon"]
+//       "js/app.js": ["js/app", "js/talon/<%= theme %>/talon"]
 //     }
 

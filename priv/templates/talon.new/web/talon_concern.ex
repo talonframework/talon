@@ -1,6 +1,6 @@
-defmodule <%= base %>.Talon do
+defmodule <%= base %>.<%= concern %> do
   @moduledoc """
-  Admmin Endpoint/Context.
+  Admmin Endpoint/Concern.
 
   This module contains a number of default functions which are all
   overridable. It is also used for namespacing configuration.
@@ -12,7 +12,7 @@ defmodule <%= base %>.Talon do
   If you are using Talon in differnt umbrella apps, create a separate
   module (differnt name) for each app that uses Talon.
   """
-  use Talon, otp_app: <%= inspect app %>
+  use Talon.Concern, otp_app: <%= inspect app %>
   <%= if boilerplate do %>
   # Here is a list of the functions that you can override:
 

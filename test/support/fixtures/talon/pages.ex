@@ -1,3 +1,3 @@
 defmodule TestTalon.Talon.Dashboard do
-  use Talon.Page, context: TestTalon.Talon
+  use Talon.Page, concern: TestTalon.Admin
 end

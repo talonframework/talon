@@ -12,6 +12,9 @@ defmodule Talon.Mixfile do
      deps: deps()]
   end
 
+  defp compilers(:test), do: [:phoenix] ++ Mix.compilers
+  defp compilers(_), do: nil
+
   def application do
     [mod: {Talon.Application, [:inflex]},
      extra_applications: [:logger]]
@@ -34,8 +37,4 @@ defmodule Talon.Mixfile do
       # {:ecto_talon, path: "../ecto_talon", only: :test},
     ]
   end
-
-  defp compilers(:test), do: [:phoenix] ++ Mix.compilers
-  defp compilers(_), do: nil
 end
-

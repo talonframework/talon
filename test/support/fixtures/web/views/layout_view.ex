@@ -1,3 +1,7 @@
-defmodule AdminLte.LayoutView do
-  use TestTalon.Web, which: :view, theme: "admin_lte", module: AdminLte.Web
+defmodule TestTalon.Admin.AdminLte.LayoutView do
+  def render(mod, conn) do
+    "Test Layout\nTest Dashboard"  # TODO: (DJS)
+  end
 end
+
+
