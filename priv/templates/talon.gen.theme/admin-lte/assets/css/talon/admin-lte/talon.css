@@ -21,6 +21,7 @@ table.index_table th.sorted-desc a {
 table.index_table th.selectable {
   width: 25px;
 }
-table.index_table th.actions {
-  width: 90px;
+table.index_table td.index-actions {
+  white-space: nowrap;
 }
+
