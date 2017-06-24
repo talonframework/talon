@@ -87,7 +87,7 @@ defmodule Mix.Tasks.Talon.Gen.Theme do
   @enabled_boolean_options ~w(brunch assets layouts generators components dashboard)
 
   # All the boolean options
-  @all_boolean_options @boolean_options ++ @enabled_boolean_options ++ @only_options
+  @all_boolean_options @boolean_options ++ Enum.map(@enabled_boolean_options ++ @only_options, &String.to_atom/1)
 
   # complete list of supported options
   @switches [
@@ -357,6 +357,7 @@ defmodule Mix.Tasks.Talon.Gen.Theme do
   end
   defp print_brunch_instructions(%{brunch: true} = config) do
     Mix.shell.info """
+
     Boilerplate has been added to your brunch-config.js file. Please review this
     and update your config file appropriately.
     """
@@ -364,7 +365,7 @@ defmodule Mix.Tasks.Talon.Gen.Theme do
   end
   defp print_brunch_instructions(config), do: config
 
-  defp render_brunch_boilerplate(config) do
+  defp render_brunch_boilerplate(%{brunch: true} = config) do
     proj = config.project_structure
     bindings = [
       root_match: brunch_snippets(proj, :root_match),
@@ -374,6 +375,7 @@ defmodule Mix.Tasks.Talon.Gen.Theme do
     ]
     EEx.eval_string(brunch_boilerplate(), bindings)
   end
+  defp render_brunch_boilerplate(config), do: config
   # this is private, but left as `def` for testing
   @doc false
   defp brunch_boilerplate do
@@ -499,11 +501,13 @@ defmodule Mix.Tasks.Talon.Gen.Theme do
   #   Application.get_env :talon, :themes, [@default_theme]
   # end
 
+  @boolean_opts @switches |> Enum.filter_map(&(elem(&1, 1) == :boolean), &elem(&1, 0))
+
   defp parse_options([], parsed) do
     {[], [], parsed}
   end
   defp parse_options(opts, parsed) do
-    bin_opts = Enum.filter(opts, fn {k,_v} -> k in @boolean_options end)
+    bin_opts = Enum.filter(opts, fn {k,_v} -> k in @boolean_opts end)
     {bin_opts, opts -- bin_opts, parsed}
   end
 
