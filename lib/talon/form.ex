@@ -3,7 +3,7 @@ defmodule Talon.Form do
   def input_builder({f, a}, field, opts) do
     # a.adapter().input_builder(a, resource, opts)
 
-    context = a.talon
+    concern = a.concern
     struct = f.data.__struct__
     associations = Talon.Schema.associations(struct)
     type =
@@ -11,7 +11,7 @@ defmodule Talon.Form do
         nil   -> struct.__schema__(:type, field)
         assoc -> assoc
       end
-    type = context.schema_field_type struct, field, type
+    type = concern.schema_field_type struct, field, type
     build_input({a, f}, field, type, opts)
   end
 
@@ -32,11 +32,11 @@ defmodule Talon.Form do
   end
 
   defp build_input({a, f}, field, %Ecto.Association.BelongsTo{} = _assoc, opts) do
-    context = a.talon
+    concern = a.concern
     {collection, opts} = Keyword.pop(opts, :collection)
     assoc_list = Keyword.get(a[:associations] || [], field, [])
     collection = for item <- collection || assoc_list,
-      do: collection_tuple(context, item)
+      do: collection_tuple(concern, item)
     select(f, field, collection, opts)
   end
 
@@ -58,8 +58,8 @@ defmodule Talon.Form do
     "unknown type"
   end
 
-  defp collection_tuple(context, item) do
-    {context.display_name(item), context.primary_key(item)}
+  defp collection_tuple(concern, item) do
+    {concern.display_name(item), concern.primary_key(item)}
   end
   # defp defn_and_adapter(%{__struct__: module}),
   #   do: defn_and_adapter(module)

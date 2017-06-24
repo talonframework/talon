@@ -34,16 +34,16 @@ defmodule Talon.Config do
   end
 
   @doc """
-  Get the configuration for a given context
+  Get the configuration for a given concern
   """
-  defmacro get_all_env(context) do
+  defmacro get_all_env(concern) do
     quote do
       Talon.Config.get_app()
-      |> Application.get_env(unquote(context), [])
+      |> Application.get_env(unquote(concern), [])
     end
   end
 
-  defmacro get_env(context, key, default \\ nil)
+  defmacro get_env(concern, key, default \\ nil)
   defmacro get_env(field, default, _) when field in @top_level_keys do
     quote do
       Talon.Config.get_app()
@@ -51,9 +51,9 @@ defmodule Talon.Config do
       |> Keyword.get(unquote(field), unquote(default))
     end
   end
-  defmacro get_env(context, key, default) do
+  defmacro get_env(concern, key, default) do
     quote do
-      Keyword.get(Talon.Config.get_all_env(unquote(context)), unquote(key), unquote(default))
+      Keyword.get(Talon.Config.get_all_env(unquote(concern)), unquote(key), unquote(default))
     end
   end
 
@@ -98,15 +98,15 @@ defmodule Talon.Config do
     end
   end
 
-  defmacro resources(context) do
+  defmacro resources(concern) do
     quote do
-      Talon.Config.get_env(unquote(context), :resources)
+      Talon.Config.get_env(unquote(concern), :resources)
     end
   end
 
-  defmacro pages(context) do
+  defmacro pages(concern) do
     quote do
-      Talon.Config.get_env(unquote(context), :pages)
+      Talon.Config.get_env(unquote(concern), :pages)
     end
   end
 

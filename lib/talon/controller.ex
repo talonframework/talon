@@ -44,7 +44,7 @@ defmodule Talon.Controller do # TODO: rename to ResourceController (DJS)
         # IO.inspect params_key, label: "params_key"
         repo = Talon.View.repo(conn)
         changeset = conn.assigns.talon.schema.changeset(conn.assigns.resource, params[params_key])
-        # TODO: we should use a context here. Can you use the user's context? How can be know what API they
+        # TODO: we should use a concern here. Can you use the user's concern? How can be know what API they
         #       are exposiing.
         case repo.insert(changeset) do
           {:ok, resource} ->
