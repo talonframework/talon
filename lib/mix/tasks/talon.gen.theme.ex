@@ -331,7 +331,7 @@ defmodule Mix.Tasks.Talon.Gen.Theme do
       Enum.into([brunch: false, print_brunch_error: true], config)
     end
   end
-  defp verify_brunch(config), do: config |> IO.inspect(label: "no verify")
+  defp verify_brunch(config), do: config
 
   defp gen_brunch_boilerplate(%{brunch: true, brunch_path: path} = config) do
     boilerplate = render_brunch_boilerplate(config)
