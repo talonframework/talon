@@ -2,9 +2,9 @@ aside.main-sidebar
   section.sidebar style="height: auto;"
     ul.sidebar-menu
       li.header.text-uppercase = dgettext "talon", "Pages"
-      = render_many page_paths(@conn), LayoutView, "nav_resource_link.html", as: :link
+      = render_many page_paths(@conn), LayoutView, "nav_resource_link.html", as: :link, conn: @conn
       li.header.text-uppercase = dgettext "talon", "Resources"
-      = render_many resource_paths(@conn), LayoutView, "nav_resource_link.html", as: :link
+      = render_many resource_paths(@conn), LayoutView, "nav_resource_link.html", as: :link, conn: @conn
       = unless (links = nav_action_links(@conn)) |> Enum.empty? do
         li.header.text-uppercase = dgettext "talon", "Actions"
         = render_many links, LayoutView, "nav_action_link.html", as: :link

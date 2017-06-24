@@ -9,6 +9,8 @@ defmodule Talon.View do
 
   defmacro __using__(_) do
     quote do
+      import Phoenix.HTML.Tag
+      import Phoenix.HTML.Link
 
       @spec concern(Plug.Conn.t) :: atom
       def concern(conn) do
