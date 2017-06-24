@@ -107,7 +107,7 @@ defmodule Talon.Concern do
 
       def page_names, do: @__page_map__ |> Map.keys
 
-      def dashboard(), do: List.first pages()
+      def dashboard(), do: List.first pages()  # TODO: default_page a better name? See #69 (DJS)
 
       def dashboard_name(), do: List.first page_names()
 
@@ -306,6 +306,7 @@ defmodule Talon.Concern do
   Note: This function is overridable
   """
   @spec nav_action_links(atom, atom, Struct.t | Module.t) :: List.t
+  def nav_action_links(_concern, _action, _resource = nil), do: []
   def nav_action_links(concern, action, resource) when action in [:index, :edit] do
     [nav_action_link(concern, :new, resource)]
   end
