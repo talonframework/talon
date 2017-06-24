@@ -15,6 +15,8 @@ defmodule Talon.PageController do
       defp set_concern(conn, opts) do
         assign conn, :talon, Enum.into(opts, %{})
       end
+
+      defoverridable [page: 2]
     end
   end
 end
