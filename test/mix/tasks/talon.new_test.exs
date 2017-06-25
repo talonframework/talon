@@ -135,7 +135,7 @@ defmodule Mix.Tasks.Talon.NewTest do
           assert_file Path.join([base_path, "layout", "#{file}.html.slim"])
         end
 
-        assert_file "lib/phx_blogger/talon/templates/admin/admin-lte/dashboard/dashboard.html.slim", [
+        assert_file "lib/phx_blogger/talon/templates/admin/admin-lte/dashboard/index.html.slim", [
           "Welcome to Talon",
           "To add dashboard sections, checkout"
         ]
@@ -250,7 +250,7 @@ defmodule Mix.Tasks.Talon.NewTest do
           assert_file "lib/blogger/talon/templates/admin/admin-lte/layout/#{file}.html.slim"
         end
 
-        assert_file "lib/blogger/talon/templates/admin/admin-lte/dashboard/dashboard.html.slim", [
+        assert_file "lib/blogger/talon/templates/admin/admin-lte/dashboard/index.html.slim", [
           "Welcome to Talon",
           "To add dashboard sections, checkout"
         ]
