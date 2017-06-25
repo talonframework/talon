@@ -107,9 +107,9 @@ defmodule Talon.Concern do
 
       def page_names, do: @__page_map__ |> Map.keys
 
-      def dashboard(), do: List.first pages()  # TODO: default_page a better name? See #69 (DJS)
+      def default_page(), do: List.first pages()
 
-      def dashboard_name(), do: List.first page_names()
+      def default_page_name(), do: List.first page_names()
 
       def schema(resource_name) do
         try do
@@ -139,7 +139,7 @@ defmodule Talon.Concern do
       def talon_page(page_name) when is_binary(page_name) do
         @__page_map__[page_name]
       end
-      def talon_page(_), do: dashboard()
+      def talon_page(_), do: default_page()
 
       def resource_schema(resource_name) when is_binary(resource_name) do
         {String.to_atom(resource_name), talon_resource(resource_name)}
