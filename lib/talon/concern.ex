@@ -306,7 +306,7 @@ defmodule Talon.Concern do
   Note: This function is overridable
   """
   @spec nav_action_links(atom, atom, Struct.t | Module.t) :: List.t
-  def nav_action_links(_concern, _action, _resource = nil), do: []
+  def nav_action_links(_concern, _action, nil = _resource), do: []
   def nav_action_links(concern, action, resource) when action in [:index, :edit] do
     [nav_action_link(concern, :new, resource)]
   end
