@@ -246,7 +246,7 @@ defmodule Mix.Tasks.Talon.Gen.Theme do
       File.mkdir_p! template_path
       copy_from paths(),
         "priv/templates/talon.gen.theme/#{theme}/templates/dashboard", template_path, binding, [
-          {:eex, "dashboard.html.slim", "dashboard.html.slim"}
+          {:eex, "index.html.slim", "index.html.slim"}
         ], config
     end
     config

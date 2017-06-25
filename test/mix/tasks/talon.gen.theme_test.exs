@@ -51,7 +51,7 @@ defmodule Mix.Tasks.Talon.Gen.ThemeTest do
           "defmodule PhxBlogger.Admin.AdminLte.Web.DashboardView do",
           ~s{use PhxBlogger.Talon.Web, which: :view, theme: "admin/admin-lte", module: PhxBlogger.Admin.AdminLte.Web}
         ]
-        assert_file "lib/phx_blogger/talon/templates/admin/admin-lte/dashboard/dashboard.html.slim", [
+        assert_file "lib/phx_blogger/talon/templates/admin/admin-lte/dashboard/index.html.slim", [
           "Welcome to Talon",
           "To add dashboard sections, checkout 'lib/talon/admin/dashboard.ex'"
         ]
@@ -246,7 +246,7 @@ defmodule Mix.Tasks.Talon.Gen.ThemeTest do
           ~s(use Blogger.Talon.Web, which: :view, theme: "admin/admin-lte", module: Blogger.Admin.AdminLte)
         ]
 
-        assert_file "web/templates/talon/admin/admin-lte/dashboard/dashboard.html.slim", [
+        assert_file "web/templates/talon/admin/admin-lte/dashboard/index.html.slim", [
           "To add dashboard sections, checkout 'lib/talon/admin/dashboard.ex'"
         ]
       end

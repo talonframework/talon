@@ -5,10 +5,10 @@ defmodule Talon.PageController do
       talon = opts[:concern] || raise("concern option required")
       plug :set_concern, talon: talon
 
-      @spec page(Plug.Conn.t, Map.t) :: Plug.Conn.t
-      def page(conn, params) do
-        page = Map.get(params, "page", "dashboard")
-        render(conn, "#{page}.html")
+
+      @spec index(Plug.Conn.t, Map.t) :: Plug.Conn.t
+      def index(conn, params) do
+        render(conn, "index.html")
       end
 
       @spec set_concern(Plug.Conn.t, Keyword.t) :: Plug.Conn.t
@@ -16,7 +16,7 @@ defmodule Talon.PageController do
         assign conn, :talon, Enum.into(opts, %{})
       end
 
-      defoverridable [page: 2]
+      defoverridable [index: 2]
     end
   end
 end

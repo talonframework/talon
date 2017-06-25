@@ -47,8 +47,9 @@ defmodule Talon.Router do
       resource_controller = Talon.Utils.module_join(concern, ResourceController)
       controller = Talon.Utils.module_join(concern, Controller)
 
-      get "/", TalonPageController, :page
-      get "/pages/:page", TalonPageController, :page
+      get "/", TalonPageController, :index
+      get "/pages/:page", TalonPageController, :index
+
       get "/select_theme/:id", controller, :select_theme
       if Application.get_env :talon, :login_user do
         get "/switch_user/:id", controller, :switch_user
