@@ -1,6 +1,8 @@
 .container-fluid
   .row
     .col-md-12
+      = if get_flash(@conn, :success) do
+        .alert.alert-success = get_flash(@conn, :success)
       .box
         .box-header.with-border
           .box-title <%%= @talon_resource.index_card_title() %>
