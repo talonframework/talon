@@ -23,4 +23,6 @@ defmodule <%= base %>.Talon.Messages do
 
   def are_you_sure_you_want_to_delete_this?, do: dgettext(@domain, "Are you sure you want to delete this?")
   def not_loaded, do: dgettext(@domain, "Not Loaded")
+  def changed_successfully, do: dgettext(@domain, "Changed succesfully")
+  def created_successfully, do: dgettext(@domain, "Created succesfully")
 end
