@@ -14,6 +14,8 @@ defmodule Talon.Messages do
 
   @callback are_you_sure_you_want_to_delete_this?() :: binary
   @callback not_loaded() :: binary
+  @callback changed_successfully() :: binary
+  @callback created_successfully() :: binary
 
   @doc """
   Returns the Messages module from the users app's configuration
@@ -22,4 +24,3 @@ defmodule Talon.Messages do
     Application.get_env :talon, :messages_backend
   end
 end
-
