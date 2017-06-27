@@ -1,4 +1,4 @@
-defmodule TestTalon.TalonPageController do
+defmodule TestTalon.AdminPageController do
   use TestTalon.Web, :controller
   use Talon.PageController, concern: TestTalon.Admin
 
