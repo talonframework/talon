@@ -10,7 +10,7 @@ defmodule TestTalon.Router do
     plug :put_secure_browser_headers
   end
 
-  scope "/talon", TestTalon do
+  scope "/admin", TestTalon do
     pipe_through :browser
     talon_routes(TestTalon.Admin)
   end

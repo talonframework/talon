@@ -77,6 +77,12 @@ defmodule Talon.Utils do
     item |> base_name |> Inflex.underscore |> String.to_atom
   end
 
+
+  @doc false
+  def module_name(module) do
+    module |> base_name |> Inflex.underscore
+  end
+
   @doc """
   Convert a field name to its human readable form.
 

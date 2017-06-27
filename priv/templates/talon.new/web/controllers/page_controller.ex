@@ -1,4 +1,4 @@
-defmodule <%= base %>.<%= web_namespace %>TalonPageController do
+defmodule <%= base %>.<%= web_namespace %><%= concern %>PageController do
   use <%= base %>.Web, :controller
   use Talon.PageController, concern: <%= base %>.<%= concern %>
 
