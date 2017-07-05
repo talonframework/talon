@@ -9,6 +9,7 @@ defmodule Talon.Mixfile do
      build_embedded: Mix.env == :prod,
      start_permanent: Mix.env == :prod,
      compilers: compilers(Mix.env),
+     dialyzer: [plt_add_deps: :transitive],
      deps: deps()]
   end
 
@@ -37,6 +38,7 @@ defmodule Talon.Mixfile do
       {:mix_test_watch, "~> 0.3", only: :dev, runtime: false},
       {:gettext, "~> 0.11", only: :test},
       {:csv, "~> 2.0"},
+      {:dialyxir, "~> 0.5.0", only: [:dev]}
       # {:ecto_talon, path: "../ecto_talon", only: :test},
     ]
   end

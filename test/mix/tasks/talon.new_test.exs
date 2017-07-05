@@ -68,7 +68,7 @@ defmodule Mix.Tasks.Talon.NewTest do
         ]
 
         assert_file "lib/phx_blogger/talon/controllers/admin_page_controller.ex", [
-          "defmodule PhxBlogger.Web.TalonPageController do",
+          "defmodule PhxBlogger.Web.AdminPageController do",
           "use PhxBlogger.Web, :controller",
           "use Talon.PageController, concern: PhxBlogger.Admin",
           "plug Talon.Plug.LoadConcern",
@@ -217,7 +217,7 @@ defmodule Mix.Tasks.Talon.NewTest do
         ]
 
         assert_file "lib/blogger/talon/controllers/admin_page_controller.ex", [
-          "defmodule Blogger.TalonPageController do",
+          "defmodule Blogger.AdminPageController do",
           "use Blogger.Web, :controller",
           "use Talon.PageController, concern: Blogger.Admin",
           "plug Talon.Plug.LoadConcern",

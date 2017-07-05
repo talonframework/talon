@@ -1,4 +1,4 @@
-defmodule TestTalon.TalonResourceController do
+defmodule TestTalon.AdminResourceController do
   use TestTalon.Web, :controller
   use Talon.Controller, repo: TestTalon.Repo, concern: TestTalon.Admin
 

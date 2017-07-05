@@ -45,10 +45,11 @@ defmodule Talon.Router do
         |> Module.concat(nil)
 
       resource_controller = Talon.Utils.module_join(concern, ResourceController)
+      page_controller = Talon.Utils.module_join(concern, PageController)
       controller = Talon.Utils.module_join(concern, Controller)
 
-      get "/", TalonPageController, :index
-      get "/pages/:page", TalonPageController, :index
+      get "/pages/:page", page_controller, :index
+      get "/", page_controller, :index
 
       get "/select_theme/:id", controller, :select_theme
       if Application.get_env :talon, :login_user do

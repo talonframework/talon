@@ -126,6 +126,8 @@ defmodule Talon.Concern do
         end)
       end
 
+      def concern_name, do: Talon.Utils.module_name(__MODULE__)
+
       def talon_resource(resource_name) when is_binary(resource_name) do
         @__resource_map__[resource_name]
       end
@@ -247,6 +249,11 @@ defmodule Talon.Concern do
         apply @__router_helpers__, @__resource_path_fn__, args
       end
 
+      def page_path(page, action \\ :index, opts \\ []) do
+        args = [@__endpoint__, action, page.route_name() | opts]
+        apply @__router_helpers__, String.to_atom(concern_name() <> "_page_path"), args
+      end
+
       @spec concern(Plug.Conn.t) :: Module.t
       def concern(conn) do
         conn.assigns.talon.concern
@@ -273,12 +280,9 @@ defmodule Talon.Concern do
       Note: This function is overridable
       """
       @spec page_paths(Plug.Conn.t) :: [Tuple.t]
-      def page_paths(conn) do  # TODO: use this approach for resource_paths? (DJS)
+      def page_paths(conn) do
         concern = concern(conn)
-        concern_name = concern |> Module.split |> List.last |> to_string |> Inflex.underscore
-        concern.pages |> Enum.map(&{apply(&1, :title, []),
-          "/#{concern_name}/pages/#{apply(&1, :name, [])}"})  # TODO: remove apply? (DJS)
-                                                              # TODO: use Router.Helpers here (SMP)
+        concern.pages() |> Enum.map(&{&1.title, concern.page_path(&1)})
       end
 
       def nav_action_links(conn) do # TODO: move to view (DJS)
@@ -292,7 +296,7 @@ defmodule Talon.Concern do
         base: 0, repo: 0, resource_map: 0, schema: 1, schema_names: 0,
         talon_resource: 1, resource_path: 3, resource_schema: 1,
         controller_action: 1, template_path_name: 1, schema_field_type: 3,
-        nav_action_links: 1, messages_backend: 0
+        nav_action_links: 1, messages_backend: 0, default_page: 0
       ]
     end
 
@@ -334,16 +338,16 @@ defmodule Talon.Concern do
   ## Examples
 
       iex> Talon.Concern.nav_action_link(TestTalon.Admin, :new, TestTalon.Simple)
-      {:new, "New Simple", "/talon/simples/new"}
+      {:new, "New Simple", "/admin/simples/new"}
 
       iex> Talon.Concern.nav_action_link(TestTalon.Admin, :new, %TestTalon.Simple{id: 1})
-      {:new, "New Simple", "/talon/simples/new"}
+      {:new, "New Simple", "/admin/simples/new"}
 
       iex> Talon.Concern.nav_action_link(TestTalon.Admin, :edit, %TestTalon.Simple{id: 1})
-      {:edit, "Edit Simple", "/talon/simples/1/edit"}
+      {:edit, "Edit Simple", "/admin/simples/1/edit"}
 
       iex> Talon.Concern.nav_action_link(TestTalon.Admin, :delete, %TestTalon.Simple{id: 1})
-      {:delete, "Delete Simple", "/talon/simples/1"}
+      {:delete, "Delete Simple", "/admin/simples/1"}
   """
   @spec nav_action_link(atom, atom, atom | struct) :: {atom, String.t, String.t}
   def nav_action_link(concern, action, resource_or_module) do
@@ -364,12 +368,10 @@ defmodule Talon.Concern do
     {action, title, path}
   end
 
-
   @spec concern(Plug.Conn.t) :: Module.t
   def concern(conn) do
     conn.assigns.talon.talon
   end
-
 
   @spec resource_path(Plug.Conn.t, atom | Module.t | Struct.t, List.t | atom, List.t) :: String.t
   def resource_path(conn, action_or_resource, opts_or_action, opts \\ [])

@@ -30,6 +30,9 @@ defmodule Talon.Page do
       @spec name() :: String.t
       def name, do: __MODULE__ |> Module.split |> List.last() |> to_string |> Inflex.underscore
 
+      @spec route_name() :: String.t
+      def route_name, do: name()
+
       defoverridable [
         concern: 0, index_card_title: 0, title: 0, name: 0
       ]
