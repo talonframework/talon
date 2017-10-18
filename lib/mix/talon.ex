@@ -144,10 +144,10 @@ defmodule Mix.Talon do
 
   @spec detect_project_structure() :: :phx | :phoenix | :unknown
   def detect_project_structure do
-    phx_dir = otp_app_path()
+    phx_web_root = otp_app_path() <> "_web"
     cond do
       File.exists?("web") -> :phoenix
-      Path.join(["lib", phx_dir, "web"]) |> File.exists? -> :phx
+      Path.join(["lib", phx_web_root]) |> File.exists? -> :phx
       true -> :unknown
     end
   end

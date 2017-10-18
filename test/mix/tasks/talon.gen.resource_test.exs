@@ -84,6 +84,34 @@ defmodule Mix.Tasks.Talon.Gen.ResourceTest do
         ]
       end
     end
+
+    test "strip app namespace if provided" do
+      Logger.disable(self())
+
+      Application.put_env(:phx_blogger, PhxBlogger.Web.Endpoint,
+        secret_key_base: String.duplicate("abcdefgh", 8),
+        code_reloader: true,
+        root: File.cwd!)
+
+      in_tmp "strip_app_namespace", fn ->
+        Mix.Tasks.Phx.New.run([@app_name, "--no-ecto"])
+      end
+
+      in_project :phx_blogger, Path.join(tmp_path(), "strip_app_namespace/phx_blogger"), fn _ ->
+        Mix.Task.clear
+        GenNew.run [] #{ }~w(--phx)
+
+        Mix.Task.clear
+        GenResource.run ["PhxBlogger.Blogs.Post"]
+        root_path = Path.join(["lib", "phx_blogger", "talon"])
+        concern_path = Path.join([root_path, "admin"])
+
+        assert_file Path.join(concern_path, "post.ex"), [
+          "defmodule PhxBlogger.Admin.Blogs.Post do",
+          "use Talon.Resource, schema: PhxBlogger.Blogs.Post, concern: PhxBlogger.Admin"
+        ]
+      end
+    end
   end
 
   describe "phoenix structure" do
