@@ -147,6 +147,7 @@ defmodule Mix.Talon do
     phx_dir = otp_app_path()
     cond do
       File.exists?("web") -> :phoenix
+      Path.join(["lib", phx_dir <> "_web"]) |> File.exists? -> :phx
       Path.join(["lib", phx_dir, "web"]) |> File.exists? -> :phx
       true -> :unknown
     end
