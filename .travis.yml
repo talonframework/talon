@@ -11,6 +11,7 @@ otp_release:
 sudo: false
 script: 
   - yes | mix archive.install https://github.com/phoenixframework/archives/raw/master/phoenix_new.ez --force
+  - mix -h
   - mix test
 notification:
   recipients:
