@@ -11,8 +11,6 @@ otp_release:
   - 19.3
 sudo: false
 script: 
-  - elixir -v
-  - mix -h
   - mix test
 notification:
   recipients:
