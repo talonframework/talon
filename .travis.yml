@@ -3,6 +3,7 @@ services:
 before_script:
   - psql -c 'create database talon_test;' -U postgres
   - nohup phantomjs --wd &
+  - yes | mix archive.install https://github.com/phoenixframework/archives/raw/master/phoenix_new.ez --force
 language: elixir
 elixir:
   - 1.4
@@ -10,7 +11,6 @@ otp_release:
   - 19.3
 sudo: false
 script: 
-  - yes | mix archive.install https://github.com/phoenixframework/archives/raw/master/phoenix_new.ez --force
   - mix -h
   - mix test
 notification:
