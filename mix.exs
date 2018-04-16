@@ -27,17 +27,17 @@ defmodule Talon.Mixfile do
   defp deps do
     [
       {:inflex, "~> 1.7"},
-      {:phoenix, "~> 1.3.0-rc"},
+      {:phoenix, "~> 1.3.0"},
       {:phoenix_html, "~> 2.6"},
       {:phoenix_ecto, "~> 3.2"},
       {:scrivener_ecto, "~> 1.1"},
       {:postgrex, ">= 0.0.0", only: :test},
       {:phoenix_slime, "~> 0.9"},
       {:slime, "~> 1.0", override: true},
-      {:ecto_talon, github: "talonframework/ecto_talon"},
       {:mix_test_watch, "~> 0.3", only: :dev, runtime: false},
       {:gettext, "~> 0.11", only: :test},
-      {:dialyxir, "~> 0.5.0", only: [:dev]}
+      {:dialyxir, "~> 0.5", only: [:dev]},
+      {:ecto_talon, github: "talonframework/ecto_talon"},
       # {:ecto_talon, path: "../ecto_talon", only: :test},
     ]
   end
