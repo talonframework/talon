@@ -130,19 +130,6 @@ defmodule Talon.Resource do
           name: name
       end
 
-      # TODO: remove and use only header_title
-      @spec form_card_title(String.t, String.t) :: String.t
-      def form_card_title(action, resource) do
-        action_name = action |> to_string |> Talon.Utils.titleize
-        resource_name = resource |> Map.get(Talon.Resource.name_field(resource.__struct__))
-        resource_type = Module.split(@__module__) |> List.last
-
-        case action do
-          :new -> dgettext @__domain__, "%{action} %{resource_type}", action: action_name, resource_type: resource_type
-          :edit -> dgettext @__domain__, "%{action} %{resource_name}", action: action_name, resource_name: resource_name
-        end
-      end
-
       # TODO: still needed?
       @spec tool_bar() :: String.t
       def tool_bar do
@@ -271,7 +258,7 @@ defmodule Talon.Resource do
 
       defoverridable [
         params_key: 0, display_schema_columns: 1,
-        index_card_title: 0, form_card_title: 2, tool_bar: 0, route_name: 0, repo: 0,
+        index_card_title: 0, tool_bar: 0, route_name: 0, repo: 0,
         adapter: 0, render_column_name: 2, get_schema_field: 3, preload: 3, concern: 0,
         paginate: 3, query: 3, search: 1, search: 3, schema_types: 0, name_field: 0,
         themes: 0, display_name: 0, display_name_plural: 0, header_title: 2, resource_title: 1
