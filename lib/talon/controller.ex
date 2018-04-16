@@ -86,7 +86,16 @@ defmodule Talon.Controller do # TODO: rename to ResourceController (DJS)
         |> render("search.html", conn: conn)
       end
 
-      defoverridable [index: 2, show: 2, new: 2, edit: 2, create: 2, update: 2, delete: 2, set_repo: 2, search: 2]
+      def csv(conn, _params) do
+        repo = Talon.View.repo(conn)
+        resources = repo.all(conn.assigns.talon.schema)
+        csv_schema = Talon.CSV.normalize_schema(conn.assigns.talon.talon_resource.csv_schema())
+        file_path = Talon.CSV.write_file(resources, csv_schema)
+        file_name = conn.assigns.talon.talon_resource.index_card_title() <> ".csv"
+        send_download(conn, {:file, file_path}, filename: file_name)
+      end
+
+      defoverridable [index: 2, show: 2, new: 2, edit: 2, create: 2, update: 2, delete: 2, set_repo: 2, search: 2, csv: 2]
     end
   end
 

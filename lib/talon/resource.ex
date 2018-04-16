@@ -71,6 +71,10 @@ defmodule Talon.Resource do
         @__module__.__schema__(:fields) -- ~w(id inserted_at updated_at)a
       end
 
+      def csv_schema do
+        @__module__.__schema__(:fields) -- ~w(inserted_at updated_at)a
+      end
+
       @doc """
       Translates column atoms into human title format.
 

@@ -37,6 +37,7 @@ defmodule Talon.Mixfile do
       {:ecto_talon, github: "talonframework/ecto_talon"},
       {:mix_test_watch, "~> 0.3", only: :dev, runtime: false},
       {:gettext, "~> 0.11", only: :test},
+      {:csv, "~> 2.0"},
       {:dialyxir, "~> 0.5.0", only: [:dev]}
       # {:ecto_talon, path: "../ecto_talon", only: :test},
     ]
