@@ -1,19 +1,6 @@
 defmodule Talon.Mixfile do
   use Mix.Project
 
-  # def project do
-  #   [app: :talon,
-  #    version: "0.1.0",
-  #    elixir: "~> 1.4",
-  #    elixirc_paths: elixirc_paths(Mix.env),
-  #    build_embedded: Mix.env == :prod,
-  #    start_permanent: Mix.env == :prod,
-  #    compilers: compilers(Mix.env),
-  #    dialyzer: [plt_add_deps: :transitive],
-  #    deps: deps()]
-  # end
-
-  # Testing out Umbrella approach
   def project do
     base_config = [
       app: :talon,
@@ -34,7 +21,9 @@ defmodule Talon.Mixfile do
       lockfile: "../../mix.lock",
     ]
 
-    if in_umbrella?(File.cwd!), do: base_config ++ umbrella_config, else: base_config
+    # if in_umbrella?(File.cwd!), do: base_config ++ umbrella_config, else: base_config TODO: REMOVE
+
+    if talon_in_umbrella?(), do: base_config ++ umbrella_config, else: base_config
   end
 
   defp compilers(:test), do: [:phoenix] ++ Mix.compilers
@@ -49,28 +38,39 @@ defmodule Talon.Mixfile do
   defp elixirc_paths(_),     do: ["lib"]
 
   defp deps do
+    # If using umbrella app, need to always include deps used by siblings
+    test_env = if talon_in_umbrella?(), do: [:dev, :prod, :test], else: :test
+
     [
       {:inflex, "~> 1.7"},
       {:phoenix, "~> 1.3.0"},
       {:phoenix_html, "~> 2.6"},
       {:phoenix_ecto, "~> 3.2"},
       {:scrivener_ecto, "~> 1.1"},
-      {:postgrex, ">= 0.0.0", only: :test},
       {:phoenix_slime, "~> 0.9"},
       {:slime, "~> 1.0", override: true},
       {:mix_test_watch, "~> 0.3", only: :dev, runtime: false},
-      {:gettext, "~> 0.11", only: :test},
       {:dialyxir, "~> 0.5", only: [:dev]},
       {:ecto_talon, github: "talonframework/ecto_talon"},
       # {:ecto_talon, path: "../ecto_talon", only: :test},
+
+      {:postgrex, ">= 0.0.0", only: [:dev, :prod, :test]},
+      {:gettext, "~> 0.11", only: test_env}
     ]
   end
 
+  def talon_in_umbrella? do
+    System.get_env("TALON_IN_UMBRELLA") == "true"
+  end
+
   # From Mix.Phoenix
+  # This doesn't work when pulling Talon into an umbrella using a symbolic link
+  # TODO: remove
   def in_umbrella?(app_path) do
     umbrella = Path.expand(Path.join [app_path, "..", ".."])
     mix_path = Path.join(umbrella, "mix.exs")
     apps_path = Path.join(umbrella, "apps")
+    IO.inspect apps_path, label: "apps_path"
     File.exists?(mix_path) && File.exists?(apps_path)
   end
 end
