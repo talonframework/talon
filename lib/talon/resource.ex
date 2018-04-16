@@ -1,8 +1,6 @@
 defmodule Talon.Resource do
   @moduledoc """
-  Define an Talon managed resource
-
-
+  Mix-in for Talon managed resource.
   """
 
   @type module_or_struct :: atom | struct
@@ -13,6 +11,7 @@ defmodule Talon.Resource do
 
     quote do
       require Talon.Config, as: Config
+      alias Talon.Utils
 
       opts = unquote(opts)
 
@@ -100,6 +99,18 @@ defmodule Talon.Resource do
         Talon.View.get_resource_field(@__concern__, resource, name)
       end
 
+      @spec header_title(Plug.Conn.t, Module.t) :: String.t
+      def header_title(conn, resource \\ nil) do
+        case action = Phoenix.Controller.action_name(conn) do
+          :show  -> dgettext @__domain__, "%{type} %{title}", type: display_name(), title: resource_title(resource)
+          :new   -> dgettext @__domain__, "%{action} %{type}", action: Utils.titleize(action), type: display_name()
+          :edit  -> dgettext @__domain__, "%{action} %{title}", action: Utils.titleize(action), title: resource_title(resource)
+          :index -> dgettext @__domain__, "%{plural_type}", plural_type: display_name_plural()
+          _      -> dgettext @__domain__, "Unknown action"
+        end
+      end
+
+      # TODO: remove and use only header_title
       @spec index_card_title() :: String.t
       def index_card_title do
         # TODO: find a resuable approach here
@@ -107,8 +118,9 @@ defmodule Talon.Resource do
         dgettext @__domain__, "%{title}", title: title
       end
 
-      @spec form_card_title(String.t) :: String.t
-      def form_card_title(resource) do
+      # TODO: remove and use only header_title
+      @spec detail_card_title(String.t) :: String.t
+      def detail_card_title(resource) do
         name =
           resource
           |> Map.get(Talon.Resource.name_field(resource.__struct__))
@@ -118,6 +130,20 @@ defmodule Talon.Resource do
           name: name
       end
 
+      # TODO: remove and use only header_title
+      @spec form_card_title(String.t, String.t) :: String.t
+      def form_card_title(action, resource) do
+        action_name = action |> to_string |> Talon.Utils.titleize
+        resource_name = resource |> Map.get(Talon.Resource.name_field(resource.__struct__))
+        resource_type = Module.split(@__module__) |> List.last
+
+        case action do
+          :new -> dgettext @__domain__, "%{action} %{resource_type}", action: action_name, resource_type: resource_type
+          :edit -> dgettext @__domain__, "%{action} %{resource_name}", action: action_name, resource_name: resource_name
+        end
+      end
+
+      # TODO: still needed?
       @spec tool_bar() :: String.t
       def tool_bar do
         dgettext(@__domain__, "Listing of ") <> index_card_title()
@@ -226,6 +252,11 @@ defmodule Talon.Resource do
         Talon.Resource.name_field @__module__
       end
 
+      @spec resource_title(Module.t) :: String.t
+      def resource_title(resource) do
+        resource |> Map.get(Talon.Resource.name_field(resource.__struct__))
+      end
+
       def themes do
         Config.themes(@__concern__)
       end
@@ -240,10 +271,10 @@ defmodule Talon.Resource do
 
       defoverridable [
         params_key: 0, display_schema_columns: 1,
-        index_card_title: 0, form_card_title: 1, tool_bar: 0, route_name: 0, repo: 0,
+        index_card_title: 0, form_card_title: 2, tool_bar: 0, route_name: 0, repo: 0,
         adapter: 0, render_column_name: 2, get_schema_field: 3, preload: 3, concern: 0,
         paginate: 3, query: 3, search: 1, search: 3, schema_types: 0, name_field: 0,
-        themes: 0, display_name: 0, display_name_plural: 0
+        themes: 0, display_name: 0, display_name_plural: 0, header_title: 2, resource_title: 1
       ]
     end
 

@@ -52,16 +52,16 @@ defmodule Talon.View do
       end
 
       def nav_action_links(conn) do
-        Talon.Concern.nav_action_links(conn) # TODO: why use Talon.Concern here? (DJS)
+        Talon.Concern.nav_action_links(conn)
       end
 
-      def index_card_title(conn) do
-        talon_resource(conn).index_card_title()
+      def header_title(conn, resource \\ nil) do
+        talon_resource(conn).header_title(conn, resource)
       end
 
       defoverridable([
         talon_resource: 1, resource_paths: 1, nav_action_links: 1,
-        resource_path: 4
+        resource_path: 4, header_title: 2
       ])
 
     end

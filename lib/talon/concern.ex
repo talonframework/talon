@@ -282,7 +282,7 @@ defmodule Talon.Concern do
       @spec page_paths(Plug.Conn.t) :: [Tuple.t]
       def page_paths(conn) do
         concern = concern(conn)
-        concern.pages() |> Enum.map(&{&1.title, concern.page_path(&1)})
+        concern.pages() |> Enum.map(&{&1.display_name, concern.page_path(&1)})
       end
 
       def nav_action_links(conn) do # TODO: move to view (DJS)

@@ -1,21 +1,20 @@
 defmodule Talon.Page do
   @moduledoc """
-  Define an Talon managed page
-
+  Mix-in for Talon managed page.
   """
 
   @type module_or_struct :: atom | struct
 
   defmacro __using__(opts) do
 
-    concern = opts[:concern]
-
     quote do
-      @__concern__ unquote(concern) || (Module.split(__MODULE__) |> hd |> Module.concat(nil))
+      opts = unquote(opts)
 
-      # TODO: too specific to template. Move to view. (DJS)
-      @spec index_card_title() :: String.t
-      def index_card_title, do: title()
+      @__concern__  opts[:concern]
+      @__domain__   opts[:domain] || "talon"
+
+      @spec header_title(String.t, String.t) :: String.t
+      def header_title(action, resource \\ nil), do: display_name()
 
       @doc """
       Return the Talon concern.
@@ -23,18 +22,19 @@ defmodule Talon.Page do
       @spec concern() :: atom
       def concern, do: @__concern__
 
-      @spec title() :: String.t
-      def title, do: name() |> Talon.Utils.titleize
-
       # TODO: perhaps resource_name, module_name (DJS)
       @spec name() :: String.t
       def name, do: __MODULE__ |> Module.split |> List.last() |> to_string |> Inflex.underscore
+
+      def display_name do
+        dgettext @__domain__, "%{name}", name: Module.split(__MODULE__) |> List.last |> Talon.Utils.titleize
+      end
 
       @spec route_name() :: String.t
       def route_name, do: name()
 
       defoverridable [
-        concern: 0, index_card_title: 0, title: 0, name: 0
+        concern: 0, header_title: 2, name: 0, display_name: 0
       ]
     end
   end
