@@ -71,7 +71,6 @@ defmodule Talon.Mixfile do
     umbrella = Path.expand(Path.join [app_path, "..", ".."])
     mix_path = Path.join(umbrella, "mix.exs")
     apps_path = Path.join(umbrella, "apps")
-    IO.puts apps_path
     File.exists?(mix_path) && File.exists?(apps_path)
   end
 end
