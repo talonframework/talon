@@ -110,30 +110,9 @@ defmodule Talon.Resource do
         end
       end
 
-      # TODO: remove and use only header_title
-      @spec index_card_title() :: String.t
-      def index_card_title do
-        # TODO: find a resuable approach here
-        title = Inflex.Pluralize.pluralize("#{Module.split(@__module__) |> List.last}")
-        dgettext @__domain__, "%{title}", title: title
-      end
-
-      # TODO: remove and use only header_title
-      @spec detail_card_title(String.t) :: String.t
-      def detail_card_title(resource) do
-        name =
-          resource
-          |> Map.get(Talon.Resource.name_field(resource.__struct__))
-
-        dgettext @__domain__, "%{mod} %{name}",
-          mod: Module.split(@__module__) |> List.last,
-          name: name
-      end
-
-      # TODO: still needed?
-      @spec tool_bar() :: String.t
-      def tool_bar do
-        dgettext(@__domain__, "Listing of ") <> index_card_title()
+      @spec toolbar_title() :: String.t
+      def toolbar_title() do
+        dgettext @__domain__, "%{type} listing", type: display_name()
       end
 
       @spec route_name() :: String.t
@@ -258,7 +237,7 @@ defmodule Talon.Resource do
 
       defoverridable [
         params_key: 0, display_schema_columns: 1,
-        index_card_title: 0, tool_bar: 0, route_name: 0, repo: 0,
+        toolbar_title: 0, route_name: 0, repo: 0,
         adapter: 0, render_column_name: 2, get_schema_field: 3, preload: 3, concern: 0,
         paginate: 3, query: 3, search: 1, search: 3, schema_types: 0, name_field: 0,
         themes: 0, display_name: 0, display_name_plural: 0, header_title: 2, resource_title: 1

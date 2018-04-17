@@ -59,6 +59,10 @@ defmodule Talon.View do
         talon_resource(conn).header_title(conn, resource)
       end
 
+      def index_toolbar_title(conn) do
+        talon_resource(conn).toolbar_title()
+      end
+
       defoverridable([
         talon_resource: 1, resource_paths: 1, nav_action_links: 1,
         resource_path: 4, header_title: 2
