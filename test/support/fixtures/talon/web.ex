@@ -31,9 +31,15 @@ defmodule TestTalon.Talon.Web do
   def resource(_) do
     quote do
       import TestTalon.Gettext
-
       require TestTalon.Gettext
       require Ecto.Query
+    end
+  end
+
+  def page(_) do
+    quote do
+      import TestTalon.Gettext
+      require TestTalon.Gettext
     end
   end
 
