@@ -123,11 +123,7 @@ defmodule Talon.Utils do
 
   """
   def titleize(atom) when is_atom(atom) do
-    atom
-    |> Module.split
-    |> List.last
-    |> to_string
-    |> titleize
+    atom |> to_string |> String.split(".") |> List.last |> titleize
   end
   def titleize(string) when is_binary(string) do
     string

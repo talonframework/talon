@@ -3,7 +3,8 @@
     .col-md-12
       .box
         .box-header
-          .box-title <%%= @talon_resource.index_card_title() %>
+          .box-header.with-border
+            .box-title#h1 = index_toolbar_title(@conn)
         .box-body
           table#datatables.table.table-hover.table-striped
             thead

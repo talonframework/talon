@@ -29,7 +29,7 @@ html lang="en"
       .content-wrapper style="min-height: 916px;"
         / TODO: Move this to a partial
         section.content-header#title_bar style="padding-left: 30px;"
-          h1#page_title = index_card_title(@conn)
+          h1#header_title = header_title(@conn, @resource)
           ol.breadcrumb
             li
               a href="/talon"

@@ -1,8 +1,6 @@
 defmodule Talon.Resource do
   @moduledoc """
-  Define an Talon managed resource
-
-
+  Mix-in for Talon managed resource.
   """
 
   @type module_or_struct :: atom | struct
@@ -13,6 +11,7 @@ defmodule Talon.Resource do
 
     quote do
       require Talon.Config, as: Config
+      alias Talon.Utils
 
       opts = unquote(opts)
 
@@ -100,27 +99,20 @@ defmodule Talon.Resource do
         Talon.View.get_resource_field(@__concern__, resource, name)
       end
 
-      @spec index_card_title() :: String.t
-      def index_card_title do
-        # TODO: find a resuable approach here
-        title = Inflex.Pluralize.pluralize("#{Module.split(@__module__) |> List.last}")
-        dgettext @__domain__, "%{title}", title: title
+      @spec header_title(Plug.Conn.t, Module.t) :: String.t
+      def header_title(conn, resource \\ nil) do
+        case action = Phoenix.Controller.action_name(conn) do
+          :show  -> dgettext @__domain__, "%{type} %{title}", type: display_name(), title: resource_title(resource)
+          :new   -> dgettext @__domain__, "%{action} %{type}", action: Utils.titleize(action), type: display_name()
+          :edit  -> dgettext @__domain__, "%{action} %{title}", action: Utils.titleize(action), title: resource_title(resource)
+          :index -> dgettext @__domain__, "%{plural_type}", plural_type: display_name_plural()
+          _      -> dgettext @__domain__, "Unknown action"
+        end
       end
 
-      @spec form_card_title(String.t) :: String.t
-      def form_card_title(resource) do
-        name =
-          resource
-          |> Map.get(Talon.Resource.name_field(resource.__struct__))
-
-        dgettext @__domain__, "%{mod} %{name}",
-          mod: Module.split(@__module__) |> List.last,
-          name: name
-      end
-
-      @spec tool_bar() :: String.t
-      def tool_bar do
-        dgettext(@__domain__, "Listing of ") <> index_card_title()
+      @spec toolbar_title() :: String.t
+      def toolbar_title() do
+        dgettext @__domain__, "%{type} listing", type: display_name()
       end
 
       @spec route_name() :: String.t
@@ -226,6 +218,11 @@ defmodule Talon.Resource do
         Talon.Resource.name_field @__module__
       end
 
+      @spec resource_title(Module.t) :: String.t
+      def resource_title(resource) do
+        Map.get(resource, Talon.Resource.name_field(resource.__struct__))
+      end
+
       def themes do
         Config.themes(@__concern__)
       end
@@ -240,10 +237,10 @@ defmodule Talon.Resource do
 
       defoverridable [
         params_key: 0, display_schema_columns: 1,
-        index_card_title: 0, form_card_title: 1, tool_bar: 0, route_name: 0, repo: 0,
+        toolbar_title: 0, route_name: 0, repo: 0,
         adapter: 0, render_column_name: 2, get_schema_field: 3, preload: 3, concern: 0,
         paginate: 3, query: 3, search: 1, search: 3, schema_types: 0, name_field: 0,
-        themes: 0, display_name: 0, display_name_plural: 0
+        themes: 0, display_name: 0, display_name_plural: 0, header_title: 2, resource_title: 1
       ]
     end
 

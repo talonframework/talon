@@ -4,6 +4,7 @@ defmodule <%= base %>.<%= concern %>.<%= page %> do
 
   TBD
   """
+  use <%= base %>.Talon.Web, which: :page
   use Talon.Page, concern: <%= base %>.<%= concern %>
   <%= if boilerplate do %>
     # TODO

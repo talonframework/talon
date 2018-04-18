@@ -1,5 +1,3 @@
-.box-header.with-border
-  .box-title = <%%= @talon_resource %>.form_card_title(@resource)
 = form_for @changeset, @action, [class: "form-horizontal"], fn f ->
   .box-body
     - a = {f, @talon}

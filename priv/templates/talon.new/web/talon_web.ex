@@ -36,6 +36,15 @@ defmodule <%= base %>.Talon.Web do
     end
   end
 
+  def page(_) do
+    quote do
+      import <%= base %>.<%= web_namespace %>Gettext
+      require <%= base %>.<%= web_namespace %>Gettext
+    end
+  end
+
+  # TODO: need separate page_controller def
+
   def controller(_) do
     quote do
       use Phoenix.Controller

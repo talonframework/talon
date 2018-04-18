@@ -21,8 +21,6 @@ defmodule Talon.Mixfile do
       lockfile: "../../mix.lock",
     ]
 
-    # if in_umbrella?(File.cwd!), do: base_config ++ umbrella_config, else: base_config TODO: REMOVE
-
     if talon_in_umbrella?(), do: base_config ++ umbrella_config, else: base_config
   end
 
@@ -61,16 +59,5 @@ defmodule Talon.Mixfile do
 
   def talon_in_umbrella? do
     System.get_env("TALON_IN_UMBRELLA") == "true"
-  end
-
-  # From Mix.Phoenix
-  # This doesn't work when pulling Talon into an umbrella using a symbolic link
-  # TODO: remove
-  def in_umbrella?(app_path) do
-    umbrella = Path.expand(Path.join [app_path, "..", ".."])
-    mix_path = Path.join(umbrella, "mix.exs")
-    apps_path = Path.join(umbrella, "apps")
-    IO.inspect apps_path, label: "apps_path"
-    File.exists?(mix_path) && File.exists?(apps_path)
   end
 end
