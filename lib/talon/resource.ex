@@ -220,7 +220,7 @@ defmodule Talon.Resource do
 
       @spec resource_title(Module.t) :: String.t
       def resource_title(resource) do
-        resource |> Map.get(Talon.Resource.name_field(resource.__struct__))
+        Map.get(resource, Talon.Resource.name_field(resource.__struct__))
       end
 
       def themes do
