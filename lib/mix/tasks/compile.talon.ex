@@ -77,7 +77,11 @@ defmodule Mix.Tasks.Compile.Talon do
         File.touch! Path.join(views_path, "#{resource_name}_view.ex")
       end
     rescue
-      _ -> []
+      # TODO: Dont' swallow exceptions. What's the best approach here? Anything like IO.puts(e.message) halts execution and don't really want that.
+      # In Elixir 1.6, Mix compilers adhere to the Mix.Task.Compiler behaviour and return error and warning diagnostics in a standardized way => Use That.
+
+      # _ -> []
+      e -> IO.inspect e # Works but not overly informative
     end
   end
 
