@@ -5,7 +5,7 @@ defmodule Talon.View do
   TBD
   """
 
-  alias Talon.Schema
+  alias Talon.{Schema, Utils}
 
   defmacro __using__(_) do
     quote do
@@ -174,6 +174,7 @@ defmodule Talon.View do
   # TODO: this is only temporary. Need to use orverridable decorator concept here
   def format_data(data) when is_binary(data), do: data
   def format_data(data) when is_number(data), do: data
+  def format_data(%DateTime{} = dt), do: dt |> Utils.to_datetime |> Utils.format_datetime
   def format_data(data), do: inspect(data)
 
 end
