@@ -56,6 +56,8 @@ defmodule Talon.Schema do
           {owner_key, assoc}
         %Ecto.Association.Has{field: field} = assoc ->
           {field, assoc}
+        %Ecto.Association.ManyToMany{} = assoc ->
+          {field, assoc} # "TODO: handle Ecto.Association.ManyToMany"
       end
     end)
   end
