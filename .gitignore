@@ -24,3 +24,5 @@ erl_crash.dump
 
 /.idea
 *.iml
+
+.elixir_ls
