@@ -6,6 +6,14 @@ defmodule <%= base %>.<%= web_namespace %><%= concern %>PageController do
   plug Talon.Plug.Theme
   plug Talon.Plug.Layout, layout: <%= layout %>
   plug Talon.Plug.View
+
+  # TODO: We want @resource always set. For index, set to nil. Use plug to set (wasn't working)?
+  def index(conn, params) do
+    conn
+    |> assign(:resource, nil)
+    |> super(params)
+  end
+
   <%= if boilerplate do %>
   # TODO
   <% end %>
