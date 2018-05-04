@@ -189,10 +189,13 @@ defmodule Talon.Concern do
       """
       def display_name(schema) do
         talon_resource = talon_resource(schema)
-        if function_exported?(talon_resource, :display_name, 1) do
-          talon_resource.display_name(schema)
-        else
-          Map.get schema, talon_resource.name_field()
+        cond do
+          is_nil(talon_resource) ->
+            "No name" #  dgettext @__domain__, "No name"
+          function_exported?(talon_resource, :display_name, 1) ->
+            talon_resource.display_name(schema)
+          true ->
+            Map.get schema, talon_resource.name_field()
         end
       end
 
