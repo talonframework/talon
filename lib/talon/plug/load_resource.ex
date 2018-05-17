@@ -25,6 +25,7 @@ defmodule Talon.Plug.LoadResource do
   defp handle_action(action, conn, _repo, schema) when action in [:index, :search] do
     talon_resource = Talon.View.talon_resource(conn)
     schema
+    |> talon_resource.default_scope(conn.params, action)
     |> talon_resource.search(conn.params, action)
     |> talon_resource.query(conn.params, action)
     |> talon_resource.preload(conn.params, action)
@@ -44,6 +45,7 @@ defmodule Talon.Plug.LoadResource do
     talon_resource = Talon.View.talon_resource(conn)
     resource =
       schema
+      |> talon_resource.default_scope(conn.params, action)
       |> talon_resource.query(conn.params, action)
       |> talon_resource.preload(conn.params, action)
       |> repo.one

@@ -145,6 +145,8 @@ defmodule Talon.Resource do
         repo().preload(resource, associations)
       end
 
+      def default_scope(query, params, action), do: query
+
       @doc """
       Hook for intercepting the query
       """
@@ -236,7 +238,7 @@ defmodule Talon.Resource do
       end
 
       defoverridable [
-        params_key: 0, display_schema_columns: 1,
+        params_key: 0, display_schema_columns: 1, default_scope: 3,
         toolbar_title: 0, route_name: 0, repo: 0,
         adapter: 0, render_column_name: 2, get_schema_field: 3, preload: 3, concern: 0,
         paginate: 3, query: 3, search: 1, search: 3, schema_types: 0, name_field: 0,
