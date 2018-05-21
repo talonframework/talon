@@ -64,7 +64,7 @@ defmodule Talon.Controller do # TODO: rename to ResourceController (DJS)
         case repo.update(changeset) do
           {:ok, resource} ->
             conn
-            |> put_flash(:success, Talon.Concern.concern(conn).messages_backend().changed_succesfully())
+            |> put_flash(:success, Talon.Concern.concern(conn).messages_backend().changed_successfully())
             |> redirect(to: Talon.Concern.resource_path(conn, resource, :show))
           {:error, changeset} ->
             render conn, "edit.html", changeset: changeset
