@@ -27,6 +27,71 @@ defmodule Talon.View do
         conn.assigns.talon.talon_resource
       end
 
+      @doc """
+      Return the humanized field name and the field value.
+
+      Reflect on the field type. Return the association display name or
+      the field value for non associations.
+
+      For associations:
+      * Use the Schema's `display_name/1` if defined
+      * Use the schema's `:name` field if it exists
+      * Otherwise, return "No Display Name"
+
+      TODO: Need to use overridable decorators to resolve value types
+      """
+
+      # TODO: pass in action too
+      @spec get_resource_field(Module.t, Struct.t, atom) :: {String.t, any}
+      def get_resource_field(concern, resource, field_name) do
+        schema = resource.__struct__
+        type = schema.__schema__(:type, field_name)
+        schema
+        |> Schema.associations()
+        |> Keyword.get(field_name)
+        |> get_resource_field(concern, type, resource, schema, field_name)
+      end
+
+      defp get_resource_field(nil, concern, _, resource, _, field_name) do
+        {Talon.Utils.titleize(to_string field_name), get_formatted_field_value(concern, resource, field_name)}
+        # "get_resource_field"
+      end
+
+      defp get_resource_field(%{field: field, related: _related}, concern, _, resource, _, _field_name) do
+        assoc_resource = Map.get(resource, field)
+        value =
+          if association_loaded? assoc_resource do
+            concern.display_name(assoc_resource)
+          else
+            concern.messages_backend().not_loaded()
+          end
+        {Talon.Utils.titleize(to_string field), format_data(value)}
+      end
+
+      defp get_resource_field(_, _, _, _resource, _, field_name) do
+        {Talon.Utils.titleize(to_string field_name), "unknown type"}
+      end
+
+
+      def get_formatted_field_value(_concern, resource, field_name) do
+        format_data(Map.get(resource, field_name))
+      end
+
+      @doc """
+      Check if the value of an association is loaded
+      """
+      @spec association_loaded?(any) :: boolean
+      def association_loaded?(%Ecto.Association.NotLoaded{}), do: false
+      def association_loaded?(%{}), do: true
+      def association_loaded?(_), do: false
+
+      # TODO: this is only temporary. Need to use orverridable decorator concept here
+      def format_data(data) when is_binary(data), do: data
+      def format_data(data) when is_number(data), do: data
+      def format_data(%DateTime{} = dt), do: dt |> Utils.to_datetime |> Utils.format_datetime
+      def format_data(data), do: inspect(data)
+
+
       # TODO: Consider renaming page_paths/presource_paths as page/resource_links. (DJS)
       # TODO: return the resource type (:page/:backed) as well. With that, we could offer a single resource_links.
       #       Could return the resource module as well for easy handling of additional callbacks, if needed. (DJS)
@@ -65,7 +130,7 @@ defmodule Talon.View do
 
       defoverridable([
         talon_resource: 1, resource_paths: 1, nav_action_links: 1,
-        resource_path: 4, header_title: 2
+        resource_path: 4, header_title: 2, get_resource_field: 3, get_formatted_field_value: 3
       ])
 
     end
@@ -78,48 +143,6 @@ defmodule Talon.View do
       Talon.Concern.web_namespace(conn),
       view
     ]
-  end
-
-  @doc """
-  Return the humanized field name the field value.
-
-  Reflect on the field type. Return the association display name or
-  the field value for non associations.
-
-  For associations:
-  * Use the Schema's `display_name/1` if defined
-  * Use the schema's `:name` field if it exists
-  * Otherwise, return "No Display Name"
-
-  TODO: Need to use overridable decorators to resolve value types
-  """
-  @spec get_resource_field(Module.t, Struct.t, atom) :: {String.t, any}
-  def get_resource_field(concern, resource, name) do
-    schema = resource.__struct__
-    type = schema.__schema__(:type, name)
-    schema
-    |> Schema.associations()
-    |> Keyword.get(name)
-    |> get_resource_field(concern, type, resource, schema, name)
-  end
-
-  defp get_resource_field(nil, _concern, _, resource, _, name) do
-    {Talon.Utils.titleize(to_string name), format_data(Map.get(resource, name))}
-  end
-
-  defp get_resource_field(%{field: field, related: _related}, concern, _, resource, _, _name) do
-    assoc_resource = Map.get(resource, field)
-    value =
-      if association_loaded? assoc_resource do
-        concern.display_name(assoc_resource)
-      else
-        concern.messages_backend().not_loaded()
-      end
-    {Talon.Utils.titleize(to_string field), format_data(value)}
-  end
-
-  defp get_resource_field(_, _, _, _resource, _, name) do
-    {Talon.Utils.titleize(to_string name), "unknown type"}
   end
 
   @doc """
@@ -162,19 +185,4 @@ defmodule Talon.View do
     |> Inflex.camelize
     |> Module.concat(nil)
   end
-
-  @doc """
-  Check if the value of an association is loaded
-  """
-  @spec association_loaded?(any) :: boolean
-  def association_loaded?(%Ecto.Association.NotLoaded{}), do: false
-  def association_loaded?(%{}), do: true
-  def association_loaded?(_), do: false
-
-  # TODO: this is only temporary. Need to use orverridable decorator concept here
-  def format_data(data) when is_binary(data), do: data
-  def format_data(data) when is_number(data), do: data
-  def format_data(%DateTime{} = dt), do: dt |> Utils.to_datetime |> Utils.format_datetime
-  def format_data(data), do: inspect(data)
-
 end
