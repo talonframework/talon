@@ -10,7 +10,7 @@
             thead
               tr
                 <%%= for name <- @talon_resource.display_schema_columns(:index) do %>
-                  / - name = Talon.View.talon_resource(@conn).get_schema_field(:index, @resource, <%%= ":#{name}" %>)
+                  / - name = Talon.View.get_resource_field(@conn, :index, @resource, <%%= ":#{name}" %>)
                   th <%%= @talon_resource.render_column_name(:index, name) %>
                 <%% end %>
                 th.disable-sorting.text-right data-orderable="false" Actions
@@ -18,7 +18,7 @@
               = for resource <- @resources do
                 tr
                 <%%= for name <- @talon_resource.display_schema_columns(:index) do %>
-                  - {_name, value} = Talon.View.talon_resource(@conn).get_schema_field(:index, resource, <%%= ":#{name}" %>)
+                  - {_name, value} = Talon.View.get_resource_field(@conn, :index, resource, <%%= ":#{name}" %>)
                   td= value
                 <%% end %>
 

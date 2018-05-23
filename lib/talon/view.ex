@@ -156,7 +156,6 @@ defmodule Talon.View do
   @spec get_resource_field(Plug.Conn.t, :index | :show | :form, Struct.t, atom) :: {String.t, any}
   def get_resource_field(conn, action, resource, field_name) do
     view = conn.private.phoenix_view
-    # TODO: conn.assigns.view_module => try
     view.get_resource_field(conn.assigns.talon.concern, action, resource, field_name)
   end
 

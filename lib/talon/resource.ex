@@ -95,10 +95,10 @@ defmodule Talon.Resource do
 
       """
       # TODO: do we still want this (and other) view-related requests to pass through Resource?
-      @spec get_schema_field(:index | :show | :form, Struct.t, String.t) :: atom
-      def get_schema_field(action, resource, name) do
-        Talon.View.get_resource_field(@__concern__, action, resource, name)
-      end
+      # @spec get_schema_field(:index | :show | :form, Struct.t, String.t) :: atom
+      # def get_schema_field(action, resource, name) do
+      #   Talon.View.get_resource_field(@__concern__, action, resource, name)
+      # end
 
       @spec header_title(Plug.Conn.t, Module.t) :: String.t
       def header_title(conn, resource \\ nil) do
@@ -241,7 +241,7 @@ defmodule Talon.Resource do
       defoverridable [
         params_key: 0, display_schema_columns: 1, default_scope: 3,
         toolbar_title: 0, route_name: 0, repo: 0,
-        adapter: 0, render_column_name: 2, get_schema_field: 3, preload: 3, concern: 0,
+        adapter: 0, render_column_name: 2, preload: 3, concern: 0,
         paginate: 3, query: 3, search: 1, search: 3, schema_types: 0, name_field: 0,
         themes: 0, display_name: 0, display_name_plural: 0, header_title: 2, resource_title: 1
       ]

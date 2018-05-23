@@ -11,7 +11,7 @@
             table.table.table-hover
               tbody
                 <%%= for name <- @talon_resource.display_schema_columns(:show) do %>
-                  - {name, value} = Talon.View.talon_resource(@conn).get_schema_field(:show, @resource, <%%= ":#{name}" %>)
+                  - {name, value} = Talon.View.get_resource_field(@conn, :show, @resource, <%%= ":#{name}" %>)
                   tr
                     th= name
                     td= value
