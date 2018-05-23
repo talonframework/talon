@@ -5,8 +5,8 @@
       .resource_selection_cell
         input.collection_selection type="checkbox" name="collection_selection[]"
     = for name <- talon_resource.display_schema_columns(:index) do
-      - {_name, value} = talon_resource.get_schema_field(:index, resource, name)
-      td= value
+      td
+        = Talon.View.get_resource_field_value(@conn, :index, resource, name)
 
     td.text-right.index-actions
       button.btn.btn-xs.btn-primary.action-show type="button" href="#{Talon.Concern.resource_path(@conn, resource, :show)}"

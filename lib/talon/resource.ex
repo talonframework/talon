@@ -94,9 +94,10 @@ defmodule Talon.Resource do
       @doc """
 
       """
+      # TODO: do we still want this (and other) view-related requests to pass through Resource?
       @spec get_schema_field(:index | :show | :form, Struct.t, String.t) :: atom
-      def get_schema_field(_action, resource, name) do
-        Talon.View.get_resource_field(@__concern__, resource, name)
+      def get_schema_field(action, resource, name) do
+        Talon.View.get_resource_field(@__concern__, action, resource, name)
       end
 
       @spec header_title(Plug.Conn.t, Module.t) :: String.t
