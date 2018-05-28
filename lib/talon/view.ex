@@ -126,6 +126,10 @@ defmodule Talon.View do
         talon_resource(conn).toolbar_title()
       end
 
+      def show_actions(_conn, resource) do
+        resource.adapter().primary_key(resource.schema)
+      end
+
       defoverridable([
         talon_resource: 1, resource_paths: 1, nav_action_links: 1,
         resource_path: 4, header_title: 2, get_resource_field: 4, get_formatted_field_value: 4
