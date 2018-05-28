@@ -373,7 +373,8 @@ defmodule Talon.Concern do
 
   @spec concern(Plug.Conn.t) :: Module.t
   def concern(conn) do
-    conn.assigns.talon.talon
+    # conn.assigns.talon.talon
+    conn.assigns.talon.concern # TODO: why can't we use just use the concern here? (DJS)
   end
 
   @spec resource_path(Plug.Conn.t, atom | Module.t | Struct.t, List.t | atom, List.t) :: String.t
