@@ -28,15 +28,15 @@ defmodule Talon.Plug.LoadResource do
     |> talon_resource.default_scope(conn.params, action)
     |> talon_resource.search(conn.params, action)
     |> talon_resource.query(conn.params, action)
-    |> talon_resource.preload(conn.params, action)
+    # |> talon_resource.preload(conn.params, action) # TODO: wasn't working before paginate with subqueries, so moved downstream
     |> talon_resource.paginate(conn.params, action)
     |> case do
       {:page, page} ->
         conn
-        |> assign(:resources, page.entries)
+        |> assign(:resources, page.entries |> talon_resource.preload(conn.params, action))
         |> assign(:page, struct(page, entries: []))
       {_, resources} ->
-        assign(conn, :resources, resources)
+        assign(conn, :resources, resources |> talon_resource.preload(conn.params, action))
     end
     |> assign(:resource, schema)
   end
