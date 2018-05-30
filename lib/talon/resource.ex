@@ -137,7 +137,7 @@ defmodule Talon.Resource do
       Note: This function is overridable
       """
       @spec preload(Ecto.Query.t | Struct.t, Map.t, atom) :: Ecto.Query.t
-      def preload(query, _params, action) when action in [:index, :show, :edit, :delete, :search, :update] do
+      def preload(%Ecto.Query{} = query, _params, action) do
         associations = schema().__schema__(:associations)
         Ecto.Query.preload(query, ^associations)
       end
