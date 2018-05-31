@@ -138,13 +138,17 @@ defmodule Talon.Resource do
       """
       @spec preload(Ecto.Query.t | Struct.t, Map.t, atom) :: Ecto.Query.t
       def preload(%Ecto.Query{} = query, _params, action) do
-        associations = schema().__schema__(:associations)
-        Ecto.Query.preload(query, ^associations)
+        # associations = schema().__schema__(:associations)
+        Ecto.Query.preload(query, ^associations_to_preload())
       end
       def preload(resource, _params, action) do
-        associations =  schema().__schema__(:associations)
-        repo().preload(resource, associations)
+        # associations =  schema().__schema__(:associations)
+        repo().preload(resource, associations_to_preload())
       end
+
+      def all_associations, do: schema().__schema__(:associations)
+
+      def associations_to_preload, do: all_associations()
 
       def default_scope(query, params, action), do: query
 
@@ -243,7 +247,8 @@ defmodule Talon.Resource do
         toolbar_title: 0, route_name: 0, repo: 0,
         adapter: 0, render_column_name: 2, preload: 3, concern: 0,
         paginate: 3, query: 3, search: 1, search: 3, schema_types: 0, name_field: 0,
-        themes: 0, display_name: 0, display_name_plural: 0, header_title: 2, resource_title: 1
+        themes: 0, display_name: 0, display_name_plural: 0, header_title: 2, resource_title: 1,
+        all_associations: 0, associations_to_preload: 0
       ]
     end
 
