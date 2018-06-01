@@ -41,38 +41,47 @@ defmodule Talon.View do
       TODO: Need to use overridable decorators to resolve value types
       """
 
-      # TODO: pass in action too
       @spec get_resource_field(Module.t, :index | :show | :form, Struct.t, atom) :: {String.t, any}
       def get_resource_field(concern, action, resource, field_name) do
-        schema = resource.__struct__
-        type = schema.__schema__(:type, field_name)
-        schema
-        |> Schema.associations()
-        |> Keyword.get(field_name)
-        |> get_resource_field(concern, type, action, resource, schema, field_name)
-      end
-
-      defp get_resource_field(nil, concern, _, action, resource, _, field_name) do
         {Talon.Utils.titleize(to_string field_name), get_formatted_field_value(concern, action, resource, field_name)}
       end
 
-      defp get_resource_field(%{field: field, related: _related}, concern, _, _action, resource, _, _field_name) do
+      @spec get_formatted_field_value(Module.t, :index | :show | :form, Struct.t, atom) :: String.t
+      def get_formatted_field_value(concern, action, resource, field_name) do
+        get_resource_field_value(concern, action, resource, field_name) |> format_field_value
+      end
+
+      @spec format_field_value({Struct.t, any}) :: String.t
+      def format_field_value({:simple, value}) do
+        format_data(value)
+      end
+      def format_field_value({:to_one, {value, path}}) do
+        Talon.Utils.link_to(value, path)
+      end
+
+      @spec get_resource_field_value(Module.t, :index | :show | :form, Struct.t, atom) :: {atom, any}
+      def get_resource_field_value(concern, action, resource, field_name) do
+        resource.__struct__
+        |> Schema.associations()
+        |> Keyword.get(field_name)
+        |> get_resource_field_value(concern, action, resource, field_name)
+      end
+
+      @spec get_resource_field_value(Struct.t, Module.t, :index | :show | :form, Struct.t, atom) :: {atom, any}
+      def get_resource_field_value(%{field: field, related: _related} = _assoc, concern, _action, resource, _field_name) do
         assoc_resource = Map.get(resource, field)
         value =
           if association_loaded? assoc_resource do
-            concern.display_name(assoc_resource)
+            {:to_one, {concern.display_name(assoc_resource), concern.resource_path(assoc_resource, :show)}}
           else
-            concern.messages_backend().not_loaded()
+            {:simple, concern.messages_backend().not_loaded()}
           end
-        {Talon.Utils.titleize(to_string field), format_data(value)}
       end
-
-      defp get_resource_field(_, _, _, _action, _resource, _, field_name) do
-        {Talon.Utils.titleize(to_string field_name), "unknown type"}
+      def get_resource_field_value(nil, _concern, _action, resource, field_name) do
+        {:simple, Map.get(resource, field_name)}
       end
-
-      def get_formatted_field_value(_concern, _action, resource, field_name) do
-        format_data(Map.get(resource, field_name))
+      def get_resource_field_value(_assoc, _concern, _action, _resource, _field_name) do
+        {:simple, "unknown type"}
       end
 
       @doc """
@@ -132,7 +141,8 @@ defmodule Talon.View do
 
       defoverridable([
         talon_resource: 1, resource_paths: 1, nav_action_links: 1,
-        resource_path: 4, header_title: 2, get_resource_field: 4, get_formatted_field_value: 4
+        resource_path: 4, header_title: 2, get_resource_field: 4,
+        # get_formatted_field_value: 4
       ])
 
     end
@@ -159,14 +169,12 @@ defmodule Talon.View do
 
   @spec get_resource_field(Plug.Conn.t, :index | :show | :form, Struct.t, atom) :: {String.t, any}
   def get_resource_field(conn, action, resource, field_name) do
-    view = Phoenix.Controller.view_module(conn)
-    view.get_resource_field(conn.assigns.talon.concern, action, resource, field_name)
+    view_module(conn).get_resource_field(conn.assigns.talon.concern, action, resource, field_name)
   end
 
   @spec get_resource_field_value(Plug.Conn.t, :index | :show | :form, Struct.t, atom) :: any
   def get_resource_field_value(conn, action, resource, field_name) do
-    {_name, value} = get_resource_field(conn, action, resource, field_name)
-    value
+    view_module(conn).get_formatted_field_value(conn.assigns.talon.concern, action, resource, field_name)
   end
 
   @doc """
@@ -199,4 +207,7 @@ defmodule Talon.View do
     |> Inflex.camelize
     |> Module.concat(nil)
   end
+
+  @spec view_module(Plug.Conn.t) :: atom
+  def view_module(conn), do: Phoenix.Controller.view_module(conn)
 end
