@@ -142,7 +142,7 @@ defmodule Talon.View do
       defoverridable([
         talon_resource: 1, resource_paths: 1, nav_action_links: 1,
         resource_path: 4, header_title: 2, get_resource_field: 4,
-        # get_formatted_field_value: 4
+        get_formatted_field_value: 4, format_field_value: 1
       ])
 
     end
