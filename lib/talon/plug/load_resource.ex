@@ -26,6 +26,7 @@ defmodule Talon.Plug.LoadResource do
     talon_resource = Talon.View.talon_resource(conn)
     schema
     |> talon_resource.default_scope(conn.params, action)
+    |> talon_resource.named_scope(conn.params, action)
     |> talon_resource.search(conn.params, action)
     |> talon_resource.query(conn.params, action)
     # |> talon_resource.preload(conn.params, action) # TODO: wasn't working before paginate with subqueries, so moved downstream

@@ -163,6 +163,15 @@ defmodule Talon.Resource do
       end
       def query(query, _parmas, action), do: query
 
+      def named_scope(query, params, _action) do
+        case params["scope"] do
+          nil -> query
+          scope -> scope_queries()[String.to_atom(scope)].(query)
+        end
+      end
+
+      def null_query(query), do: query
+
       @doc """
       Paginate the query
       """
@@ -198,6 +207,18 @@ defmodule Talon.Resource do
         search(schema, params)
       end
       def search(schema, _params, _), do: schema
+
+      @spec scopes() :: [Tuple.t]
+      def scopes() do
+        scope_queries()
+        |> Enum.map(fn {scope_name, query_fn} ->
+          {Talon.Utils.titleize(scope_name), concern().resource_path(schema(), :index, [[scope: scope_name]])}
+        end)
+      end
+
+      def scope_queries() do
+        []
+      end
 
       @doc """
       Override schema type.
@@ -248,7 +269,7 @@ defmodule Talon.Resource do
         adapter: 0, render_column_name: 2, preload: 3, concern: 0,
         paginate: 3, query: 3, search: 1, search: 3, schema_types: 0, name_field: 0,
         themes: 0, display_name: 0, display_name_plural: 0, header_title: 2, resource_title: 1,
-        all_associations: 0, associations_to_preload: 0
+        all_associations: 0, associations_to_preload: 0, scopes: 0, scope_queries: 0, named_scope: 3
       ]
     end
 
