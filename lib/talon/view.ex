@@ -139,14 +139,24 @@ defmodule Talon.View do
         resource.adapter().primary_key(resource.schema)
       end
 
-      def scope_links(conn) do
-        if r = talon_resource(conn), do: r.scopes(), else: []
+      def scope_links(%Plug.Conn{} = conn) do
+        if r = talon_resource(conn), do: scope_links(conn, r), else: []
       end
+
+      def scope_links(conn, resource) do
+        resource.scope_queries()
+        |> Enum.map(fn {scope_name, query_fn} ->
+          {format_scope_name(resource, scope_name), concern(conn).resource_path(resource.schema(), :index, [[scope: scope_name]])}
+        end)
+      end
+
+      def format_scope_name(resource, scope_name), do: resource.format_scope_name(scope_name)
 
       defoverridable([
         talon_resource: 1, resource_paths: 1, nav_action_links: 1,
         resource_path: 4, header_title: 2, get_resource_field: 4,
-        get_formatted_field_value: 4, format_field_value: 1
+        get_formatted_field_value: 4, format_field_value: 1, scope_links: 1,
+        scope_links: 2, format_scope_name: 2
       ])
 
     end
