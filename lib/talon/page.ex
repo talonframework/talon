@@ -33,7 +33,7 @@ defmodule Talon.Page do
       @spec route_name() :: String.t
       def route_name, do: name()
 
-      def scopes(), do: []
+      def scope_queries(), do: []
 
       defoverridable [
         concern: 0, header_title: 2, name: 0, display_name: 0
