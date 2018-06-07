@@ -146,8 +146,12 @@ defmodule Talon.View do
       def scope_links(conn, resource) do
         resource.scope_queries()
         |> Enum.map(fn {scope_name, query_fn} ->
-          {format_scope_name(resource, scope_name), concern(conn).resource_path(resource.schema(), :index, [[scope: scope_name]])}
+          {format_scope_name(resource, scope_name), scope_path(conn, resource, scope_name)}
         end)
+      end
+
+      def scope_path(conn, resource, scope_name) do
+        concern(conn).resource_path(resource.schema(), :index, [[scope: scope_name]])
       end
 
       def format_scope_name(resource, scope_name), do: resource.format_scope_name(scope_name)
