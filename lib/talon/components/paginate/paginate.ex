@@ -92,15 +92,17 @@ defmodule Talon.Components.Paginate do
 
       defp build_item(link, {item, num}, opts) when item in [:first, :prev, :next, :last] do
         content_tag :li do
-          link "#{special_name item, opts}", to: "#{link}&page=#{num}"
+          link "#{special_name item, opts}", to: "#{link}#{link_delimiter(link)}page=#{num}"
         end
       end
 
       defp build_item(link, {_item, num}, _) do
         content_tag :li do
-          link dgettext(@domain, "%{num}", num: num), to: "#{link}&page=#{num}"
+          link dgettext(@domain, "%{num}", num: num), to: "#{link}#{link_delimiter(link)}page=#{num}"
         end
       end
+
+      defp link_delimiter(link), do: if String.contains?(link, "?"), do: "&", else: "?"
 
 
       defp display_pagination(name, _record_number, 1, record_count, _, opts) do
