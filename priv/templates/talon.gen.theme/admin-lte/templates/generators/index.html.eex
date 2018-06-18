@@ -5,7 +5,8 @@
 javascript:
 
   function search_path(value) {
-    return $('#datatable-view').data('path') + '/' + value + '?format.js';
+    // TODO: use _format=js if actually need js format
+    return $('#datatable-view').data('path') + value
   }
 
   window.onload = function(e) {

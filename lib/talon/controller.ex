@@ -78,10 +78,11 @@ defmodule Talon.Controller do # TODO: rename to ResourceController (DJS)
         redirect conn, to: Talon.Concern.resource_path(conn, conn.assigns.resource, :index)
       end
 
+      # TODO: consider using /index?search=abc&_format=js instead
       @spec search(Plug.Conn.t, Map.t) :: Plug.Conn.t
       def search(conn, params) do
         conn
-        |> put_layout(false)
+        |> put_layout(false) # TODO: layout false only when doing Ajax-like request
         |> put_view(Talon.View.view_module(conn, DatatableView))
         |> render("search.html", conn: conn)
       end

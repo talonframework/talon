@@ -8,7 +8,7 @@
           .box-title#h1 = index_toolbar_title(@conn)
       .col-sm-3
         / .dataTables_filter TODO: use correct classes from AdminLTE
-        input#search.form-control.input-sm type="search" placeholder="#{dgettext "talon", "Search"}" style="float: right;"
+        input#search.form-control.input-sm type="search" value="#{search_value(@conn)}" placeholder="#{dgettext "talon", "Search"}" style="float: right;"
 
   #table-body-and-paging data-route="#{talon_resource.route_name()}"
     = render "table_and_paging.html", resources: @resources, conn: @conn

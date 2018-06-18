@@ -207,7 +207,7 @@ defmodule Talon.Resource do
       end
 
       @spec search(Struct.t, Map.t, atom) :: Ecto.Query.t
-      def search(schema, params, :search) do
+      def search(schema, params, action) when action in [:search, :index] do
         search(schema, params)
       end
       def search(schema, _params, _), do: schema

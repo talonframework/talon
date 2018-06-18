@@ -123,6 +123,10 @@ defmodule Talon.View do
         resource_path(conn, :search, [""])
       end
 
+      def search_value(conn) do
+        conn.params["search_terms"]
+      end
+
       def nav_action_links(conn) do
         Talon.Concern.nav_action_links(conn)
       end
