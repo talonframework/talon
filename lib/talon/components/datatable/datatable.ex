@@ -10,7 +10,7 @@ defmodule Talon.Components.Datatable do
       Render the search results
       """
       def render("search.html", opts) do
-        render("table_body.html", opts)
+        render("table_and_paging.html", opts)
         |> Phoenix.HTML.safe_to_string
         |> Phoenix.HTML.raw
       end

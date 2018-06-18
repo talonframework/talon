@@ -1,0 +1,29 @@
+- talon_resource = Talon.View.talon_resource(@conn)
+
+.box-body.table-responsive.no-padding
+  .paginated_collection
+    table#datatables.table.table-hover.table-striped.index_table
+      thead
+        tr
+          th.selectable
+            .resource_selection_toggle_cell
+              input.toggle_all#collection_selection_toggle_all type="checkbox" name="collection_selection_toggle_all"
+          = for name <- talon_resource.display_schema_columns(:index) do
+            th class="sortable #{sort_column_class(@conn, name)}"
+              a href="#{column_sort_link(@conn, name)}" = talon_resource.render_column_name(:index, name)
+          = if show_actions(@conn, talon_resource) do
+            th.actions.disable-sorting.text-right data-orderable="false"= dgettext "talon", "Actions"
+      tbody#datatable-body data-route="#{talon_resource.route_name()}"
+        = render "table_body.html", resources: @resources, conn: @conn
+      tfoot
+        tr
+          th.selectable
+            .resource_selection_toggle_cell
+              input.toggle_all#collection_selection_toggle_all type="checkbox" name="collection_selection_toggle_all"
+          = for name <- talon_resource.display_schema_columns(:index) do
+            th = talon_resource.render_column_name(:index, name)
+          = if show_actions(@conn, talon_resource) do
+            th.text-right data-orderable="false"= dgettext "talon", "Actions"
+
+.box-footer.clear-fix
+  = <%= base %>.<%= concern %>.<%= theme_module %>.<%= web_namespace %>PaginateView.paginate(@conn)

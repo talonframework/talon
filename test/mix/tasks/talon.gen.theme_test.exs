@@ -65,6 +65,9 @@ defmodule Mix.Tasks.Talon.Gen.ThemeTest do
           assert file =~ ~s(= PhxBlogger.Admin.AdminLte.Web.DatatableView.render_table)
         end
         assert_file "lib/phx_blogger/talon/templates/admin/admin-lte/components/datatable/datatable.html.slim", fn file ->
+          assert file =~ ~s(= render "table_and_paging.html", resources: @resources, conn: @conn)
+        end
+        assert_file "lib/phx_blogger/talon/templates/admin/admin-lte/components/datatable/table_and_paging.html.slim", fn file ->
           assert file =~ ~s(= PhxBlogger.Admin.AdminLte.Web.PaginateView.paginate)
         end
       end
@@ -104,6 +107,9 @@ defmodule Mix.Tasks.Talon.Gen.ThemeTest do
           assert file =~ ~s(= PhxBlogger.Front.FrontEnd.Web.DatatableView.render_table)
         end
         assert_file "lib/phx_blogger/talon/templates/front/front-end/components/datatable/datatable.html.slim", fn file ->
+          assert file =~ ~s(= render "table_and_paging.html", resources: @resources, conn: @conn)
+        end
+        assert_file "lib/phx_blogger/talon/templates/front/front-end/components/datatable/table_and_paging.html.slim", fn file ->
           assert file =~ ~s(= PhxBlogger.Front.FrontEnd.Web.PaginateView.paginate)
         end
       end
@@ -238,6 +244,9 @@ defmodule Mix.Tasks.Talon.Gen.ThemeTest do
           assert file =~ ~s(= Blogger.Admin.AdminLte.DatatableView.render_table)
         end
         assert_file "web/templates/talon/admin/admin-lte/components/datatable/datatable.html.slim", fn file ->
+          assert file =~ ~s(= render "table_and_paging.html", resources: @resources, conn: @conn)
+        end
+        assert_file "web/templates/talon/admin/admin-lte/components/datatable/table_and_paging.html.slim", fn file ->
           assert file =~ ~s(= Blogger.Admin.AdminLte.PaginateView.paginate)
         end
 

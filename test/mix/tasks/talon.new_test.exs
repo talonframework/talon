@@ -128,6 +128,9 @@ defmodule Mix.Tasks.Talon.NewTest do
         assert_file Path.join(path, "show.html.eex")
 
         assert_file Path.join(datatable_path, "datatable.html.slim"), [
+          "= render \"table_and_paging.html\", resources: @resources, conn: @conn"
+        ]
+        assert_file Path.join(datatable_path, "table_and_paging.html.slim"), [
           "= PhxBlogger.Admin.AdminLte.Web.PaginateView.paginate(@conn)"
         ]
         assert_file Path.join(datatable_path, "table_body.html.slim")
@@ -243,6 +246,9 @@ defmodule Mix.Tasks.Talon.NewTest do
         assert_file "lib/blogger/talon/templates/admin/admin-lte/generators/new.html.eex"
         assert_file "lib/blogger/talon/templates/admin/admin-lte/generators/show.html.eex"
         assert_file "lib/blogger/talon/templates/admin/admin-lte/components/datatable/datatable.html.slim", [
+          "= render \"table_and_paging.html\", resources: @resources, conn: @conn"
+        ]
+        assert_file "lib/blogger/talon/templates/admin/admin-lte/components/datatable/table_and_paging.html.slim", [
           "= Blogger.Admin.AdminLte.PaginateView.paginate(@conn)"
         ]
         assert_file "lib/blogger/talon/templates/admin/admin-lte/components/datatable/table_body.html.slim"

@@ -1,36 +1,14 @@
 - talon_resource = Talon.View.talon_resource(@conn)
-      .box
-        .box-header
-          .row
-            .col-sm-9
-              .box-header.with-border
-                .box-title#h1 = index_toolbar_title(@conn)
-            .col-sm-3
-              button#go-search.btn.btn-xs.btn-primary type="button" style="float: right; margin-left: 5px;" Go
-              input#search type="search" placeholder="#{dgettext "talon", "Search"}" style="float: right;"
-        .box-body.table-responsive.no-padding
-          .paginated_collection
-            table#datatables.table.table-hover.table-striped.index_table
-              thead
-                tr
-                  th.selectable
-                    .resource_selection_toggle_cell
-                      input.toggle_all#collection_selection_toggle_all type="checkbox" name="collection_selection_toggle_all"
-                  = for name <- talon_resource.display_schema_columns(:index) do
-                    th class="sortable #{sort_column_class(@conn, name)}"
-                      a href="#{column_sort_link(@conn, name)}" = talon_resource.render_column_name(:index, name)
-                  th.actions.disable-sorting.text-right data-orderable="false"= dgettext "talon", "Actions"
-              tbody#datatable-body data-route="#{talon_resource.route_name()}"
-                = render "table_body.html", resources: @resources, conn: @conn
-              tfoot
-                tr
-                  th.selectable
-                    .resource_selection_toggle_cell
-                      input.toggle_all#collection_selection_toggle_all type="checkbox" name="collection_selection_toggle_all"
-                  = for name <- talon_resource.display_schema_columns(:index) do
-                    th = talon_resource.render_column_name(:index, name)
 
-                  th.text-right data-orderable="false"= dgettext "talon", "Actions"
+.box
+  .box-header
+    .row
+      .col-sm-9
+        .box-header.with-border
+          .box-title#h1 = index_toolbar_title(@conn)
+      .col-sm-3
+        / .dataTables_filter TODO: use correct classes from AdminLTE
+        input#search.form-control.input-sm type="search" placeholder="#{dgettext "talon", "Search"}" style="float: right;"
 
-        .box-footer.clear-fix
-          = <%= base %>.<%= concern %>.<%= theme_module %>.<%= web_namespace %>PaginateView.paginate(@conn)
+  #table-body-and-paging data-route="#{talon_resource.route_name()}"
+    = render "table_and_paging.html", resources: @resources, conn: @conn
