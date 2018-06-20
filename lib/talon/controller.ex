@@ -15,7 +15,13 @@ defmodule Talon.Controller do # TODO: rename to ResourceController (DJS)
       end
 
       @spec index(Plug.Conn.t, Map.t) :: Plug.Conn.t
-      def index(conn, _params) do
+      def index(conn, %{"remote" => remote} = params) do
+         conn
+        |> put_layout(false)
+        |> put_view(Talon.View.view_module(conn, DatatableView))
+        |> render("page.html", conn: conn)
+      end
+      def index(conn, params) do
         render(conn, "index.html")
       end
 

@@ -2,6 +2,7 @@
   .row
     .col-md-12#datatable-view(data-path="#{search_path @conn}")
       = <%= base %>.<%= concern %>.<%= target_module %>.<%= web_namespace %>DatatableView.render_table(@conn, @resources)
+
 javascript:
 
   function search_path(value) {
@@ -9,25 +10,40 @@ javascript:
     return $('#datatable-view').data('path') + value
   }
 
-  window.onload = function(e) {
+  function doSearch(value) {
+    $.get(search_path(value), function(html) {
+      $('#table-body-and-paging').html(html)
+    })
+  }
+
+  window. onload = function(e) {
     $('body').on('click', '.index-actions button.action-show', function(e) {
       window.location = $(this).attr('href');
     })
+
     $('body').on('click', '.index-actions button.action-edit', function(e) {
       window.location = $(this).attr('href');
     })
-    $('body').on('keypress', '#search', function(e) {
-      var value = $(this).val() + e.key
-      $.get(search_path(value), function(html) {
-        $('#datatable-body').html(html)
+
+    $('body').on('click', '.pagination a', function(e) {
+      e.preventDefault()
+      var href = e.target.href
+      var sep = href.includes("?") ? "&" : "?"
+      var path = href + sep + "remote=true"
+      $.get(path, function(html) {
+        $('#table-body-and-paging').html(html)
       })
     })
-    $('body').on('keyup', '#search', function(e) {
+
+    $('body').on('keypress', '#search', function(e) {
       var value = $(this).val()
-      if(e.keyCode == 8) {
-        $.get(search_path(value), function(html) {
-          $('#datatable-body').html(html)
-        })
+      if (e.keyCode != 13) { value += e.key }
+      doSearch(value)
+    })
+
+    $('body').on('keyup', '#search', function(e) {
+      if (e.keyCode == 8) {
+        doSearch($(this).val())
       }
     })
   }

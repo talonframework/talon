@@ -73,10 +73,10 @@ defmodule Talon.Components.Paginate do
         |> Phoenix.HTML.raw
       end
 
-      defp build_item(_, {:current, num}, opts) do
+      defp build_item(link, {:current, num}, opts) do
         active_class = opts[:active_class] || @active_class
         content_tag :li, class: active_class do
-          link dgettext(@domain, "%{num}", num: num), to: "#"
+          link dgettext(@domain, "%{num}", num: num), to: "#{link}#{link_delimiter(link)}page=#{num}"
         end
       end
 
