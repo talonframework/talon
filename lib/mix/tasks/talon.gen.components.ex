@@ -60,7 +60,8 @@ defmodule Mix.Tasks.Talon.Gen.Components do
       :talon
       |> Application.app_dir(@component_path)
       |> Path.wildcard
-      |> Enum.filter_map(&File.dir?/1, & {Path.basename(&1), &1})
+      |> Enum.filter(&File.dir?/1)
+      |> Enum.map(& {Path.basename(&1), &1})
 
     {config, components}
   end

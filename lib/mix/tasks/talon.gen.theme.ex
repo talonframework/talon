@@ -501,7 +501,7 @@ defmodule Mix.Tasks.Talon.Gen.Theme do
   #   Application.get_env :talon, :themes, [@default_theme]
   # end
 
-  @boolean_opts @switches |> Enum.filter_map(&(elem(&1, 1) == :boolean), &elem(&1, 0))
+  @boolean_opts @switches |> Enum.filter(&(elem(&1, 1) == :boolean)) |> Enum.map(&elem(&1, 0))
 
   defp parse_options([], parsed) do
     {[], [], parsed}
