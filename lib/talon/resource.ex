@@ -148,7 +148,14 @@ defmodule Talon.Resource do
 
       def all_associations, do: schema().__schema__(:associations)
 
-      def associations_to_preload, do: all_associations()
+      def cardinality_one_associations do
+        all_associations
+        |> Enum.reduce([], fn(field, acc) ->
+          if schema().__schema__(:association, field).cardinality in [:one], do: [field | acc], else: acc
+        end)
+      end
+
+      def associations_to_preload, do: cardinality_one_associations()
 
       def default_scope(query, params, action), do: query
 
