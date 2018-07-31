@@ -149,7 +149,7 @@ defmodule Talon.Resource do
       def all_associations, do: schema().__schema__(:associations)
 
       def cardinality_one_associations do
-        all_associations
+        all_associations()
         |> Enum.reduce([], fn(field, acc) ->
           if schema().__schema__(:association, field).cardinality in [:one], do: [field | acc], else: acc
         end)
