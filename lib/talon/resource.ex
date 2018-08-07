@@ -267,7 +267,7 @@ defmodule Talon.Resource do
         toolbar_title: 0, route_name: 0, repo: 0,
         adapter: 0, render_column_name: 2, preload: 3, concern: 0,
         paginate: 3, query: 3, search: 1, search: 3, schema_types: 0, name_field: 0,
-        themes: 0, display_name: 0, display_name_plural: 0, header_title: 2, resource_title: 1,
+        themes: 0, display_name: 0, display_name_plural: 0, header_title: 2, header_title: 1, resource_title: 1,
         all_associations: 0, associations_to_preload: 0, scope_queries: 0, named_scope: 3,
         format_scope_name: 1
       ]
