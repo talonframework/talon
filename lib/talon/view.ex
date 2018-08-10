@@ -93,14 +93,10 @@ defmodule Talon.View do
       def association_loaded?(_), do: false
 
       # TODO: this is only temporary. Need to use orverridable decorator concept here
-      def format_data("http://" <> _ = link), do: format_link(link)
-      def format_data("https://" <> _ = link), do: format_link(link)
       def format_data(%DateTime{} = dt), do: dt |> Utils.to_datetime |> Utils.format_datetime
       def format_data(data) when is_binary(data), do: data
       def format_data(data) when is_number(data), do: data
       def format_data(data), do: inspect(data)
-
-      def format_link(link), do: link && link(link, to: link, target: "_blank")
 
       # TODO: Consider renaming page_paths/presource_paths as page/resource_links. (DJS)
       # TODO: return the resource type (:page/:backed) as well. With that, we could offer a single resource_links.
@@ -167,7 +163,7 @@ defmodule Talon.View do
         talon_resource: 1, resource_paths: 1, nav_action_links: 1,
         resource_path: 4, header_title: 2, get_resource_field: 4,
         get_formatted_field_value: 4, format_field_value: 1, scope_links: 1,
-        scope_links: 2, format_scope_name: 2, format_link: 1
+        scope_links: 2, format_scope_name: 2
       ])
 
     end
