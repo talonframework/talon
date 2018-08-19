@@ -138,6 +138,8 @@ defmodule Talon.Concern do
         talon_resource(resource.__struct__)
       end
 
+      def concern_scope(query, conn, action), do: query
+
       def talon_page(page_name) when is_binary(page_name) do
         @__page_map__[page_name]
       end
@@ -299,7 +301,8 @@ defmodule Talon.Concern do
         base: 0, repo: 0, resource_map: 0, schema: 1, schema_names: 0,
         talon_resource: 1, resource_path: 3, resource_schema: 1,
         controller_action: 1, template_path_name: 1, schema_field_type: 3,
-        nav_action_links: 1, messages_backend: 0, default_page: 0
+        nav_action_links: 1, messages_backend: 0, default_page: 0,
+        concern_scope: 3
       ]
     end
 

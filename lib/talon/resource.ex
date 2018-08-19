@@ -159,6 +159,8 @@ defmodule Talon.Resource do
 
       def associations_to_preload, do: cardinality_one_associations()
 
+      def concern_scope(query, conn, action), do: concern().concern_scope(query, conn, action)
+
       def default_scope(query, params, action), do: query
 
       @doc """
@@ -267,7 +269,6 @@ defmodule Talon.Resource do
       defoverridable [
         params_key: 0, display_schema_columns: 1, default_scope: 3,
         toolbar_title: 0, route_name: 0, repo: 0,
-        adapter: 0, render_column_name: 2, preload: 3, concern: 0,
         adapter: 0, render_column_name: 2, preload: 3, concern: 0, concern_scope: 3,
         paginate: 3, query: 3, search: 1, search: 3, schema_types: 0, name_field: 0,
         themes: 0, display_name: 0, display_name_plural: 0, header_title: 2, header_title: 1, resource_title: 1,
