@@ -125,6 +125,8 @@ defmodule Talon.Resource do
       @spec schema() :: Module.t
       def schema, do: @__module__
 
+      def all(schema, _conn, _action), do: schema
+
       @spec adapter() :: Module.t
       def adapter, do: @__adapter__
 
@@ -269,7 +271,7 @@ defmodule Talon.Resource do
         paginate: 3, query: 3, search: 1, search: 3, schema_types: 0, name_field: 0,
         themes: 0, display_name: 0, display_name_plural: 0, header_title: 2, header_title: 1, resource_title: 1,
         all_associations: 0, associations_to_preload: 0, scope_queries: 0, named_scope: 3,
-        format_scope_name: 1
+        format_scope_name: 1, all: 3
       ]
     end
 
