@@ -65,9 +65,15 @@ defmodule Talon.Resource do
           end
 
       """
+
+      # FIXME: remove this and use conn function head only
       @spec display_schema_columns(atom) :: List.t
       def display_schema_columns(_action) do
         @__module__.__schema__(:fields) -- ~w(id inserted_at updated_at)a
+      end
+
+      def display_schema_columns(conn, _action) do
+        @__module__.__schema__(:fields) -- concern().schema_column_filter(conn)
       end
 
       @doc """
