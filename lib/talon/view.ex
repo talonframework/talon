@@ -102,16 +102,10 @@ defmodule Talon.View do
       # TODO: return the resource type (:page/:backed) as well. With that, we could offer a single resource_links.
       #       Could return the resource module as well for easy handling of additional callbacks, if needed. (DJS)
 
-      def resource_paths(conn) do  # TODO: don't repeat logic done in Concern, see page_paths (DJS)
-        concern = conn.assigns.talon.concern
-        concern.resources()
-        |> Enum.map(fn tr ->
-          {tr.display_name_plural(), concern.resource_path(tr.schema, :index)}
-        end)
-      end
+      def resource_paths(conn), do: concern(conn).resource_paths(conn)
 
       def resource_path(conn, resource, action, opts \\ []) do
-        Talon.Concern.resource_path conn, resource, action, opts # TODO: why use Talon.Concern here? (DJS)
+        Talon.Concern.resource_path conn, resource, action, opts
       end
 
       def page_paths(conn) do

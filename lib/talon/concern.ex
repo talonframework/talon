@@ -95,9 +95,9 @@ defmodule Talon.Concern do
       @spec repo() :: atom
       def repo, do: @__repo__
 
-      def resource_map, do: @__resource_map__
+      def resource_map, do: @__resource_map__ # TODO: add conn?
 
-      def resources, do: @__resources__
+      def resources(conn), do: @__resources__
 
       def resource_names, do: @__resource_map__ |> Map.keys
 
@@ -272,7 +272,7 @@ defmodule Talon.Concern do
       @spec resource_paths(Plug.Conn.t) :: [Tuple.t]
       def resource_paths(conn) do
         concern = concern(conn)
-        concern.resources()
+        concern.resources(conn)
         |> Enum.map(fn talon_resource ->
           schema = talon_resource.schema()
           {Talon.Utils.titleize(schema) |> Inflex.Pluralize.pluralize, concern.resource_path(schema, :index)}
@@ -298,7 +298,7 @@ defmodule Talon.Concern do
       def messages_backend, do: @__messages_backend__
 
       defoverridable [
-        base: 0, repo: 0, resource_map: 0, schema: 1, schema_names: 0,
+        base: 0, repo: 0, resource_map: 0, resources: 1, schema: 1, schema_names: 0,
         talon_resource: 1, resource_path: 3, resource_schema: 1,
         controller_action: 1, template_path_name: 1, schema_field_type: 3,
         nav_action_links: 1, messages_backend: 0, default_page: 0,
