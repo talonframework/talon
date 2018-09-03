@@ -98,7 +98,7 @@ defmodule Talon.View do
       def format_data(data) when is_number(data), do: data
       def format_data(data), do: inspect(data)
 
-      # TODO: Consider renaming page_paths/presource_paths as page/resource_links. (DJS)
+      # TODO: Consider renaming page_paths/resource_paths as page/resource_links. (DJS)
       # TODO: return the resource type (:page/:backed) as well. With that, we could offer a single resource_links.
       #       Could return the resource module as well for easy handling of additional callbacks, if needed. (DJS)
 
