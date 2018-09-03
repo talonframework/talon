@@ -273,11 +273,14 @@ defmodule Talon.Concern do
       """
       @spec resource_paths(Plug.Conn.t) :: [Tuple.t]
       def resource_paths(conn) do
-        concern = concern(conn)
-        concern.resources(conn)
+        resource_paths(conn, resources(conn))
+      end
+
+      def resource_paths(conn, resources) do
+        resources
         |> Enum.map(fn talon_resource ->
           schema = talon_resource.schema()
-          {Talon.Utils.titleize(schema) |> Inflex.Pluralize.pluralize, concern.resource_path(schema, :index)}
+          {Talon.Utils.titleize(schema) |> Inflex.Pluralize.pluralize, concern(conn).resource_path(schema, :index)}
         end)
       end
 
@@ -304,7 +307,8 @@ defmodule Talon.Concern do
         talon_resource: 1, resource_path: 3, resource_schema: 1,
         controller_action: 1, template_path_name: 1, schema_field_type: 3,
         nav_action_links: 1, messages_backend: 0, default_page: 0,
-        concern_scope: 3, schema_column_filter: 1
+        concern_scope: 3, schema_column_filter: 1,
+        resource_paths: 1, resource_paths: 2
       ]
     end
 
