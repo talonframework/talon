@@ -140,7 +140,7 @@ Please review [CONTRIUBITING](CONTRIBUTING.md) and [CODE OF CONDUCT](CODE_OF_CON
 
 ## License
 
-`talon` is Copyright (c) 2017 E-MetroTel
+`talon` is Copyright (c) 2017-2018 Bracket7, LLC and 2017 E-MetroTel
 
 The source code is released under the MIT License.
 
