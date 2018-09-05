@@ -14,7 +14,6 @@ Use the issues tracker for:
 Please **do not** use the issue tracker for personal support requests nor feature requests. Support requests should be sent to:
 
 Development issues can also be discussed on:
-* [#talon channel on chat.spallen.com](https://chat.spallen.com) (prefered).
 * Elixir Slack Team #talon channel
 * [the talon-talk mailing list](http://groups.google.com/group/talon-talk).
 

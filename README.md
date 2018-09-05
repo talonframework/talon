@@ -130,17 +130,13 @@ Refer to the following projects for examples of using Talon.
 
 The new Talon architecture is under very active development. So, expect significant changes as we explore architectural and feature ideas.
 
-Before starting to work on anything, please have a quick conversation with @smpallen99 on the relevant issue on [talonframework/talon](https://github.com/talonframework/talon/issues). If an issues does not exist, please create one. For realtime discussions, @smpallen99 can be reached on:
-
-* #talon channel in https://chat.spallen.com (preferred - my own Phoenix chat app)
-* #exadmin channel in Elixir's slack team
-* skype `wedge99` (one-on-one voice/video)
+Before starting to work on anything, please have a quick conversation with @smpallen99 on the relevant issue on [talonframework/talon](https://github.com/talonframework/talon/issues). If an issues does not exist, please create one.
 
 Please review [CONTRIUBITING](CONTRIBUTING.md) and [CODE OF CONDUCT](CODE_OF_CONDUCT.md) for additional information.
 
 ## License
 
-`talon` is Copyright (c) 2017-2018 Bracket7, LLC and 2017 E-MetroTel
+`talon` is Copyright (c) 2017-2018 Bracket7, LLC and E-MetroTel
 
 The source code is released under the MIT License.
 
