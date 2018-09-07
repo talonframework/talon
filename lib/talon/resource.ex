@@ -66,12 +66,7 @@ defmodule Talon.Resource do
 
       """
 
-      # FIXME: remove this and use conn function head only
-      @spec display_schema_columns(atom) :: List.t
-      def display_schema_columns(_action) do
-        @__module__.__schema__(:fields) -- ~w(id inserted_at updated_at)a
-      end
-
+      @spec display_schema_columns(Plug.Conn.t, atom) :: List.t
       def display_schema_columns(conn, _action) do
         @__module__.__schema__(:fields) -- concern().schema_column_filter(conn)
       end
@@ -215,19 +210,19 @@ defmodule Talon.Resource do
 
       @spec search(Plug.Conn.t) :: Ecto.Query.t
       def search(conn) do
-        Talon.Search.search(__MODULE__, schema(), conn.params["search_terms"])
+        Talon.Search.search(conn, __MODULE__, schema(), conn.params["search_terms"])
       end
 
-      @spec search(Struct.t, Map.t) :: Ecto.Query.t
-      def search(schema, params) do
-        Talon.Search.search(__MODULE__, schema, params["search_terms"])
+      @spec search(Struct.t, Plug.Conn.t, Map.t) :: Ecto.Query.t
+      def search(schema, conn, params) do
+        Talon.Search.search(conn, __MODULE__, schema, params["search_terms"])
       end
 
-      @spec search(Struct.t, Map.t, atom) :: Ecto.Query.t
-      def search(schema, params, action) when action in [:search, :index] do
-        search(schema, params)
+      @spec search(Struct.t, Plug.Conn.t, Map.t, atom) :: Ecto.Query.t
+      def search(schema, conn, params, action) when action in [:search, :index] do
+        search(schema, conn, params)
       end
-      def search(schema, _params, _), do: schema
+      def search(schema, _conn, _params, _), do: schema
 
       @doc """
       Override schema type.
@@ -273,10 +268,10 @@ defmodule Talon.Resource do
       end
 
       defoverridable [
-        params_key: 0, display_schema_columns: 1, display_schema_columns: 2, default_scope: 3,
+        params_key: 0, display_schema_columns: 2, default_scope: 3,
         toolbar_title: 0, route_name: 0, repo: 0,
         adapter: 0, render_column_name: 2, preload: 3, concern: 0, concern_scope: 3,
-        paginate: 3, query: 3, search: 1, search: 3, schema_types: 0, name_field: 0,
+        paginate: 3, query: 3, search: 1, search: 3, search: 4, schema_types: 0, name_field: 0,
         themes: 0, display_name: 0, display_name_plural: 0, header_title: 2, header_title: 1, resource_title: 1,
         all_associations: 0, associations_to_preload: 0, scope_queries: 0, named_scope: 3,
         format_scope_name: 1, all: 3

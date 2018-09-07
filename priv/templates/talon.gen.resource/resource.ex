@@ -25,14 +25,14 @@ defmodule <%= to_s base %>.<%= to_s concern %>.<%= to_s scoped_resource %> do
   # :id, :updated_at and :inserted_at fields for the
   # show page. Use the default for the form page.
   # """
-  # def display_schema_columns(:index) do
-  #   [:id | super(:index)]
+  # def display_schema_columns(conn, :index) do
+  #   [:id | super(conn, :index)]
   # end
-  # def display_schema_columns(:show) do
-  #   [:id | super(:showw)] ++ [:updated_at, :inserted_at]
+  # def display_schema_columns(conn, :show) do
+  #   [:id | super(conn, :showw)] ++ [:updated_at, :inserted_at]
   # end
-  # def display_schema_columns(action) do
-  #   super(action)
+  # def display_schema_columns(conn, action) do
+  #   super(conn, action)
   # end
 
   # @doc """

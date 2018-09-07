@@ -27,7 +27,7 @@ defmodule Talon.Plug.LoadResource do
 
     # TODO: consider passing conn to each below
     talon_resource.all(schema, conn, action)
-    |> talon_resource.search(conn.params, action) # TODO: this assumes incoming schema, not a query; putting first to work around (let resource set schema)
+    |> talon_resource.search(conn, conn.params, action) # TODO: this assumes incoming schema, not a query; putting first to work around (let resource set schema)
     |> talon_resource.concern_scope(conn, action)
     |> talon_resource.default_scope(conn.params, action)
     |> talon_resource.named_scope(conn.params, action)

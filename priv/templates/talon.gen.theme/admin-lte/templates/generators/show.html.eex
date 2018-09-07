@@ -10,7 +10,7 @@
           .panel_contents
             table.table.table-hover
               tbody
-                <%%= for name <- @talon_resource.display_schema_columns(:show) do %>
+                <%%= for name <- @talon_resource.display_schema_columns(@conn, :show) do %>
                   - {name, value} = Talon.View.get_resource_field(@conn, :show, @resource, <%%= ":#{name}" %>)
                   tr
                     th= name

@@ -4,7 +4,7 @@
     td.selectable
       .resource_selection_cell
         input.collection_selection type="checkbox" name="collection_selection[]"
-    = for name <- talon_resource.display_schema_columns(:index) do
+    = for name <- talon_resource.display_schema_columns(@conn, :index) do
       td
         = Talon.View.get_resource_field_value(@conn, :index, resource, name)
 

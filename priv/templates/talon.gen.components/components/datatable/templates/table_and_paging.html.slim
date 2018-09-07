@@ -8,7 +8,7 @@
           th.selectable
             .resource_selection_toggle_cell
               input.toggle_all#collection_selection_toggle_all type="checkbox" name="collection_selection_toggle_all"
-          = for name <- talon_resource.display_schema_columns(:index) do
+          = for name <- talon_resource.display_schema_columns(@conn, :index) do
             th class="sortable #{sort_column_class(@conn, name)}"
               a href="#{column_sort_link(@conn, name)}" = talon_resource.render_column_name(:index, name)
           = if show_actions(@conn, talon_resource) do
@@ -20,7 +20,7 @@
           th.selectable
             .resource_selection_toggle_cell
               input.toggle_all#collection_selection_toggle_all type="checkbox" name="collection_selection_toggle_all"
-          = for name <- talon_resource.display_schema_columns(:index) do
+          = for name <- talon_resource.display_schema_columns(@conn, :index) do
             th = talon_resource.render_column_name(:index, name)
           = if show_actions(@conn, talon_resource) do
             th.text-right data-orderable="false"= dgettext "talon", "Actions"

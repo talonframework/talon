@@ -12,7 +12,7 @@ defmodule Talon.Concern do
       iex> TestTalon.Admin.resource_map()["simples"]
       TestTalon.Admin.Simple
 
-      iex> TestTalon.Admin.resources() |> Enum.any?(& &1 == TestTalon.Admin.Simple)
+      iex> TestTalon.Admin.resources(nil) |> Enum.any?(& &1 == TestTalon.Admin.Simple)
       true
 
       iex> TestTalon.Admin.resource_names()|> Enum.any?(& &1 == "simples")

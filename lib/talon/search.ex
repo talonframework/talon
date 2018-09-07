@@ -8,9 +8,12 @@ defmodule Talon.Search do
   @doc """
   Default freetext search handler
   """
-  @spec search(Module.t, Module.t, String.t) :: Ecto.Query.t
-  def search(_, schema, nil), do: where(schema, true)
-  def search(talon_resource, schema, search_terms) do
+  @spec search(Plug.Conn.t, Module.t, Module.t, String.t) :: Ecto.Query.t
+  def search(_conn, _resource, schema, nil) do
+    where(schema, true)
+  end
+
+  def search(conn, talon_resource, schema, search_terms) do
     cond do
       function_exported?(talon_resource, :search_fields, 0) ->
         {:cont, apply(talon_resource, :search_fields, [])}
@@ -18,12 +21,12 @@ defmodule Talon.Search do
         {:halt, apply(talon_resource, :search_query, [search_terms])}
       true ->
         # TODO: this will not work if no string type is found
-        {:cont, find_string_fields(talon_resource, schema)}
+        {:cont, find_string_fields(conn, talon_resource, schema)}
     end
     |> build_query(schema, search_terms)
   end
 
-  defp find_string_fields(talon_resource, schema) do
+  defp find_string_fields(conn, talon_resource, schema) do
     string_fields =
       :types
       |> schema.__schema__
@@ -32,7 +35,7 @@ defmodule Talon.Search do
         _, acc -> acc
       end)
 
-    talon_resource.display_schema_columns(:index)
+    talon_resource.display_schema_columns(conn, :index)
     |> Enum.filter(& &1 in string_fields)
   end
 

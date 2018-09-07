@@ -1,7 +1,7 @@
 = form_for @changeset, @action, [class: "form-horizontal"], fn f ->
   .box-body
     - a = {f, @talon}
-    <%%= for name <- @talon_resource.display_schema_columns(:form) do %>
+    <%%= for name <- @talon_resource.display_schema_columns(@conn, :form) do %>
       .form-group
         = label f, <%%= ":#{name}" %>, class: "col-sm-2 control-label"
         .col-sm-10
