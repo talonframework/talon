@@ -308,7 +308,7 @@ defmodule Talon.Concern do
         controller_action: 1, template_path_name: 1, schema_field_type: 3,
         nav_action_links: 1, messages_backend: 0, default_page: 0,
         concern_scope: 3, schema_column_filter: 1,
-        resource_paths: 1, resource_paths: 2
+        resource_paths: 1, resource_paths: 2, pages: 0
       ]
     end
 
