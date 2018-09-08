@@ -97,13 +97,13 @@ defmodule Talon.Concern do
 
       def resource_map, do: @__resource_map__ # TODO: add conn?
 
-      def resources(conn), do: @__resources__
+      def resources(_conn), do: @__resources__
 
       def resource_names, do: @__resource_map__ |> Map.keys
 
       def page_map, do: @__page_map__
 
-      def pages, do: @__pages__
+      def pages(_conn), do: @__pages__
 
       def page_names, do: @__page_map__ |> Map.keys
 
@@ -292,7 +292,7 @@ defmodule Talon.Concern do
       @spec page_paths(Plug.Conn.t) :: [Tuple.t]
       def page_paths(conn) do
         concern = concern(conn)
-        concern.pages() |> Enum.map(&{&1.display_name, concern.page_path(&1)})
+        concern.pages(conn) |> Enum.map(&{&1.display_name, concern.page_path(&1)})
       end
 
       def nav_action_links(conn) do # TODO: move to view (DJS)
@@ -308,7 +308,7 @@ defmodule Talon.Concern do
         controller_action: 1, template_path_name: 1, schema_field_type: 3,
         nav_action_links: 1, messages_backend: 0, default_page: 0,
         concern_scope: 3, schema_column_filter: 1,
-        resource_paths: 1, resource_paths: 2, pages: 0
+        resource_paths: 1, resource_paths: 2, pages: 1
       ]
     end
 
