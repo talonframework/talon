@@ -104,6 +104,7 @@ defmodule Talon.Concern do
       def page_map, do: @__page_map__
 
       def pages(_conn), do: @__pages__
+      def pages(), do: @__pages__ # TODO: remove this and use conn-based always
 
       def page_names, do: @__page_map__ |> Map.keys
 
