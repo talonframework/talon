@@ -53,6 +53,23 @@ defmodule Talon.Form do
     text_input new_f, field, opts
   end
 
+  defp build_input({a, f}, field, {:array, :string}, opts) do
+    source = f.source
+    resource = source.data
+
+    value = if f.params["#{field}"] != [] do
+              f.params["#{field}"]
+            else
+              Enum.join(Map.get(source.data, field) || [], "\n")
+            end
+
+    opts = opts
+            |> Keyword.put(:value, value)
+            |> Keyword.put(:placeholder, "value1\nvalue2...")
+
+    textarea f, field, opts
+  end
+
   defp build_input({_a, _f}, field, type, _opts) do
     IO.puts "build_input unknow #{inspect type} for #{inspect field}"
     "unknown type"
