@@ -41,6 +41,7 @@ defmodule Talon.View do
       TODO: Need to use overridable decorators to resolve value types
       """
 
+      # TODO: should this be get_formatted_resource_field?
       @spec get_resource_field(Module.t, :index | :show | :form, Struct.t, atom) :: {String.t, any}
       def get_resource_field(concern, action, resource, field_name) do
         {Talon.Utils.titleize(to_string field_name), get_formatted_field_value(concern, action, resource, field_name)}
@@ -183,11 +184,13 @@ defmodule Talon.View do
     conn.assigns.talon[:talon_resource]
   end
 
+  # TODO: should this be get_formatted_resource_field?
   @spec get_resource_field(Plug.Conn.t, :index | :show | :form, Struct.t, atom) :: {String.t, any}
   def get_resource_field(conn, action, resource, field_name) do
     view_module(conn).get_resource_field(conn.assigns.talon.concern, action, resource, field_name)
   end
 
+  # TODO: should this be get_formatted_resource_field_value?
   @spec get_resource_field_value(Plug.Conn.t, :index | :show | :form, Struct.t, atom) :: any
   def get_resource_field_value(conn, action, resource, field_name) do
     view_module(conn).get_formatted_field_value(conn.assigns.talon.concern, action, resource, field_name)
