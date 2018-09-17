@@ -27,9 +27,16 @@ defmodule Talon.Config do
   end
 
   defmacro get_app do
-    app = Mix.Project.config[:app]
+    app =
+      if Mix.Project.umbrella? do
+        # FIXME: hack to work with umbrella apps, but only one Talon app allow this way
+        Application.get_env(:talon, :talon_app)
+      else
+        Mix.Project.config[:app]
+      end
     quote do
       unquote(app)
+      :admin
     end
   end
 
