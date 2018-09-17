@@ -14,7 +14,7 @@ defmodule Talon.Plug.Layout do
         nil ->
           talon = conn.assigns[:talon]
           theme = opts[:theme] || conn.assigns.talon.theme
-          mod = Module.concat [talon.concern, Inflex.camelize(theme), Config.web_namespace(:talon), LayoutView]
+          mod = Module.concat [talon.concern, Inflex.camelize(theme), Config.web_namespace(), LayoutView]
           {mod, "app.html"}
         layout ->
           layout
