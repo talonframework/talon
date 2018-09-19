@@ -8,7 +8,7 @@ defmodule Talon.View do
   alias Talon.{Schema, Utils}
 
   defmacro __using__(_) do
-    quote do
+    quote location: :keep  do
       import Phoenix.HTML.Tag
       import Phoenix.HTML.Link
 

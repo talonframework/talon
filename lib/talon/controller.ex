@@ -1,7 +1,7 @@
 defmodule Talon.Controller do # TODO: rename to ResourceController (DJS)
 
   defmacro __using__(opts) do
-    quote do
+    quote location: :keep do
       opts = unquote(opts)
       repo = opts[:repo] || raise("repo option required")
       talon = opts[:concern] || raise("concern option required")

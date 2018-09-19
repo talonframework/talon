@@ -9,7 +9,7 @@ defmodule Talon.Resource do
 
     repo = opts[:repo]
 
-    quote do
+    quote location: :keep do
       require Talon.Config, as: Config
       alias Talon.Utils
 
