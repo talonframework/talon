@@ -11,10 +11,14 @@ defmodule Mix.Tasks.Compile.Talon do
   - Does not work with live reload. You need to manually compile the project and live reload will pickup the changes.
   """
   use Mix.Task
+
   @recursive true
 
   def run(_args) do
-    {:ok, _} = Application.ensure_all_started(:talon)
+    # Config.get_app() |> IO.inspect(label: "Compile.Talon.get_app")
+    # This causes a dependency cycle, at least within an umbrella
+    # {:ok, _} = Application.ensure_all_started(Config.get_app())
+
     if Mix.Talon.compiler_opts()[:verbose_compile] do
       IO.puts "Compiling Talon generators"
     end
