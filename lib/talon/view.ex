@@ -127,7 +127,7 @@ defmodule Talon.View do
 
       # TODO: remove resource, don't need
       def header_title(conn, resource \\ nil) do
-        talon_resource(conn).header_title(conn, talon_resource(conn))
+        talon_resource(conn).header_title(conn, resource)
       end
 
       def index_toolbar_title(conn) do
