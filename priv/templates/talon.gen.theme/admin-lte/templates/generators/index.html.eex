@@ -17,15 +17,15 @@ javascript:
   }
 
   window. onload = function(e) {
-    $('body').on('click', '.index-actions button.action-show', function(e) {
+    $(document).on('click', '.index-actions button.action-show', function(e) {
       window.location = $(this).attr('href');
     })
 
-    $('body').on('click', '.index-actions button.action-edit', function(e) {
+    $(document).on('click', '.index-actions button.action-edit', function(e) {
       window.location = $(this).attr('href');
     })
 
-    $('body').on('click', '.pagination a', function(e) {
+    $(document).on('click', '.pagination a', function(e) {
       e.preventDefault()
       var href = e.target.href
       var sep = href.includes("?") ? "&" : "?"
@@ -35,13 +35,13 @@ javascript:
       })
     })
 
-    $('body').on('keypress', '#search', function(e) {
+    $(document).on('keypress', '#search', function(e) {
       var value = $(this).val()
       if (e.keyCode != 13) { value += e.key }
       doSearch(value)
     })
 
-    $('body').on('keyup', '#search', function(e) {
+    $(document).on('keyup', '#search', function(e) {
       if (e.keyCode == 8) {
         doSearch($(this).val())
       }

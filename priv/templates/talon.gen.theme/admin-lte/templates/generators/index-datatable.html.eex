@@ -38,10 +38,10 @@
 javascript:
   window.onload = function(e) {
     console.log('on load!!')
-    $('body').on('click', '.index-actions button.action-show', function(e) {
+    $(document).on('click', '.index-actions button.action-show', function(e) {
       window.location = $(this).data('url');
     })
-    $('body').on('click', '.index-actions button.action-edit', function(e) {
+    $(document).on('click', '.index-actions button.action-edit', function(e) {
       window.location = $(this).data('url');
     })
 

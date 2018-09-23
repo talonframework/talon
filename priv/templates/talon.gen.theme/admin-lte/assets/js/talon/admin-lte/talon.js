@@ -1,4 +1,4 @@
-$('body').on('click', '.delete-link', function(e) {
+$(document).on('click', '.delete-link', function(e) {
   e.preventDefault()
   e.stopPropagation()
   var url = $(this).attr('href');
