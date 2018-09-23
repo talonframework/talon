@@ -1,7 +1,7 @@
 defmodule Talon.Plug.Theme do
   import Plug.Conn
   require Talon.Config, as: Config
-  import Phoenix.Controller, only: [put_flash: 3, get_flash: 1]
+  import Phoenix.Controller, only: [put_flash: 3]
 
   @behaviour Plug
 

@@ -53,9 +53,9 @@ defmodule Talon.Form do
     text_input new_f, field, opts
   end
 
-  defp build_input({a, f}, field, {:array, :string}, opts) do
+  defp build_input({_a, f}, field, {:array, :string}, opts) do
     source = f.source
-    resource = source.data
+    _resource = source.data
 
     value = if f.params["#{field}"] != [] do
               f.params["#{field}"]
