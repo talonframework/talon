@@ -67,8 +67,8 @@ defmodule Talon.Resource do
       """
 
       @spec display_schema_columns(Plug.Conn.t, atom) :: List.t
-      def display_schema_columns(conn, _action) do
-        @__module__.__schema__(:fields) -- concern().schema_column_filter(conn)
+      def display_schema_columns(conn, action) do
+        @__module__.__schema__(:fields) --  concern().schema_column_filter(conn, action)
       end
 
       @doc """

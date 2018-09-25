@@ -150,7 +150,7 @@ defmodule Talon.Concern do
         {String.to_atom(resource_name), talon_resource(resource_name)}
       end
 
-      def schema_column_filter(_conn), do: ~w(id inserted_at updated_at)a
+      def schema_column_filter(_conn, _action), do: ~w(id inserted_at updated_at)a
 
       def theme do
         @__otp_app__
@@ -308,7 +308,7 @@ defmodule Talon.Concern do
         talon_resource: 1, resource_path: 3, resource_schema: 1,
         controller_action: 1, template_path_name: 1, schema_field_type: 3,
         nav_action_links: 1, messages_backend: 0, default_page: 0,
-        concern_scope: 3, schema_column_filter: 1,
+        concern_scope: 3, schema_column_filter: 2,
         resource_paths: 1, resource_paths: 2, pages: 1
       ]
     end
