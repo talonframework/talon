@@ -27,7 +27,12 @@ defmodule Talon.Config do
   end
 
   defmacro get_app do
-    app = Application.get_env(:talon, :talon_app) || Mix.Project.config[:app]
+    app
+      = if Mix.Project.umbrella? do
+        Application.get_env(:talon, :talon_app)
+      else
+        Mix.Project.config[:app]
+      end
     quote do
       unquote(app)
     end
