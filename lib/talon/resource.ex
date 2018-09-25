@@ -251,8 +251,9 @@ defmodule Talon.Resource do
       end
 
       @spec resource_title(Module.t) :: String.t
+      def resource_title(nil), do: display_name()
       def resource_title(resource) do
-        Map.get(resource, name_field())
+        if name_field = name_field(), do: Map.get(resource, name_field), else: display_name()
       end
 
       def themes do
