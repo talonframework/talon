@@ -32,7 +32,7 @@ defmodule Mix.Tasks.Compile.Talon do
     Mix.Talon.themes()
     |> Enum.reduce(:ok, fn theme, acc ->
       Enum.reduce Mix.Talon.concerns(), acc, fn concern, _acc ->
-        compile_templates concern, theme
+       compile_templates concern, theme
       end
     end)
     |> case do
@@ -54,39 +54,69 @@ defmodule Mix.Tasks.Compile.Talon do
   end
 
   defp compile_templates(concern, theme) do
-    try do
+    # IO.puts "Talon compile start"
+
+    # try do
+
       base = Mix.Phoenix.base()
       base_path = templates_path(concern, theme)
       views_path = views_path(concern, theme)
 
       unless base, do: Mix.raise(":module configuration required")
 
-      Code.ensure_compiled concern
+      # TODO: does this create a reverse dependency to the client project?
+      { :module, _mod } = Code.ensure_compiled concern
 
       for {resource_name, talon_resource} <- concern.resource_map() do
+        # IO.puts "Processing #{resource_name} #{talon_resource}"
         resource_name = concern.template_path_name resource_name
+        view_file = Path.join([views_path, "#{resource_name}_view.ex"])
+        # |> IO.inspect
+        if File.exists?(view_file) do
+          {:ok, stats} = File.stat(view_file)
+          # stats.size |> IO.inspect(label: "stats")
+          template_file_apth = Path.join(base_path, resource_name)
+          if stats.size > 0 && File.exists?(template_file_apth) do
 
-        for action <- [:index, :edit, :form, :new, :show] do
-          unless compile_custom_template(action, resource_name, talon_resource, concern, theme) do
-            if Mix.Talon.compiler_opts()[:verbose_compile] do
-              IO.puts "compiling global template for #{resource_name} #{action}"
+            for action <- [:index, :edit, :form, :new, :show] do
+              unless compile_custom_template(action, resource_name, talon_resource, concern, theme) do
+                if Mix.Talon.compiler_opts()[:verbose_compile] do
+                  IO.puts "compiling global template for #{concern} #{theme} #{resource_name} #{action}"
+                end
+                templ = EEx.eval_file(Path.join([base_path, "generators", "#{action}.html.eex"]),
+                  assigns: [talon_resource: talon_resource])
+                File.mkdir_p(template_file_apth)
+                Path.join([base_path, resource_name, "#{action}.html.slim"])
+                |> File.write(templ)
+              end
             end
-            templ = EEx.eval_file(Path.join([base_path, "generators", "#{action}.html.eex"]),
-              assigns: [talon_resource: talon_resource])
-            File.mkdir_p(Path.join(base_path, resource_name))
-            Path.join([base_path, resource_name, "#{action}.html.slim"])
-            |> File.write(templ)
-          end
-        end
-        File.touch! Path.join(views_path, "#{resource_name}_view.ex")
-      end
-    rescue
-      # TODO: Dont' swallow exceptions. What's the best approach here? Anything like IO.puts(e.message) halts execution and don't really want that.
-      # In Elixir 1.6, Mix compilers adhere to the Mix.Task.Compiler behaviour and return error and warning diagnostics in a standardized way => Use That.
 
-      # _ -> []
-      e -> IO.inspect e # Works but not overly informative
-    end
+            File.touch!(view_file)
+          else
+            if stats.size == 0 do
+              IO.puts "Removing empty view file: #{view_file}"
+              File.rm_rf(view_file)
+            end
+          end
+        else
+          # dir = Path.join(base_path, resource_name)
+          # if File.exists?(dir) do
+          #   File.rm_rf!(dir)
+          # end
+        end
+      end
+
+    # TODO: need better message here, plus this may stop the loop
+
+    # rescue
+    #   # TODO: Dont' swallow exceptions. What's the best approach here? Anything like IO.puts(e.message) halts execution and don't really want that.
+    #   # In Elixir 1.6, Mix compilers adhere to the Mix.Task.Compiler behaviour and return error and warning diagnostics in a standardized way => Use That.
+
+    #   # _ -> []
+    #   e -> IO.inspect e # Works but not overly informative
+    # end
+
+    # IO.puts "talon compile done"
   end
 
   defp compile_custom_template(action, resource_name, talon_resource, concern, theme) do
