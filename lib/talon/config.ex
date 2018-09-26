@@ -26,17 +26,67 @@ defmodule Talon.Config do
     end
   end
 
-  defmacro get_app do
-    app
-      = if Mix.Project.umbrella? do
-        Application.get_env(:talon, :talon_app)
-      else
-        Mix.Project.config[:app]
+    # TODO: this needs to be per app
+
+    defmacro get_app do
+      app =
+        if Mix.env() != :test do
+          Application.get_env(:talon, :talon_app) || Mix.Project.config[:app]
+        else
+          Mix.Project.config[:app]
+        end
+        # |> IO.inspect(label: "Talon Config app")
+      quote do
+        unquote(app)
       end
-    quote do
-      unquote(app)
     end
-  end
+
+  # defmacro get_app do
+  #   app
+  #     = if Mix.Project.umbrella? do # true ||
+  #       Application.get_env(:talon, :talon_app)
+  #     else
+  #       Mix.Project.config[:app]
+  #     end
+  #   |> IO.inspect(label: "Derived app")
+  #   Application.get_env(:talon, :talon_app) |> IO.inspect(label: "talon_app")
+  #   Mix.Project.config[:app] |> IO.inspect(label: "Mix project app")
+
+  #   # app = Mix.Project.config[:app] || Application.get_env(:talon, :talon_app)
+  #   quote do
+  #     unquote(app)
+  #   end
+  # end
+
+  # works but wtf
+  # def get_app do
+  #   if Mix.env() != :test do
+  #     Application.get_env(:talon, :talon_app) || Mix.Project.config[:app]
+  #   else
+  #     Mix.Project.config[:app]
+  #   end
+  #   |> IO.inspect(label: "Talon Config app")
+  # end
+
+  # sporadically fails
+  # def get_app do
+  #   if Mix.Project.umbrella? do
+  #     Application.get_env(:talon, :talon_app) || Mix.Project.config[:app]
+  #   else
+  #     Mix.Project.config[:app] || Application.get_env(:talon, :talon_app)
+  #   end
+  #   |> IO.inspect(label: "Talon Config app")
+  # end
+
+  # sporadically fails
+  # def get_app do
+  #   if Mix.Project.umbrella? do
+  #     Application.get_env(:talon, :talon_app)
+  #   else
+  #     Mix.Project.config[:app]
+  #   end
+  #   |> IO.inspect(label: "Mix project app")
+  # end
 
   @doc """
   Get the configuration for a given concern
