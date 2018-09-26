@@ -103,10 +103,13 @@ defmodule Talon.Resource do
 
       @spec header_title(Plug.Conn.t, Module.t) :: String.t
       def header_title(conn, resource \\ nil) do
+        # TODO: add option for simple title
+        resource_title = if %{} == resource, do: resource_title(resource), else: display_name()
         case action = Phoenix.Controller.action_name(conn) do
-          :show  -> dgettext @__domain__, "%{type} %{title}", type: display_name(), title: resource_title(resource)
+          # :show  -> dgettext @__domain__, "%{type} %{title}", type: display_name(), title: resource_title
+          :show  -> dgettext @__domain__, "%{type} detail", type: display_name()
           :new   -> dgettext @__domain__, "%{action} %{type}", action: Utils.titleize(action), type: display_name()
-          :edit  -> dgettext @__domain__, "%{action} %{title}", action: Utils.titleize(action), title: resource_title(resource)
+          :edit  -> dgettext @__domain__, "%{action} %{title}", action: Utils.titleize(action), title: resource_title
           :index -> dgettext @__domain__, "%{plural_type}", plural_type: display_name_plural()
           _      -> dgettext @__domain__, "Unknown action"
         end
