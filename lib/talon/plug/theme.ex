@@ -19,6 +19,8 @@ defmodule Talon.Plug.Theme do
         if (new_theme in Config.themes(:talon)) do
           Application.put_env(:admin, Admin.Admin, theme: new_theme)
           conn
+          |> Phoenix.Controller.redirect(to: conn.request_path)
+          |> halt
         else
           Config.themes(:talon)
           # |> IO.inspect(label: "error setting theme")
