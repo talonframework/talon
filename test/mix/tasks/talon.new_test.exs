@@ -22,7 +22,7 @@ defmodule Mix.Tasks.Talon.NewTest do
     test "talon.new", %{parsed: _parsed} do
       Logger.disable(self())
 
-      Application.put_env(:phx_blogger, PhxBlogger.Web.Endpoint,
+      Application.put_env(:phx_blogger, PhxBloggerWeb.Endpoint,
         secret_key_base: String.duplicate("abcdefgh", 8),
         code_reloader: true,
         root: File.cwd!)
@@ -56,20 +56,20 @@ defmodule Mix.Tasks.Talon.NewTest do
         ]
 
         assert_file "lib/phx_blogger/talon/web.ex", [
-          "import PhxBlogger.Web.Router.Helpers",
-          "import PhxBlogger.Web.ErrorHelpers",
-          "import PhxBlogger.Web.Gettext",
+          "import PhxBloggerWeb.Router.Helpers",
+          "import PhxBloggerWeb.ErrorHelpers",
+          "import PhxBloggerWeb.Gettext",
         ]
 
         assert_file "lib/phx_blogger/talon/controllers/admin_resource_controller.ex", [
-          "defmodule PhxBlogger.Web.AdminResourceController do",
-          "use PhxBlogger.Web, :controller",
+          "defmodule PhxBloggerWeb.AdminResourceController do",
+          "use PhxBloggerWeb, :controller",
           "use Talon.Controller, repo: PhxBlogger.Repo, concern: PhxBlogger.Admin"
         ]
 
         assert_file "lib/phx_blogger/talon/controllers/admin_page_controller.ex", [
-          "defmodule PhxBlogger.Web.AdminPageController do",
-          "use PhxBlogger.Web, :controller",
+          "defmodule PhxBloggerWeb.AdminPageController do",
+          "use PhxBloggerWeb, :controller",
           "use Talon.PageController, concern: PhxBlogger.Admin",
           "plug Talon.Plug.LoadConcern",
           "plug Talon.Plug.Theme",
@@ -85,7 +85,7 @@ defmodule Mix.Tasks.Talon.NewTest do
 
         assert_file "lib/phx_blogger/talon/messages.ex", [
           "defmodule PhxBlogger.Talon.Messages do",
-          "import PhxBlogger.Web.Gettext"
+          "import PhxBloggerWeb.Gettext"
         ]
 
         #########
