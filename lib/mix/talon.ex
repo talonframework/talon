@@ -263,7 +263,7 @@ defmodule Mix.Talon do
       iex> Talon.Mix.web_namespace(:phx)
       "Web."
   """
-  @spec web_namespace(:phx | :phoneix) :: String.t
+  @spec web_namespace(:phx | :phoenix) :: String.t
   def web_namespace(:phx), do: "Web."
   def web_namespace(:phoenix), do: ""
 
