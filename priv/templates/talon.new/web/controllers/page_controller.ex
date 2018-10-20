@@ -1,5 +1,5 @@
 defmodule <%= web_base %>.<%= concern %>PageController do
-  use <%= web_base %>, :controller
+  use <%= web_base %><%= controller_namespace %>, :controller
   use Talon.PageController, concern: <%= base %>.<%= concern %>
 
   plug Talon.Plug.LoadConcern, concern: <%= base %>.<%= concern %>, web_namespace: <%= web_module %>

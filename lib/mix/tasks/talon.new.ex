@@ -159,9 +159,16 @@ defmodule Mix.Tasks.Talon.New do
     layout = Module.concat([config.base, config.concern, config.theme_module,
       web_module, LayoutView])
     layout = ~s/{#{layout}, "app.html"}/
-    binding = Kernel.binding() ++ [base: config.base, web_base: config.web_base, concern: config.concern,
-      boilerplate: config[:boilerplate], web_namespace: config.web_namespace,
-      layout: layout, web_module: web_module]
+    binding = Kernel.binding() ++ [
+      base: config.base,
+      web_base: config.web_base,
+      concern: config.concern,
+      boilerplate: config[:boilerplate],
+      web_namespace: config.web_namespace,
+      controller_namespace: config.controller_namespace,
+      layout: layout,
+      web_module: web_module
+    ]
     target_path = Path.join([config.root_path, "controllers", config.path_prefix])
     unless config.dry_run do
       File.mkdir_p! target_path
@@ -180,9 +187,16 @@ defmodule Mix.Tasks.Talon.New do
     layout = Module.concat([config.base, config.concern, config.theme_module,
       web_module, LayoutView])
     layout = ~s/{#{layout}, "app.html"}/  # TODO: DJS handle layout
-    binding = Kernel.binding() ++ [base: config.base, web_base: config.web_base, concern: config.concern,
-      boilerplate: config[:boilerplate], web_namespace: config.web_namespace,
-      layout: layout, web_module: web_module]
+    binding = Kernel.binding() ++ [
+      base: config.base,
+      web_base: config.web_base,
+      concern: config.concern,
+      boilerplate: config[:boilerplate],
+      web_namespace: config.web_namespace,
+      controller_namespace: config.controller_namespace,
+      layout: layout,
+      web_module: web_module
+    ]
     target_path = Path.join([config.root_path, "controllers", config.path_prefix])
     unless config.dry_run do
       File.mkdir_p! target_path
@@ -211,10 +225,15 @@ defmodule Mix.Tasks.Talon.New do
   def gen_web(config) do
     fname = "talon_web.ex"
     theme = config.theme_name
-    binding = Kernel.binding() ++
-      [base: config.base, web_base: config.web_base, web_namespace: config.web_namespace, theme: theme,
-        theme_module: Inflex.camelize(theme), root_path: config.root_path,
-        path_prefix: config.path_prefix]
+    binding = Kernel.binding() ++ [
+      base: config.base,
+      web_base: config.web_base,
+      web_namespace: config.web_namespace,
+      theme: theme,
+      theme_module: Inflex.camelize(theme),
+      root_path: config.root_path,
+      path_prefix: config.path_prefix
+    ]
     target_path = Path.join config.root_path, config.path_prefix
     unless config.dry_run do
       copy_from paths(),
@@ -227,8 +246,11 @@ defmodule Mix.Tasks.Talon.New do
 
   def gen_messages(config) do
     fname = "talon_messages.ex"
-    binding = Kernel.binding() ++
-      [base: config.base, web_base: config.web_base, web_namespace: config.web_namespace]
+    binding = Kernel.binding() ++ [
+      base: config.base,
+      web_base: config.web_base,
+      web_namespace: config.web_namespace,
+    ]
     target_path = Path.join config.root_path, config.path_prefix
     unless config.dry_run do
       copy_from paths(),
@@ -351,6 +373,7 @@ defmodule Mix.Tasks.Talon.New do
         app_path_name: app_path_name,
         project_structure: proj_struct,
         web_namespace: web_namespace(proj_struct),
+        controller_namespace: controller_namespace(proj_struct),
         binding: binding,
         boilerplate: bin_opts[:boilerplate] || Application.get_env(:talon, :boilerplate, true),
         base: bin_opts[:module] || binding[:base],

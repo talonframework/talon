@@ -267,6 +267,10 @@ defmodule Mix.Talon do
   def web_namespace(:phx), do: "Web."
   def web_namespace(:phoenix), do: ""
 
+  @spec controller_namespace(:phx | :phoenix) :: String.t
+  def controller_namespace(:phx), do: ""
+  def controller_namespace(:phoenix), do: ".Web"
+
   @spec web_base(String.t, :phx | :phoenix) :: String.t
   def web_base(base, :phx), do: base <> "Web"
   def web_base(base, :phoenix), do: base
