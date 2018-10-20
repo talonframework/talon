@@ -92,9 +92,16 @@ defmodule Mix.Tasks.Talon.Gen.Concern do
     layout = Module.concat([config.base, config.concern, config.theme_module,
       web_module, LayoutView])
     layout = ~s/{#{inspect layout}, "app.html"}/
-    binding = Kernel.binding() ++ [base: config.base, concern: config.concern,
-      boilerplate: config[:boilerplate], web_namespace: config.web_namespace,
-      layout: layout, web_module: web_module]
+    binding = Kernel.binding() ++ [
+      base: config.base,
+      web_base: config.web_base,
+      concern: config.concern,
+      boilerplate: config[:boilerplate],
+      web_namespace: config.web_namespace,
+      controller_namespace: config.controller_namespace,
+      layout: layout,
+      web_module: web_module
+    ]
     target_path = Path.join([config.root_path, "controllers", config.path_prefix])
     unless config.dry_run do
       File.mkdir_p! target_path
@@ -165,10 +172,12 @@ defmodule Mix.Tasks.Talon.Gen.Concern do
       theme_module: theme_module,
       project_structure: proj_struct,
       web_namespace: web_namespace(proj_struct),
+      controller_namespace: controller_namespace(proj_struct),
       concern: concern,
       concern_path: concern_path(concern),
       boilerplate: bin_opts[:boilerplate] || Config.boilerplate() || true,
       base: base,
+      web_base: web_base(base, proj_struct),
       app: app
     }
   end

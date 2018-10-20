@@ -1,5 +1,5 @@
-defmodule <%= base %>.<%= web_namespace %><%= concern %>ResourceController do
-  use <%= base %>.Web, :controller
+defmodule <%= web_base %>.<%= concern %>ResourceController do
+  use <%= web_base %><%= controller_namespace %>, :controller
   use Talon.Controller, repo: <%= base %>.Repo, concern: <%= base %>.<%= concern %>
 
   plug Talon.Plug.LoadConcern, concern: <%= base %>.<%= concern %>, web_namespace: <%= web_module %>

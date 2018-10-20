@@ -31,15 +31,15 @@ defmodule <%= base %>.Talon.Web do
   def resource(_) do
     quote do
       import Ecto.Query
-      import <%= base %>.<%= web_namespace %>Gettext
-      require <%= base %>.<%= web_namespace %>Gettext
+      import <%= web_base %>.Gettext
+      require <%= web_base %>.Gettext
     end
   end
 
   def page(_) do
     quote do
-      import <%= base %>.<%= web_namespace %>Gettext
-      require <%= base %>.<%= web_namespace %>Gettext
+      import <%= web_base %>.Gettext
+      require <%= web_base %>.Gettext
     end
   end
 
@@ -53,8 +53,8 @@ defmodule <%= base %>.Talon.Web do
       import Ecto
       import Ecto.Query
 
-      import <%= base %>.<%= web_namespace %>Router.Helpers
-      import <%= base %>.<%= web_namespace %>Gettext
+      import <%= web_base %>.Router.Helpers
+      import <%= web_base %>.Gettext
     end
   end
 
@@ -72,9 +72,9 @@ defmodule <%= base %>.Talon.Web do
       # Use all HTML functionality (forms, tags, etc)
       use Phoenix.HTML
 
-      import <%= base %>.<%= web_namespace %>Router.Helpers
-      import <%= base %>.<%= web_namespace %>ErrorHelpers
-      import <%= base %>.<%= web_namespace %>Gettext
+      import <%= web_base %>.Router.Helpers
+      import <%= web_base %>.ErrorHelpers
+      import <%= web_base %>.Gettext
     end
   end
 
@@ -92,9 +92,9 @@ defmodule <%= base %>.Talon.Web do
       # Use all HTML functionality (forms, tags, etc)
       use Phoenix.HTML
 
-      import <%= base %>.<%= web_namespace %>Router.Helpers
-      import <%= base %>.<%= web_namespace %>ErrorHelpers
-      import <%= base %>.<%= web_namespace %>Gettext
+      import <%= web_base %>.Router.Helpers
+      import <%= web_base %>.ErrorHelpers
+      import <%= web_base %>.Gettext
     end
   end
 
@@ -111,7 +111,7 @@ defmodule <%= base %>.Talon.Web do
       alias <%= base %>.Repo
       import Ecto
       import Ecto.Query
-      import <%= base %>.<%= web_namespace %>Gettext
+      import <%= web_base %>.Gettext
     end
   end
 
