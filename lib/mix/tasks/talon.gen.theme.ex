@@ -174,7 +174,7 @@ defmodule Mix.Tasks.Talon.Gen.Theme do
   defp gen_components(config), do: config
 
   defp gen_layout_view(%{layouts: true} = config) do
-    binding = Kernel.binding() ++ [base: config.base, target_name: config.target_name,
+    binding = Kernel.binding() ++ [base: config.base, web_base: config.web_base, target_name: config.target_name,
       target_module: config.target_module, web_namespace: config.web_namespace,
       view_opts: config.view_opts, concern: config.concern]
     theme = config.theme
@@ -213,7 +213,7 @@ defmodule Mix.Tasks.Talon.Gen.Theme do
   defp gen_layout_templates(config), do: config
 
   defp gen_generators(%{generators: true} = config) do
-    binding = Kernel.binding() ++ [base: config.base, target_name: config.target_name,
+    binding = Kernel.binding() ++ [base: config.base, web_base: config.web_base, target_name: config.target_name,
       target_module: config.target_module, web_namespace: config.web_namespace, concern: config.concern]
     theme = config.theme
     template_path = Path.join([config.root_path, "templates", config.path_prefix,
@@ -254,7 +254,7 @@ defmodule Mix.Tasks.Talon.Gen.Theme do
   def gen_dashboard(config), do: config
 
   defp gen_dashboard_view(%{dashboard: true} = config) do
-    binding = Kernel.binding() ++ [base: config.base, target_name: config.target_name,
+    binding = Kernel.binding() ++ [base: config.base, web_base: config.web_base, target_name: config.target_name,
       target_module: config.target_module, web_namespace: config.web_namespace,
       view_opts: config.view_opts, concern: config.concern, page: "Dashboard"]
 
@@ -453,6 +453,7 @@ defmodule Mix.Tasks.Talon.Gen.Theme do
         binding: binding,
         boilerplate: bin_opts[:boilerplate] || Application.get_env(:talon, :boilerplate, true),
         base: base,
+        web_base: web_base(base, proj_struct),
       })
     |> set_config_onlys(bin_opts)
   end

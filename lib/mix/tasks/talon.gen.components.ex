@@ -100,7 +100,7 @@ defmodule Mix.Tasks.Talon.Gen.Components do
       |> Path.wildcard
       |> Enum.map(&Path.basename/1)
 
-    binding = Kernel.binding() ++ [base: config.base, theme_name: config.theme_name,
+    binding = Kernel.binding() ++ [base: config.base, web_base: config.web_base, theme_name: config.theme_name,
       theme_module: config.theme_module, web_namespace: config.web_namespace,
       view_opts: config.view_opts, concern_path: config.concern_path, concern: config.concern]
 
@@ -161,6 +161,7 @@ defmodule Mix.Tasks.Talon.Gen.Components do
       web_namespace: web_namespace(proj_struct),
       boilerplate: bin_opts[:boilerplate] || Config.boilerplate() || true,
       base: base,
+      web_base: web_base(base, proj_struct),
     }
   end
 

@@ -161,7 +161,7 @@ defmodule Mix.Talon do
   def prompt_project_structure(binding) do
     Mix.shell.info [
       "Cannot automatically detect the project structure!\n",
-      "1. Use phx 1.3 structure (lib/#{binding.base}/web)\n",
+      "1. Use phx 1.3 structure (lib/#{binding.base}_web)\n",
       "2. Use phoenix structure (web)\n",
       "3. Abort\n",
     ]
@@ -212,7 +212,7 @@ defmodule Mix.Talon do
   def web_path(opts \\ []) do
     path =
       case detect_project_structure() do
-        :phx -> Path.join ["lib", otp_app_path(), "web"]
+        :phx -> Path.join ["lib", otp_app_path() <> "_web"]
         _    -> "web"
       end
 
@@ -266,6 +266,10 @@ defmodule Mix.Talon do
   @spec web_namespace(:phx | :phoneix) :: String.t
   def web_namespace(:phx), do: "Web."
   def web_namespace(:phoenix), do: ""
+
+  @spec web_base(String.t, :phx | :phoenix) :: String.t
+  def web_base(base, :phx), do: base <> "Web"
+  def web_base(base, :phoenix), do: base
 
   @spec web_module(String.t | nil) :: String.t
   def web_module("Web."), do: "Web"

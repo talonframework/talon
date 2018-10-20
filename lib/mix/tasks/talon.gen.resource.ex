@@ -87,7 +87,7 @@ defmodule Mix.Tasks.Talon.Gen.Resource do
     unless config.dry_run do
       # Enum.each config.themes, fn theme ->
         theme = config.target_name
-        binding = config.binding ++ [base: config[:base], resource: config.resource,
+        binding = config.binding ++ [base: config[:base], web_base: config.web_base, resource: config.resource,
           theme_module: theme_module_name(theme), theme_name: theme, view_opts: config.view_opts,
           web_namespace: config.web_namespace, concern: config.concern,
           concern_path: config.concern_path]
@@ -193,6 +193,7 @@ defmodule Mix.Tasks.Talon.Gen.Resource do
       project_structure: proj_struct,
       boilerplate: bin_opts[:boilerplate] || Application.get_env(:talon, :boilerplate, true),
       base: base,
+      web_base: web_base(base, proj_struct),
     }
     # |> IO.inspect(label: "contfig")
   end
