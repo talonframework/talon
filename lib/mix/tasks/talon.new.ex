@@ -294,12 +294,6 @@ defmodule Mix.Tasks.Talon.New do
   end
 
   defp print_route_instructions(config) do
-    namespace =
-      if config.project_structure == :phx do
-        "#{config.base}.Web"
-      else
-        config.base
-      end
     full_concern = Module.concat config.base, config.concern
 
     route_scope = Inflex.underscore(config.concern)
@@ -311,7 +305,7 @@ defmodule Mix.Tasks.Talon.New do
       use Talon.Router
 
       # your app's routes
-      scope "/#{route_scope}", #{namespace} do
+      scope "/#{route_scope}", #{config.web_base} do
         pipe_through :browser
         talon_routes(#{to_s full_concern})
       end
