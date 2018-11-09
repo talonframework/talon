@@ -30,6 +30,7 @@ defmodule Talon.Config do
 
     defmacro get_app do
       app =
+        # TODO: remove this hack
         if Mix.env() != :test do
           Application.get_env(:talon, :talon_app) || Mix.Project.config[:app]
         else

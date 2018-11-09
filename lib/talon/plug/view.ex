@@ -13,21 +13,19 @@ defmodule Talon.Plug.View do
           talon = conn.assigns[:talon]
           theme = Inflex.camelize talon.theme
           prefix = talon[:talon_resource] |> Module.split |> List.last
+          web_namespace = Talon.Concern.web_namespace(conn)
 
           # FIXME: quick and dirty default view handling
 
           {:ok, modules} = :application.get_key(:admin, :modules)
 
-          canonical_view = Module.concat [talon.concern, theme, conn.assigns.talon.web_namespace, prefix <> "View"]
+          canonical_view = Module.concat [talon.concern, theme, web_namespace, prefix <> "View"]
 
-          default_view = Module.concat [talon.concern, theme, conn.assigns.talon.web_namespace, "DefaultView"]
+          default_view = Module.concat [talon.concern, theme, web_namespace, "DefaultView"]
 
           all_mods_with_default_last = (modules -- [default_view]) ++ [default_view]
 
           all_mods_with_default_last |> Enum.find(fn(element) -> element in [canonical_view, default_view] end)
-
-          # prefix = "Default"
-          # Module.concat [talon.concern, theme, conn.assigns.talon.web_namespace, prefix <> "View"]
         view ->
           view
       end
