@@ -2,8 +2,6 @@ defmodule Talon.Plug.Layout do
 
   @behaviour Plug
 
-  require Talon.Config, as: Config
-
   def init(opts) do
     Enum.into opts, %{}
   end
@@ -14,7 +12,8 @@ defmodule Talon.Plug.Layout do
         nil ->
           talon = conn.assigns[:talon]
           theme = opts[:theme] || conn.assigns.talon.theme
-          mod = Module.concat [talon.concern, Inflex.camelize(theme), Config.web_namespace(), LayoutView]
+          web_namespace = Talon.Concern.web_namespace(conn)
+          mod = Module.concat [talon.concern, Inflex.camelize(theme), web_namespace, LayoutView]
           {mod, "app.html"}
         layout ->
           layout
